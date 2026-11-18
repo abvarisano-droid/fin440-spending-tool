@@ -31,8 +31,8 @@ was used, what the output looks like, **how we know it's valid**, and why anyone
 | 2 | Design system | Grok | Done, audited; fix round = 3D.3 |
 | 3 | Design pass on the first 4 pages | Grok + Builder | 3B done; 3D.1 to 3D.3 open |
 | 4 | Robustness + deploy prep | Builder | Done (`0f69b4c`, `3b17e5f`) |
-| **5** | **Investments math engines** | Builder team (3 workers) | **Active** |
-| 6 | New pages wired to the engines | Builder | Next |
+| 5 | Investments math engines | Builder team (3 workers) | Done, cross-checked (77 tests) |
+| **6** | **New pages wired to the engines** | Builder | **Active** |
 | 7 | Design for the new pages | Grok | Can start now from the page specs below |
 | 8 | Proof: validation page + Excel cross-check workbook | Builder | After 6 |
 | 9 | Final audit, deploy, write-up, group prep | All | Last |
@@ -42,9 +42,9 @@ Three workers in parallel, each owning one new module and its test file. The lea
 plumbing (multi-ticker fetch, risk-free rate from Yahoo `^IRX`, the 13-week T-bill) and reviews.
 | ID | Module | What it computes | Hand-check tests | Status |
 |---|---|---|---|---|
-| 5.1 | `core/risk.py` | Returns, annualized return and volatility, Sharpe, max drawdown, beta and Jensen's alpha by regression on excess returns, CAPM expected return, SML points | Asset = 2 x market gives beta 2, alpha 0, R² 1; a known drawdown path; vol of a known series | in progress |
+| 5.1 | `core/risk.py` | Returns, annualized return and volatility, Sharpe, max drawdown, beta and Jensen's alpha by regression on excess returns, CAPM expected return, SML points | Asset = 2 x market gives beta 2, alpha 0, R² 1; a known drawdown path; vol of a known series | done; beta = numpy.polyfit on 5y QQQ/SPY (1.2801) |
 | 5.2 | `core/montecarlo.py` | Roth projection with random monthly returns (normal or bootstrap from history); percentile bands by age; odds of reaching a target | Zero volatility reproduces `tvm.roth_projection` exactly; mean of 20,000 paths is within 1% of the closed-form FV | done; median $528,893 vs closed form $705,071 (volatility drag, a presentation point) |
-| 5.3 | `core/portfolios.py`, `core/timing.py` | Shadow portfolios with weights (e.g. 60/40), built on `shadow.build_shadow`; a market-timing test that reshuffles purchase dates 1,000 times and ranks your real timing (efficient markets: your timing is luck) | Constant prices make every shuffle equal; rising prices make earlier dates always better; weights 1.0 equal the single-fund shadow | in progress |
+| 5.3 | `core/portfolios.py`, `core/timing.py` | Shadow portfolios with weights (e.g. 60/40), built on `shadow.build_shadow`; a market-timing test that reshuffles purchase dates 1,000 times and ranks your real timing (efficient markets: your timing is luck) | Constant prices make every shuffle equal; rising prices make earlier dates always better; weights 1.0 equal the single-fund shadow | done; 60/40 equals a brute-force recompute to the cent |
 | 5.4 | `core/prices.py` (lead) | Fetch several tickers at once; risk-free rate from `^IRX`; monthly history for Monte Carlo bootstrap | Existing tests + a live smoke check | done (`f37d293`): rf 4.143% discount = 4.31% EAR |
 
 ## Page specs (Phase 6 builds them; Grok can design them now in Phase 7)
