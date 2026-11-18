@@ -53,6 +53,20 @@ def test_roth_cap_and_catchup():
     assert proj.iloc[-1]["balance"] == pytest.approx(32200)
 
 
+def test_closed_form_matches_simulation_across_catchup():
+    # 45 -> 55 at $700/mo, 7% APR: $625/mo cap for ages 45-49, $700 (< 8600/12) for 50-54
+    pmts = tvm.monthly_payments_by_age(45, 55, 700)
+    assert pmts == pytest.approx([625] * 5 + [700] * 5)
+    r = 0.07 / 12
+    fv, segs = tvm.fv_segments(0, pmts, r)
+    # hand form: FVA(625, 60) grown 60 more months + FVA(700, 60)
+    hand = tvm.fv_annuity(625, r, 60) * (1 + r) ** 60 + tvm.fv_annuity(700, r, 60)
+    assert fv == pytest.approx(hand, rel=1e-12)
+    assert segs == [(625, 60, 60), (700, 60, 0)]
+    sim = tvm.roth_projection(45, 55, 700, 0.07).iloc[-1]["balance"]
+    assert fv == pytest.approx(sim, rel=1e-10)
+
+
 def test_roth_bad_ages():
     with pytest.raises(ValueError):
         tvm.roth_projection(65, 65, 100, 0.07)

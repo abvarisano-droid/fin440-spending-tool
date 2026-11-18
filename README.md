@@ -18,12 +18,20 @@ python -m pytest            # math + ingest + headless page tests (shadow test n
 | Roth calculator | Monthly contributions (typed, or a % of your discretionary spending), editable return, APR vs effective rate, end vs start of month, 2026 IRA cap ($7,500 + $1,100 catch-up at 50+). "Show the math" prints the closed-form FV. |
 
 ## Math conventions
-- **Roth:** month-by-month simulation; matches `FV = PV(1+r)^n + PMT((1+r)^n - 1)/r` (times `(1+r)` if due). APR mode uses r = rate/12, the same as Excel `FV(rate/12, n, -pmt)`. A real return means outputs are in today's dollars.
+- **Spending is gross purchases.** Refunds, deposits and other money coming in are dropped, not
+  netted against a category, because a bank CSV can't reliably tell a refund from income. In the
+  sample that leaves out one $23.40 Amazon return. Card payments and transfers are categorized
+  but excluded from totals on every page.
+- **Discretionary** = Dining, Coffee, Entertainment, Shopping, Subscriptions, Travel. Transport and
+  Gas count as needs.
+- **Roth:** month-by-month simulation; matches `FV = PV(1+r)^n + PMT((1+r)^n - 1)/r` (times `(1+r)` if due). APR mode uses r = rate/12, the same as Excel `FV(rate/12, n, -pmt)`. When the IRA cap changes the payment (the age-50 catch-up), "Show the math" splits it into segments, each annuity grown to retirement, and the total equals the simulation. A real return means outputs are in today's dollars.
 - **Shadow:** dividend-adjusted closes (dividends reinvested), no fees or taxes. Purchases after the latest price are skipped and counted. XIRR is shown only for spans of a week or more.
 
 ## Privacy
 Uploads live only in `st.session_state` for the browser session. Nothing is written to disk or
-logged. The only outbound request is the ticker and start date sent to Yahoo Finance. `data/` is
+logged. The only outbound request carrying anything derived from your data is the ticker and
+start date (your earliest purchase date) sent to Yahoo Finance. Streamlit's own usage telemetry
+is turned off in `.streamlit/config.toml` (`gatherUsageStats = false`). `data/` is
 gitignored for any real CSVs you keep locally. Never commit real statements.
 
 ## Code layout

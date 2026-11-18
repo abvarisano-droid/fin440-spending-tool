@@ -34,8 +34,8 @@ with ui.section("roth_inputs"):
             pct = st.slider("Share of discretionary spending to redirect", 0, 100, 25, 5,
                             format="%d%%", key="roth_pct")
             monthly = disc_monthly * pct / 100
-            st.caption(f"Your discretionary average is ${disc_monthly:,.2f}/month, so this redirects "
-                       f"**${monthly:,.2f}/month**.")
+            st.caption(f"Your discretionary average is \\${disc_monthly:,.2f}/month, so this redirects "
+                       f"**\\${monthly:,.2f}/month**.")
     with c3:
         rate_pct = st.slider("Annual return", 0.0, 12.0, 7.0, 0.25, format="%.2f%%", key="roth_rate",
                              help="7% is a common long-run real return assumption for US stocks.")
@@ -47,7 +47,7 @@ with ui.section("roth_inputs"):
         due = st.toggle("Contribute at the start of each month", value=False, key="roth_due",
                         help="Off = ordinary annuity (end of month). On = annuity due.")
         enforce = st.toggle("Cap at the IRA limit", value=True, key="roth_cap",
-                            help=f"2026: ${tvm.IRA_LIMIT_2026:,.0f}/yr, plus ${tvm.IRA_CATCHUP_2026:,.0f} "
+                            help=f"2026: \\${tvm.IRA_LIMIT_2026:,.0f}/yr, plus \\${tvm.IRA_CATCHUP_2026:,.0f} "
                                  f"from age {tvm.CATCHUP_AGE}. Held flat in today's dollars.")
 
 if retirement_age <= current_age:
@@ -58,7 +58,8 @@ proj = tvm.roth_projection(int(current_age), int(retirement_age), monthly, rate_
                            starting, convention, due, enforce)
 final = proj.iloc[-1]
 years = int(retirement_age - current_age)
-capped = enforce and monthly > tvm.IRA_LIMIT_2026 / 12
+pmts = tvm.monthly_payments_by_age(int(current_age), int(retirement_age), monthly, enforce)
+capped = any(p < monthly for p in pmts)
 
 ui.kpi_row("roth_kpis", [
     dict(label=f"Balance at {int(retirement_age)}", value=f"${final['balance']:,.0f}"),
@@ -66,8 +67,10 @@ ui.kpi_row("roth_kpis", [
     dict(label="Growth", value=f"${final['growth']:,.0f}"),
 ])
 if capped:
-    st.info(f"${monthly:,.2f}/month is over the IRA limit, so contributions are capped at "
-            f"${tvm.IRA_LIMIT_2026 / 12:,.2f}/month (more after {tvm.CATCHUP_AGE}).")
+    capped_ages = [a for a, p in zip(range(int(current_age), int(retirement_age)), pmts) if p < monthly]
+    st.info(f"\\${monthly:,.2f}/month is over the IRA limit at ages {capped_ages[0]} to {capped_ages[-1]}, "
+            f"so those years use the cap: \\${tvm.IRA_LIMIT_2026 / 12:,.2f}/month before {tvm.CATCHUP_AGE}, "
+            f"\\${tvm.annual_limit(tvm.CATCHUP_AGE) / 12:,.2f}/month from {tvm.CATCHUP_AGE} (catch-up).")
 
 chart_df = proj.assign(principal=proj["total_contributed"] + starting)[["age", "principal", "growth"]]
 chart_df = chart_df.melt("age", var_name="part", value_name="dollars")
@@ -89,16 +92,22 @@ with ui.section("chart_roth", "Balance by age"):
 r = tvm.periodic_rate(rate_pct / 100, 12, convention)
 n = years * 12
 with st.expander("Show the math", key="roth_math"):
-    if enforce and capped:
-        st.write("Contributions hit the cap, so the closed form below uses the capped payment "
-                 "and only matches the simulation exactly if the cap never changes (no catch-up years).")
-    pmt = min(monthly, tvm.IRA_LIMIT_2026 / 12) if enforce else monthly
-    st.latex(r"FV = PV(1+r)^n + PMT\cdot\frac{(1+r)^n - 1}{r}" + (r"\cdot(1+r)" if due else ""))
-    st.write(
-        f"r = {r:.6%} per month, n = {n} months, PMT = ${pmt:,.2f}, PV = ${starting:,.2f}  \n"
-        f"FV of PV = ${tvm.fv_lump(starting, r, n):,.2f}  \n"
-        f"FV of payments = ${tvm.fv_annuity(pmt, r, n, due):,.2f}"
-    )
+    fv, segments = tvm.fv_segments(starting, pmts, r, due)
+    due_term = r"\cdot(1+r)" if due else ""
+    if len(segments) == 1:
+        st.latex(r"FV = PV(1+r)^n + PMT\cdot\frac{(1+r)^n - 1}{r}" + due_term)
+    else:
+        st.write("The payment changes partway (IRA cap and age-50 catch-up), so each run of equal "
+                 "payments is its own annuity, grown to retirement for the months after it ends:")
+        st.latex(r"FV = PV(1+r)^n + \sum_k PMT_k\cdot\frac{(1+r)^{n_k} - 1}{r}" + due_term
+                 + r"\cdot(1+r)^{m_k}")
+    lines = [f"r = {r:.6%} per month, n = {n} months, PV = \\${starting:,.2f}",
+             f"FV of PV = \\${tvm.fv_lump(starting, r, n):,.2f}"]
+    for pmt, months, after in segments:
+        lines.append(f"PMT = \\${pmt:,.2f} for {months} months, then grows {after} months: "
+                     f"\\${tvm.fv_annuity(pmt, r, months, due) * (1 + r) ** after:,.2f}")
+    lines.append(f"**Total FV = \\${fv:,.2f}** (matches the balance above)")
+    st.markdown("  \n".join(lines))
     st.dataframe(
         proj,
         hide_index=True,

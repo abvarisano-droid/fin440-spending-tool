@@ -2,12 +2,13 @@ import streamlit as st
 
 from core import ingest, ui
 from core.categorize import categorize
-from core.state import SAMPLE_CSV, clear_transactions, get_transactions, set_transactions
+from core.state import SAMPLE_CSV, clear_transactions, get_transactions, set_transactions, spending_only
 
 st.title("Upload your transactions")
 st.caption(
-    "Export a CSV from your bank or card. It stays in this browser session only: "
-    "nothing is saved to disk or sent anywhere."
+    "Export a CSV from your bank or card. Your transactions stay in this browser session only: "
+    "they're never saved to disk or sent anywhere. Only purchases count as spending; refunds, "
+    "deposits and other money coming in are left out, not subtracted."
 )
 
 with ui.section("upload_source", border=False):
@@ -99,10 +100,14 @@ if raw is not None:
 
 tx = get_transactions()
 if tx is not None:
+    spend = spending_only(tx)
     with ui.section("loaded_summary", "Loaded"):
         ui.kpi_row("loaded_kpis", [
-            dict(label="Purchases", value=f"{len(tx):,}"),
-            dict(label="Total spent", value=f"${tx['amount'].sum():,.2f}"),
+            dict(label="Purchases", value=f"{len(spend):,}",
+                 help=f"{len(tx) - len(spend)} card payment or transfer row(s) not counted."
+                 if len(tx) != len(spend) else None),
+            dict(label="Total spent", value=f"${spend['amount'].sum():,.2f}",
+                 help="Excludes card payments and transfers, same as Spending breakdown."),
             dict(label="Date range", value=f"{tx['date'].min():%b %d, %Y} to {tx['date'].max():%b %d, %Y}"),
         ])
         st.caption(f"Source: {st.session_state.get('source_name', 'unknown')}")

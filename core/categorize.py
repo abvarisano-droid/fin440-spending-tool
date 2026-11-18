@@ -33,9 +33,10 @@ RULES: list[tuple[str, tuple[str, ...]]] = [
     ("Education", ("tuition", "bookstore", "chegg", "pearson", "mcgraw", "university", "college")),
 ]
 
-# Wants, not needs. The Roth page can redirect a share of these.
+# Wants, not needs. The Roth page can redirect a share of these. Transport (rides, transit,
+# parking, tolls) counts as a need, the same as Gas, because most of it is getting to work/class.
 DISCRETIONARY = frozenset({"Dining", "Coffee", "Entertainment", "Shopping", "Subscriptions",
-                           "Travel", "Transport"})
+                           "Travel"})
 
 # Not real spending, excluded from totals by default
 NON_SPEND = frozenset({"Transfers & Payments"})

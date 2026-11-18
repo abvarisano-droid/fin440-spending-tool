@@ -45,6 +45,38 @@ def annual_limit(age: int) -> float:
     return IRA_LIMIT_2026 + (IRA_CATCHUP_2026 if age >= CATCHUP_AGE else 0.0)
 
 
+def monthly_payments_by_age(
+    current_age: int, retirement_age: int, monthly_contribution: float, enforce_limit: bool = True
+) -> list[float]:
+    """The monthly payment used in each age year, after the age-dependent IRA cap."""
+    return [
+        min(monthly_contribution, annual_limit(age) / 12) if enforce_limit else monthly_contribution
+        for age in range(current_age, retirement_age)
+    ]
+
+
+def fv_segments(starting_balance: float, yearly_pmts: list[float], rate: float, due: bool = False):
+    """Closed-form FV when the monthly payment changes between years (e.g. the age-50 catch-up).
+    Groups consecutive equal payments into segments; each segment's annuity FV is grown to the
+    end at (1 + r)^(months remaining after it). Returns (fv, segments), segments being
+    (pmt, months, months_after) tuples."""
+    segments: list[list] = []
+    for p in yearly_pmts:
+        if segments and segments[-1][0] == p:
+            segments[-1][1] += 12
+        else:
+            segments.append([p, 12])
+    n_total = 12 * len(yearly_pmts)
+    fv = fv_lump(starting_balance, rate, n_total)
+    out, elapsed = [], 0
+    for pmt, months in segments:
+        elapsed += months
+        after = n_total - elapsed
+        fv += fv_annuity(pmt, rate, months, due) * (1 + rate) ** after
+        out.append((pmt, months, after))
+    return fv, out
+
+
 def roth_projection(
     current_age: int,
     retirement_age: int,
