@@ -48,12 +48,14 @@ ACCENT = "#1E4A3A"
 FAN_OUTER = "#EDE6D9"
 FAN_INNER = "#A8B894"
 HIST_FILL = "#C9D0B0"
-PORTFOLIO_ORDER = list(PRESETS.keys())
+PORTFOLIO_ORDER = list(PRESETS.keys()) + ["SPY (market)", "SPY"]
 PORTFOLIO_COLORS = {
     "100% VOO": SHADOW,
     "60/40 VOO/BND": SPENT,
     "100% BND": MUTED,
     "100% QQQ": ACCENT,
+    "SPY (market)": "#5C4A6E",
+    "SPY": "#5C4A6E",
 }
 
 
@@ -279,7 +281,7 @@ def chart_fan(
         .mark_area(opacity=0.9, color=FAN_OUTER)
         .encode(
             x=x_enc,
-            y=alt.Y("p5:Q", title=y_title),
+            y=alt.Y("p5:Q", title=y_title, axis=alt.Axis(format="$,.0f")),
             y2="p95:Q",
             tooltip=[
                 alt.Tooltip(f"{x}:Q", title="Age"),
@@ -316,7 +318,12 @@ def chart_histogram(
         alt.Chart(df)
         .mark_bar(color=HIST_FILL)
         .encode(
-            x=alt.X("value:Q", bin=alt.Bin(maxbins=bins), title=x_title),
+            x=alt.X(
+                "value:Q",
+                bin=alt.Bin(maxbins=bins),
+                title=x_title,
+                axis=alt.Axis(format="$,.0f", labelOverlap=True),
+            ),
             y=alt.Y("count()", title="Shuffles"),
         )
     ]
