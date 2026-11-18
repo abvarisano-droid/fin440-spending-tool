@@ -170,23 +170,25 @@ This page holds the signature moment.
 
 ### 5. Risk & CAPM (`app_pages/risk.py`, new)
 
-Class topic: risk/return, CAPM, SML. Needs loaded transactions. Market series is SPY. Portfolio dots use `unit_value` from `build_portfolio`, never the cash-flow balance.
+Class topic: risk/return, CAPM, SML. Needs loaded transactions. Market series is SPY.
 
 1. Title: "Risk and CAPM". Caption: volatility and beta come from unit value (deposits do not look like returns); prices and the T-bill are Yahoo only.
-2. **`risk_kpis`**: five wells for the default portfolio (100% VOO vs SPY): Vol, Sharpe, Max drawdown, Beta, Alpha. Wrap on a phone. Alpha uses green/brick delta coloring via a signed string.
-3. Two-column row **1:1**: **`chart_risk_return`** | **`chart_sml`**.
-   - Scatter: x = annualized vol, y = annualized return, one dot per portfolio, color `name`. Axis percents. Call `ui.chart_risk_return`.
-   - SML: pine line of `risk.sml_line` (x = beta, y = expected return). Dots are each portfolio's realized return at its beta; vertical distance from the line is alpha. Call `ui.chart_sml`.
-4. **`risk_explainer`**: bordered card, body type. CAPM `E[R] = rf + beta (E[Rm] - rf)`. One sentence: a dot above the line earned more than CAPM asked for (positive alpha) over this sample.
+2. **`risk_window`**: horizontal radio, not a card. "Your purchase dates" (default) vs "Last 5 years of fund history". Purchase dates replay buys via `unit_value`. History uses a daily-rebalanced mix (`lab.constant_mix_index`) so a six-month sample is not the only read. Prefer history for the presentation.
+3. **`risk_kpis`**: five wells for the default portfolio (100% VOO vs SPY): Vol, Sharpe, Max drawdown, Beta, Alpha. Wrap on a phone. Alpha uses green/brick delta coloring via a signed string. Caption under the row: T-bill yield, EAR, day count. `st.info` when the window is under 252 trading days.
+4. Two-column row **1:1**: **`chart_risk_return`** | **`chart_sml`**.
+   - Scatter: x = annualized vol, y = annualized return, one dot per portfolio plus SPY, color `name`. Axis percents. Call `ui.chart_risk_return`.
+   - SML: pine line of `risk.sml_line` (x = beta, y = expected return). Dots are each portfolio's realized return at its beta. Call `ui.chart_sml`. If realized SPY return is below the T-bill, the line slopes down: the explainer must say that is a short-window realized premium, not CAPM's expected premium, and point at fund history.
+5. **`risk_table`**: bordered card, title "All portfolios". Dataframe widget key `risk_stats` (a container and a widget cannot share a key).
+6. **`risk_explainer`**: bordered card, body type. CAPM `E[R] = rf + beta (E[Rm] - rf)`. A dot above the line earned more than CAPM asked for over this sample. SPY sits on the line (beta 1, alpha 0).
 
 ### 6. Timing test (`app_pages/timing.py`, new)
 
 Class topic: market efficiency, behavioral finance. Needs loaded transactions. Default ticker matches Shadow (VOO).
 
 1. Title: "Timing test". Caption: if prices already reflect what is knowable, the dates you spent should look like luck.
-2. **`timing_kpis`**: Your value, Median shuffled value, Percentile rank (as `37th of 1,000`). Neutral color; luck is not a gain/loss.
+2. **`timing_kpis`**: Your dates in {ticker}, Median random dates, Your percentile. Value is `37th` (a percentile, not rank 37 of 1,000). Label: "Your percentile, of 1,000 shuffles". Neutral color; luck is not a gain/loss.
 3. **`chart_timing_hist`**: histogram of the 1,000 shuffled end values (`#C9D0B0` bars). Pine rule at the actual value, muted dashed rule at the median shuffle. Call `ui.chart_histogram`.
-4. **`timing_explainer`**: bordered card. 5th to 95th percentile is consistent with luck. Mention the lump-sum-on-day-one figure in the body, not as a fourth KPI.
+4. **`timing_explainer`**: bordered card. 5th to 95th percentile is consistent with luck. Give the min/max of the 1,000 shuffles in the body (small steady purchases barely move). Lump-sum-on-day-one in the body, not as a fourth KPI.
 
 ### 7. Proof (`app_pages/proof.py`, new)
 
@@ -219,7 +221,7 @@ Signatures stay stable: `section(key, title=None, border=True)`, `kpi_row(key, i
 
 `upload_source`, `column_mapper`, `loaded_summary`, `loaded_kpis`, `loaded_actions`, `spend_kpis`, `chart_by_category`, `table_by_category`, `chart_by_month`, `top_merchants`, `shadow_controls`, `shadow_kpis`, `chart_shadow`, `shadow_compare`, `roth_inputs`, `roth_kpis`, `chart_roth`, `roth_mc_controls`, `chart_roth_fan`, `roth_mc_kpis`, `risk_kpis`, `chart_risk_return`, `chart_sml`, `risk_explainer`, `timing_kpis`, `chart_timing_hist`, `timing_explainer`, `proof_checks`, `proof_download`, `proof_process`.
 
-Plus expanders `all_tx`, `shadow_ledger`, `roth_math`, tables `raw_preview`, `cat_table`, `top_table`, `tx_editor`, `ledger_table`, `roth_table`, `risk_table`, `compare_table`, and signature wraps `shadow_signature` / `shadow_signature_down`.
+Plus expanders `all_tx`, `shadow_ledger`, `roth_math`, tables `raw_preview`, `cat_table`, `top_table`, `tx_editor`, `ledger_table`, `roth_table`, `risk_stats`, `compare_table`, and signature wraps `shadow_signature` / `shadow_signature_down`. Radio `risk_window` is unkeyed chrome above the Risk KPIs.
 
 ---
 

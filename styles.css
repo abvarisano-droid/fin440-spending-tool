@@ -107,6 +107,7 @@ h3 {
 .st-key-timing_explainer,
 .st-key-proof_checks,
 .st-key-risk_table,
+.st-key-risk_stats,
 .st-key-compare_table {
   background: var(--ss-surface);
   border-color: var(--ss-border) !important;
@@ -274,6 +275,7 @@ h3 {
   .st-key-timing_explainer:hover,
   .st-key-proof_checks:hover,
   .st-key-risk_table:hover,
+  .st-key-risk_stats:hover,
   .st-key-compare_table:hover {
     transform: translateY(-2px);
     opacity: 1;
@@ -331,6 +333,7 @@ h3 {
   .st-key-timing_explainer,
   .st-key-proof_checks,
   .st-key-risk_table,
+  .st-key-risk_stats,
   .st-key-compare_table,
   .stButton button[kind="primary"],
   [data-testid="stBaseButton-primary"],
@@ -360,6 +363,7 @@ h3 {
   .st-key-timing_explainer:hover,
   .st-key-proof_checks:hover,
   .st-key-risk_table:hover,
+  .st-key-risk_stats:hover,
   .st-key-compare_table:hover,
   .stButton button:active,
   [data-testid="stBaseButton-primary"]:active,
