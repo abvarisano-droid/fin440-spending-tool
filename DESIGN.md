@@ -219,7 +219,7 @@ Signatures stay stable: `section(key, title=None, border=True)`, `kpi_row(key, i
 
 `upload_source`, `column_mapper`, `loaded_summary`, `loaded_kpis`, `loaded_actions`, `spend_kpis`, `chart_by_category`, `table_by_category`, `chart_by_month`, `top_merchants`, `shadow_controls`, `shadow_kpis`, `chart_shadow`, `shadow_compare`, `roth_inputs`, `roth_kpis`, `chart_roth`, `roth_mc_controls`, `chart_roth_fan`, `roth_mc_kpis`, `risk_kpis`, `chart_risk_return`, `chart_sml`, `risk_explainer`, `timing_kpis`, `chart_timing_hist`, `timing_explainer`, `proof_checks`, `proof_download`, `proof_process`.
 
-Plus expanders `all_tx`, `shadow_ledger`, `roth_math`, tables `raw_preview`, `cat_table`, `top_table`, `tx_editor`, `ledger_table`, `roth_table`, and signature wraps `shadow_signature` / `shadow_signature_down`.
+Plus expanders `all_tx`, `shadow_ledger`, `roth_math`, tables `raw_preview`, `cat_table`, `top_table`, `tx_editor`, `ledger_table`, `roth_table`, `risk_table`, `compare_table`, and signature wraps `shadow_signature` / `shadow_signature_down`.
 
 ---
 
