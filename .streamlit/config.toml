@@ -1,0 +1,77 @@
+[theme]
+base = "light"
+primaryColor = "#1E4A3A"
+backgroundColor = "#F4EFE6"
+secondaryBackgroundColor = "#FFFBF4"
+textColor = "#1C1915"
+linkColor = "#1E4A3A"
+borderColor = "#DDD4C6"
+codeTextColor = "#1C1915"
+codeBackgroundColor = "#EDE6D9"
+showWidgetBorder = true
+showSidebarBorder = false
+baseRadius = "4px"
+buttonRadius = "4px"
+linkUnderline = false
+
+baseFontSize = 16
+baseFontWeight = 400
+codeFontSize = "13px"
+codeFontWeight = 400
+headingFontSizes = ["40px", "28px", "22px", "18px", "16px", "14px"]
+headingFontWeights = [600, 600, 600, 600, 500, 500]
+
+font = "'Source Sans 3':https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+headingFont = "Fraunces:https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap"
+codeFont = "'IBM Plex Mono':https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap"
+
+redColor = "#A33B32"
+orangeColor = "#B45309"
+yellowColor = "#A16207"
+greenColor = "#1E6B45"
+blueColor = "#2C4A6E"
+violetColor = "#5C4A6E"
+grayColor = "#6E675C"
+
+redBackgroundColor = "#F4E4E1"
+orangeBackgroundColor = "#F6E6D4"
+yellowBackgroundColor = "#F3EBD4"
+greenBackgroundColor = "#DCE8E0"
+blueBackgroundColor = "#DDE4EC"
+violetBackgroundColor = "#E6E0E8"
+grayBackgroundColor = "#EDE6D9"
+
+redTextColor = "#8A2F28"
+orangeTextColor = "#8A3F07"
+yellowTextColor = "#7A4A05"
+greenTextColor = "#165234"
+blueTextColor = "#223A56"
+violetTextColor = "#46384F"
+grayTextColor = "#6E675C"
+
+chartCategoricalColors = [
+    "#1E4A3A",
+    "#A33B32",
+    "#2C4A6E",
+    "#B45309",
+    "#5C6B4A",
+    "#6B3D4A",
+    "#6E675C",
+    "#3D5A4C",
+]
+
+chartSequentialColors = [
+    "#F4EFE6",
+    "#E4E0C8",
+    "#C9D0B0",
+    "#A8B894",
+    "#7E9974",
+    "#5A7D5C",
+    "#3E6550",
+    "#2C5444",
+    "#1E4A3A",
+    "#16382C",
+]
+
+dataframeBorderColor = "#DDD4C6"
+dataframeHeaderBackgroundColor = "#EDE6D9"

@@ -1,0 +1,171 @@
+/* Spend Shadow. Owned by the designer. Tokens live in DESIGN.md. */
+
+:root {
+  --ss-bg: #f4efe6;
+  --ss-surface: #fffbf4;
+  --ss-tint: #ede6d9;
+  --ss-text: #1c1915;
+  --ss-muted: #6e675c;
+  --ss-accent: #1e4a3a;
+  --ss-accent-hover: #16382c;
+  --ss-border: #ddd4c6;
+  --ss-green: #1e6b45;
+  --ss-red: #a33b32;
+  --ss-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ss-radius: 4px;
+}
+
+/* Chrome */
+.stAppDeployButton {
+  display: none;
+}
+
+[data-testid="stHeader"] {
+  background: var(--ss-bg);
+  border-bottom: 1px solid var(--ss-border);
+}
+
+[data-testid="stMainBlockContainer"] {
+  max-width: 1200px;
+  padding-top: 1.5rem;
+  padding-bottom: 3rem;
+}
+
+h1, h2, h3 {
+  letter-spacing: -0.02em;
+}
+
+/* Tabular money */
+[data-testid="stMetricValue"],
+[data-testid="stDataFrame"] {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Cards (upload_source is unbordered on purpose) */
+.st-key-column_mapper,
+.st-key-loaded_summary,
+.st-key-chart_by_category,
+.st-key-table_by_category,
+.st-key-chart_by_month,
+.st-key-top_merchants,
+.st-key-shadow_controls,
+.st-key-chart_shadow,
+.st-key-roth_inputs,
+.st-key-chart_roth {
+  background: var(--ss-surface);
+  border-color: var(--ss-border) !important;
+  border-radius: var(--ss-radius) !important;
+  padding: 4px;
+  transition: transform 220ms var(--ss-ease), opacity 220ms var(--ss-ease);
+}
+
+.st-key-column_mapper:hover,
+.st-key-loaded_summary:hover,
+.st-key-chart_by_category:hover,
+.st-key-table_by_category:hover,
+.st-key-chart_by_month:hover,
+.st-key-top_merchants:hover,
+.st-key-shadow_controls:hover,
+.st-key-chart_shadow:hover,
+.st-key-roth_inputs:hover,
+.st-key-chart_roth:hover {
+  transform: translateY(-2px);
+  opacity: 1;
+}
+
+/* KPI type. Wells come from st.metric(border=True). */
+.st-key-spend_kpis [data-testid="stMetricLabel"],
+.st-key-shadow_kpis [data-testid="stMetricLabel"],
+.st-key-roth_kpis [data-testid="stMetricLabel"],
+.st-key-loaded_kpis [data-testid="stMetricLabel"] {
+  color: var(--ss-muted);
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+.st-key-spend_kpis [data-testid="stMetricValue"],
+.st-key-shadow_kpis [data-testid="stMetricValue"],
+.st-key-roth_kpis [data-testid="stMetricValue"],
+.st-key-loaded_kpis [data-testid="stMetricValue"] {
+  font-family: Fraunces, "Source Serif 4", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.75rem;
+  letter-spacing: -0.02em;
+  color: var(--ss-text);
+}
+
+/* Signature moment: shadow "it'd be worth" is the second KPI */
+.st-key-shadow_kpis [data-testid="stHorizontalBlock"] > div:nth-child(2) [data-testid="stMetricValue"] {
+  font-size: 2.5rem;
+  color: var(--ss-accent);
+}
+
+/* Primary buttons */
+.stButton button[kind="primary"],
+[data-testid="stBaseButton-primary"] {
+  background: var(--ss-accent);
+  border-color: var(--ss-accent);
+  color: #fffbf4;
+  border-radius: var(--ss-radius);
+  transition: background-color 160ms var(--ss-ease);
+}
+
+.stButton button[kind="primary"]:hover,
+[data-testid="stBaseButton-primary"]:hover {
+  background: var(--ss-accent-hover);
+  border-color: var(--ss-accent-hover);
+}
+
+/* File uploader and expanders sit on paper */
+[data-testid="stFileUploaderDropzone"],
+[data-testid="stExpander"] {
+  background: var(--ss-surface);
+  border-color: var(--ss-border);
+  border-radius: var(--ss-radius);
+}
+
+/* Focus */
+:focus-visible {
+  outline: 2px solid var(--ss-accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .st-key-column_mapper,
+  .st-key-loaded_summary,
+  .st-key-chart_by_category,
+  .st-key-table_by_category,
+  .st-key-chart_by_month,
+  .st-key-top_merchants,
+  .st-key-shadow_controls,
+  .st-key-chart_shadow,
+  .st-key-roth_inputs,
+  .st-key-chart_roth,
+  .stButton button[kind="primary"],
+  [data-testid="stBaseButton-primary"] {
+    transition: none;
+  }
+
+  .st-key-column_mapper:hover,
+  .st-key-loaded_summary:hover,
+  .st-key-chart_by_category:hover,
+  .st-key-table_by_category:hover,
+  .st-key-chart_by_month:hover,
+  .st-key-top_merchants:hover,
+  .st-key-shadow_controls:hover,
+  .st-key-chart_shadow:hover,
+  .st-key-roth_inputs:hover,
+  .st-key-chart_roth:hover {
+    transform: none;
+  }
+}
+
+@media (max-width: 640px) {
+  [data-testid="stMainBlockContainer"] {
+    padding-top: 1rem;
+  }
+
+  .st-key-shadow_kpis [data-testid="stHorizontalBlock"] > div:nth-child(2) [data-testid="stMetricValue"] {
+    font-size: 2rem;
+  }
+}
