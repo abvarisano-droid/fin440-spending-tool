@@ -19,6 +19,7 @@ page = st.navigation(
         st.Page("app_pages/risk.py", title="Risk & CAPM", icon=":material/query_stats:"),
         st.Page("app_pages/timing.py", title="Timing test", icon=":material/shuffle:"),
         st.Page("app_pages/roth.py", title="Roth calculator", icon=":material/savings:"),
+        st.Page("app_pages/proof.py", title="Proof", icon=":material/verified:"),
     ],
     position="top",
 )

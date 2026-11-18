@@ -19,6 +19,7 @@ python -m pytest            # math + ingest + headless page tests (tests/test_ap
 | Risk & CAPM | Volatility, Sharpe, max drawdown, beta and Jensen's alpha vs SPY, a risk vs return scatter and the security market line. Two windows: your purchase dates (time-weighted unit value) or 5 years of fund history (daily-rebalanced mix). Risk-free is the 13-week T-bill (^IRX). |
 | Timing test | Replays your purchases on 1,000 random sets of trading days and ranks your real dates (market efficiency), plus the lump-sum comparison. |
 | Roth calculator | Monthly contributions (typed, or a % of your discretionary spending), editable return, APR vs effective rate, end vs start of month, 2026 IRA cap ($7,500 + $1,100 catch-up at 50+). "Show the math" prints the closed-form FV. "With uncertain returns" runs a Monte Carlo (normal or bootstrap from real fund months): percentile fan, median, 5th percentile, odds of a target. |
+| Proof | 10 live checks, each pairing an app number with an independent recompute (raw-CSV re-read, brute-force loop, numpy, Excel's FV figure, a second engine), pass/fail with both numbers. Downloads an Excel workbook built in memory whose cells are real formulas (FV, shares and value per purchase, SLOPE beta, STDEV.S volatility, T-bill conversion, Sharpe) next to the app's values. Plus how AI built and audited the app. |
 
 ## Math conventions
 - **Spending is gross purchases.** Refunds, deposits and other money coming in are dropped, not
@@ -45,7 +46,7 @@ gitignored for any real CSVs you keep locally. Never commit real statements.
 
 ## Code layout
 - `streamlit_app.py`: navigation entrypoint. `app_pages/`: one file per page (UI only).
-- `core/`: pure logic (`ingest`, `categorize`, `shadow`, `tvm`, `portfolios`, `risk`, `timing`, `montecarlo`, `lab` for page glue) plus `prices` (yfinance + cache) and `state`.
+- `core/`: pure logic (`ingest`, `categorize`, `shadow`, `tvm`, `portfolios`, `risk`, `timing`, `montecarlo`, `lab` for page glue, `proof` for the live checks and the workbook) plus `prices` (yfinance + cache) and `state`.
 - `tests/`: hand-checked TVM and portfolio values, ingest cases, headless page smoke tests.
 
 ## Design
@@ -60,7 +61,7 @@ Grok (designer) owns the look: `DESIGN.md`, `.streamlit/config.toml`, `styles.cs
   `chart_by_month`, `top_merchants`, `shadow_controls`, `shadow_kpis`, `chart_shadow`,
   `shadow_compare`, `roth_inputs`, `roth_kpis`, `chart_roth`, `roth_mc_controls`, `chart_roth_fan`,
   `roth_mc_kpis`, `risk_kpis`, `chart_risk_return`, `chart_sml`, `risk_table`, `risk_explainer`, `timing_kpis`,
-  `chart_timing_hist`, `timing_explainer`. Phase 7 chart helpers: `chart_fan`, `chart_histogram`,
+  `chart_timing_hist`, `timing_explainer`, `proof_checks`, `proof_download`, `proof_process`. Phase 7 chart helpers: `chart_fan`, `chart_histogram`,
   `chart_risk_return`, `chart_sml`.
 
 ## Agent setup (one terminal tab each, all in this folder)

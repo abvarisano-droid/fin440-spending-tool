@@ -1,7 +1,7 @@
 # Plan (owned by the project lead, Claude Code)
 
 The lead writes this plan; each agent does only its own tasks; the lead updates the status
-column. Requests between agents go through HANDOFF.md. Last updated 2026-11-18 (phase 6 done).
+column. Requests between agents go through HANDOFF.md. Last updated 2026-11-18 (phase 8 done).
 
 ## The goal, from the FIN 440 assignment
 "Build something using AI that is meaningfully related to investments." There is no rubric beyond
@@ -34,8 +34,8 @@ was used, what the output looks like, **how we know it's valid**, and why anyone
 | 5 | Investments math engines | Builder team (3 workers) | Done, cross-checked (77 tests) |
 | 6 | New pages wired to the engines | Builder | Done, cross-checked (83 tests); awaiting Grok audit |
 | 7 | Design for the new pages | Grok | Done (`3e8f567`); visual check of phase 6 pages open |
-| **8** | **Proof: validation page + Excel cross-check workbook** | Builder | **Next** |
-| 9 | Final audit, deploy, write-up, group prep | All | Last |
+| 8 | Proof: validation page + Excel cross-check workbook | Builder | Done; workbook recalculated in Excel; awaiting Grok audit |
+| **9** | **Final audit, deploy, write-up, group prep** | All | **Next** |
 
 ## Phase 5: math engines (pure functions, no network, each with hand-checked tests)
 Three workers in parallel, each owning one new module and its test file. The lead does the price
