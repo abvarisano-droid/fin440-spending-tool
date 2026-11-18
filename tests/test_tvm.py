@@ -70,3 +70,11 @@ def test_closed_form_matches_simulation_across_catchup():
 def test_roth_bad_ages():
     with pytest.raises(ValueError):
         tvm.roth_projection(65, 65, 100, 0.07)
+
+
+def test_tbill_discount_to_effective_annual_hand():
+    from core.prices import tbill_effective_annual
+    # d = 4.143%: price = 1 - 0.04143*91/360 = 0.98952725; HPR = 1/price - 1 = 0.0105836;
+    # EAR = 1.0105836^(365/91) - 1 = 0.043130
+    assert tbill_effective_annual(0.04143) == pytest.approx(0.043130, abs=2e-6)
+    assert tbill_effective_annual(0.0) == 0.0
