@@ -16,7 +16,10 @@ RULES: list[tuple[str, tuple[str, ...]]] = [
                    "safeway", "h-e-b", "wegmans", "costco", "sam's club", "grocery", "supermarket")),
     ("Gas", ("shell", "exxon", "chevron", "bp ", "speedway", "marathon", "circle k", "wawa",
              "sunoco", "valero", "fuel", "gas station")),
-    ("Transport", ("uber", "lyft", "transit", "parking", "metro", "toll", "amtrak", "bird", "lime")),
+    ("Transport", ("uber", "lyft", "transit", "parking", "metro transit", "metrorail",
+                  "metro card", "metrocard", " metro ", "toll road", " tolls", " toll ", "e-zpass",
+                  "ezpass", "fastrak", "sunpass", "amtrak", " bird ", "bird*", " lime ", "lime*",
+                  "limebike")),
     ("Subscriptions", ("netflix", "spotify", "hulu", "disney+", "disney plus", "apple.com/bill",
                        "youtube premium", "hbo", "max.com", "paramount", "peacock", "chatgpt",
                        "openai", "adobe", "amazon prime", "patreon", "icloud", "subscription")),
@@ -46,6 +49,8 @@ ALL_CATEGORIES = [name for name, _ in RULES] + ["Other"]
 
 def categorize_one(description: str) -> str:
     d = f" {description.lower()} "
+    if "metro pcs" in d or "metropcs" in d:  # phone bill, not transit
+        return "Housing & Utilities"
     for name, keywords in RULES:
         if any(k in d for k in keywords):
             return name

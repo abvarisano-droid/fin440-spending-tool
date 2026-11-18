@@ -65,6 +65,13 @@ def _match(columns: list[str], hints: tuple[str, ...], taken: set[str]) -> str |
     return None
 
 
+def _mostly_dates(s: pd.Series) -> bool:
+    if pd.api.types.is_numeric_dtype(s):  # floats would parse as epoch timestamps
+        return False
+    parsed = pd.to_datetime(s, errors="coerce", format="mixed")
+    return bool(parsed.notna().mean() > 0.8)
+
+
 def detect_columns(df: pd.DataFrame) -> ColumnMap:
     cols = list(df.columns)
     taken: set[str] = set()
@@ -73,8 +80,7 @@ def detect_columns(df: pd.DataFrame) -> ColumnMap:
     m.date = _match(cols, DATE_HINTS, taken)
     if m.date is None:
         for c in cols:
-            parsed = pd.to_datetime(df[c], errors="coerce", format="mixed")
-            if parsed.notna().mean() > 0.8:
+            if _mostly_dates(df[c]):
                 m.date = c
                 break
     if m.date:
@@ -91,7 +97,8 @@ def detect_columns(df: pd.DataFrame) -> ColumnMap:
         m.amount = _match(cols, AMOUNT_HINTS, taken)
         if m.amount is None:
             for c in cols:
-                if c not in taken and to_number(df[c]).notna().mean() > 0.8:
+                if (c not in taken and not _mostly_dates(df[c])
+                        and to_number(df[c]).notna().mean() > 0.8):
                     m.amount = c
                     break
         if m.amount:
@@ -101,7 +108,7 @@ def detect_columns(df: pd.DataFrame) -> ColumnMap:
     if m.description:
         taken.add(m.description)
     else:
-        text_cols = [c for c in cols if c not in taken and df[c].dtype == object]
+        text_cols = [c for c in cols if c not in taken and not pd.api.types.is_numeric_dtype(df[c])]
         if text_cols:
             m.description = max(text_cols, key=lambda c: df[c].astype(str).str.len().mean())
             taken.add(m.description)

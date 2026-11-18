@@ -53,6 +53,24 @@ def test_categorize_rules(desc, cat):
     assert categorize_one(desc) == cat
 
 
+def test_amount_fallback_skips_date_column():
+    df = _df("When,What,HowMuch\n01/05/2026,STARBUCKS,-12.50\n01/06/2026,TARGET,-20.00\n"
+             "02/07/2026,KROGER,-5.25\n")
+    m = ingest.detect_columns(df)
+    assert (m.date, m.amount, m.description) == ("When", "HowMuch", "What")
+
+
+@pytest.mark.parametrize("desc,cat", [
+    ("SUBLIME DONUTS", "Other"), ("METRO PCS PAYMENT", "Housing & Utilities"),
+    ("TOLLHOUSE COOKIES", "Other"), ("LIME*RIDE 1234", "Transport"),
+    ("E-ZPASS NY", "Transport"), ("WMATA METRORAIL", "Transport"),
+])
+def test_categorize_transport_word_boundaries(desc, cat):
+    assert categorize_one(desc) == cat
+    if cat != "Transport":
+        assert categorize_one(desc) != "Transport"
+
+
 def test_sample_csv_loads():
     raw = ingest.read_csv(SAMPLE_CSV)
     m = ingest.detect_columns(raw)
