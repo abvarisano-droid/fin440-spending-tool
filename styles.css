@@ -15,6 +15,15 @@
   --ss-radius: 4px;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+.stApp {
+  overflow-x: hidden;
+  background: var(--ss-bg);
+}
+
 /* Chrome */
 .stAppDeployButton,
 [data-testid="stDecoration"] {
@@ -24,16 +33,22 @@
 [data-testid="stHeader"] {
   background: var(--ss-bg);
   border-bottom: 1px solid var(--ss-border);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
 }
 
 [data-testid="stMainBlockContainer"] {
   max-width: 1200px;
-  padding-top: 1.5rem;
+  padding-top: 5.5rem;
   padding-bottom: 3rem;
+  padding-left: max(1.5rem, env(safe-area-inset-left));
+  padding-right: max(1.5rem, env(safe-area-inset-right));
 }
 
 h1, h2, h3 {
   letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
 }
 
 [data-testid="stCaption"] {
@@ -44,6 +59,10 @@ h1, h2, h3 {
 [data-testid="stMetricValue"],
 [data-testid="stDataFrame"] {
   font-variant-numeric: tabular-nums;
+}
+
+[data-testid="stMetricValue"] {
+  overflow-wrap: anywhere;
 }
 
 /* Cards (upload_source is unbordered on purpose) */
@@ -62,20 +81,6 @@ h1, h2, h3 {
   border-radius: var(--ss-radius) !important;
   padding: 4px;
   transition: transform 220ms var(--ss-ease), opacity 220ms var(--ss-ease);
-}
-
-.st-key-column_mapper:hover,
-.st-key-loaded_summary:hover,
-.st-key-chart_by_category:hover,
-.st-key-table_by_category:hover,
-.st-key-chart_by_month:hover,
-.st-key-top_merchants:hover,
-.st-key-shadow_controls:hover,
-.st-key-chart_shadow:hover,
-.st-key-roth_inputs:hover,
-.st-key-chart_roth:hover {
-  transform: translateY(-2px);
-  opacity: 1;
 }
 
 /* KPI type. Wells come from st.metric(border=True). */
@@ -118,25 +123,31 @@ h1, h2, h3 {
   color: var(--ss-green);
 }
 
+button,
+[data-testid="stBaseButton-primary"],
+[data-testid="stBaseButton-secondary"],
+.st-key-use_sample button,
+.st-key-clear_btn button,
+[data-testid="stFileUploaderDropzone"] {
+  min-height: 44px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(30, 74, 58, 0.14);
+}
+
 /* Upload: sample data is the invitation at the door. */
 .st-key-use_sample button {
   background: var(--ss-accent);
   border-color: var(--ss-accent);
   color: #fffbf4;
   border-radius: var(--ss-radius);
-  transition: background-color 160ms var(--ss-ease);
-}
-
-.st-key-use_sample button:hover {
-  background: var(--ss-accent-hover);
-  border-color: var(--ss-accent-hover);
-  color: #fffbf4;
+  transition: background-color 160ms var(--ss-ease), transform 160ms var(--ss-ease), opacity 160ms var(--ss-ease);
 }
 
 .st-key-clear_btn button {
   color: var(--ss-red);
   border-color: var(--ss-border);
   background: var(--ss-surface);
+  transition: background-color 160ms var(--ss-ease), transform 160ms var(--ss-ease), opacity 160ms var(--ss-ease);
 }
 
 /* Primary buttons */
@@ -146,13 +157,7 @@ h1, h2, h3 {
   border-color: var(--ss-accent);
   color: #fffbf4;
   border-radius: var(--ss-radius);
-  transition: background-color 160ms var(--ss-ease);
-}
-
-.stButton button[kind="primary"]:hover,
-[data-testid="stBaseButton-primary"]:hover {
-  background: var(--ss-accent-hover);
-  border-color: var(--ss-accent-hover);
+  transition: background-color 160ms var(--ss-ease), transform 160ms var(--ss-ease), opacity 160ms var(--ss-ease);
 }
 
 /* File uploader, expanders, quiet alerts */
@@ -167,6 +172,57 @@ h1, h2, h3 {
   border-radius: var(--ss-radius);
 }
 
+[data-testid="stDataFrameGlideDataEditor"],
+[data-testid="stDataFrame"],
+.vega-embed,
+[data-testid="stArrowVegaLiteChart"] {
+  max-width: 100%;
+}
+
+.vega-embed,
+[data-testid="stArrowVegaLiteChart"],
+[data-testid="stDataFrame"] {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Fine pointer only: card lift. Phones skip this so hover does not stick. */
+@media (hover: hover) and (pointer: fine) {
+  .st-key-column_mapper:hover,
+  .st-key-loaded_summary:hover,
+  .st-key-chart_by_category:hover,
+  .st-key-table_by_category:hover,
+  .st-key-chart_by_month:hover,
+  .st-key-top_merchants:hover,
+  .st-key-shadow_controls:hover,
+  .st-key-chart_shadow:hover,
+  .st-key-roth_inputs:hover,
+  .st-key-chart_roth:hover {
+    transform: translateY(-2px);
+    opacity: 1;
+  }
+
+  .st-key-use_sample button:hover,
+  .stButton button[kind="primary"]:hover,
+  [data-testid="stBaseButton-primary"]:hover {
+    background: var(--ss-accent-hover);
+    border-color: var(--ss-accent-hover);
+    color: #fffbf4;
+  }
+}
+
+/* Touch press: short opacity + scale, transform/opacity only. */
+@media (hover: none), (pointer: coarse) {
+  .stButton button:active,
+  [data-testid="stBaseButton-primary"]:active,
+  [data-testid="stBaseButton-secondary"]:active,
+  .st-key-use_sample button:active,
+  .st-key-clear_btn button:active {
+    transform: scale(0.98);
+    opacity: 0.88;
+  }
+}
+
 /* Focus */
 :focus-visible {
   outline: 2px solid var(--ss-accent);
@@ -174,6 +230,10 @@ h1, h2, h3 {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
   .st-key-column_mapper,
   .st-key-loaded_summary,
   .st-key-chart_by_category,
@@ -186,7 +246,8 @@ h1, h2, h3 {
   .st-key-chart_roth,
   .stButton button[kind="primary"],
   [data-testid="stBaseButton-primary"],
-  .st-key-use_sample button {
+  .st-key-use_sample button,
+  .st-key-clear_btn button {
     transition: none;
   }
 
@@ -199,18 +260,59 @@ h1, h2, h3 {
   .st-key-shadow_controls:hover,
   .st-key-chart_shadow:hover,
   .st-key-roth_inputs:hover,
-  .st-key-chart_roth:hover {
+  .st-key-chart_roth:hover,
+  .stButton button:active,
+  [data-testid="stBaseButton-primary"]:active,
+  .st-key-use_sample button:active,
+  .st-key-clear_btn button:active {
     transform: none;
   }
 }
 
+/* Phone: Streamlit columns already wrap at 640px. Tighten type, padding, tap targets. */
 @media (max-width: 640px) {
   [data-testid="stMainBlockContainer"] {
-    padding-top: 1rem;
+    padding-top: 5rem;
+    padding-bottom: max(2.5rem, env(safe-area-inset-bottom));
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+
+  h1 {
+    font-size: 1.75rem !important;
+    line-height: 1.2 !important;
+  }
+
+  h2 {
+    font-size: 1.35rem !important;
+  }
+
+  h3 {
+    font-size: 1.15rem !important;
+  }
+
+  .st-key-spend_kpis [data-testid="stMetricValue"],
+  .st-key-shadow_kpis [data-testid="stMetricValue"],
+  .st-key-roth_kpis [data-testid="stMetricValue"],
+  .st-key-loaded_kpis [data-testid="stMetricValue"] {
+    font-size: 1.5rem;
   }
 
   .st-key-shadow_signature [data-testid="stMetricValue"],
   .st-key-shadow_signature_down [data-testid="stMetricValue"] {
     font-size: 2rem;
+  }
+
+  [data-testid="stMain"] .stButton,
+  [data-testid="stMain"] .stButton button,
+  [data-testid="stMain"] button[data-testid="stBaseButton-primary"],
+  [data-testid="stMain"] button[data-testid="stBaseButton-secondary"],
+  [data-testid="stMain"] .st-key-use_sample,
+  [data-testid="stMain"] .st-key-clear_btn {
+    width: 100% !important;
+  }
+
+  [data-testid="stFileUploaderDropzone"] {
+    min-height: 88px;
   }
 }

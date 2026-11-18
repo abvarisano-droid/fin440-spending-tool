@@ -132,7 +132,7 @@ def section(key: str, title: str | None = None, border: bool = True):
 def kpi_row(key: str, items: list[dict]) -> None:
     """items: dicts of st.metric kwargs (label, value, and optional delta, help)."""
     with st.container(key=key):
-        cols = st.columns(len(items), gap="small")
+        cols = st.columns(len(items), gap="small", wrap=True)
         for i, (col, item) in enumerate(zip(cols, items)):
             kwargs = dict(item)
             kwargs.setdefault("border", True)

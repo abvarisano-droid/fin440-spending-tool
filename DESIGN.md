@@ -77,30 +77,33 @@ Primary `#1E4A3A` on white button text is ~10:1. Body `#1C1915` on `#F4EFE6` is 
 ## Spacing
 
 - Base unit: **8px**
-- Page top padding: **24px**
+- Page top padding: **5.5rem** (clears Streamlit's sticky top nav). **5rem** on phones.
 - Section gap: **24px**
 - Card padding: **16px** (Streamlit default; CSS adds 4px extra on keyed cards)
 - Card gap inside a row: **16px**
 - Max content width: **1200px**, centered
 - Upload and Roth input stacks: sit inside that 1200px; they do not need a tighter column
-- KPI row: 3 or 4 equal columns, 12px gap; wrap under 640px
+- KPI row: 3 or 4 equal columns, 12px gap; Streamlit wraps them under 640px into a stack
 - Radius: **4px** on cards, inputs, buttons (statement, not pill)
 - Borders: **1px solid `border`**
-- Shadows: none on rest; hover only (see Motion)
-- Header/nav: paper background, 1px bottom hairline `#DDD4C6`
+- Shadows: none on rest; hover only on fine pointers (see Motion)
+- Header/nav: paper background, 1px bottom hairline `#DDD4C6`; horizontal scroll on a phone if the four top-nav labels overflow
+- Phone (max 640px): side padding 16px plus `env(safe-area-inset-*)`, h1 28px, KPI values 24px, signature 32px, buttons 44px min-height and full width, file dropzone at least 88px tall
 
 ---
 
 ## Motion
 
 - Easing: `cubic-bezier(0.22, 1, 0.36, 1)`
-- Card hover: 220ms, `translateY(-2px)`, opacity 1.00 from 0.99
-- Button hover: 160ms, background to `accent-hover`
+- Card lift: 220ms, `translateY(-2px)`, only inside `@media (hover: hover) and (pointer: fine)` so a tap on a phone does not leave a stuck hover
+- Button hover (fine pointer): 160ms, background to `accent-hover`
+- Button press (touch / coarse pointer): 160ms, `scale(0.98)` and opacity 0.88
+- `touch-action: manipulation` on buttons (no extra tap delay). Tap highlight is a light pine wash
 - Page transition: Streamlit native rerun (no custom)
 - Properties: transform and opacity only
-- Reduced motion: `@media (prefers-reduced-motion: reduce)` sets transition to none and translateY to 0
+- Reduced motion: `@media (prefers-reduced-motion: reduce)` sets transition, transform, and `scroll-behavior` to none
 
-No scroll libraries, no grain overlay, no parallax. Streamlit reruns make cinematic scroll a mismatch.
+No scroll libraries, no grain overlay, no parallax. Streamlit reruns make cinematic scroll a mismatch. The app is usable on a phone: columns wrap at 640px, top nav can scroll sideways, tables and charts scroll inside their card if they overflow.
 
 ---
 
