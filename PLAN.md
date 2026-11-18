@@ -1,7 +1,7 @@
 # Plan (owned by the project lead, Claude Code)
 
 The lead writes this plan; each agent does only its own tasks; the lead updates the status
-column. Requests between agents go through HANDOFF.md. Last updated 2026-11-18.
+column. Requests between agents go through HANDOFF.md. Last updated 2026-11-18 (phase 6 done).
 
 ## The goal, from the FIN 440 assignment
 "Build something using AI that is meaningfully related to investments." There is no rubric beyond
@@ -32,9 +32,9 @@ was used, what the output looks like, **how we know it's valid**, and why anyone
 | 3 | Design pass on the first 4 pages | Grok + Builder | 3B done; 3D.1 to 3D.3 open |
 | 4 | Robustness + deploy prep | Builder | Done (`0f69b4c`, `3b17e5f`) |
 | 5 | Investments math engines | Builder team (3 workers) | Done, cross-checked (77 tests) |
-| **6** | **New pages wired to the engines** | Builder | **Active** |
-| 7 | Design for the new pages | Grok | Can start now from the page specs below |
-| 8 | Proof: validation page + Excel cross-check workbook | Builder | After 6 |
+| 6 | New pages wired to the engines | Builder | Done, cross-checked (83 tests); awaiting Grok audit |
+| 7 | Design for the new pages | Grok | Done (`3e8f567`); visual check of phase 6 pages open |
+| **8** | **Proof: validation page + Excel cross-check workbook** | Builder | **Next** |
 | 9 | Final audit, deploy, write-up, group prep | All | Last |
 
 ## Phase 5: math engines (pure functions, no network, each with hand-checked tests)

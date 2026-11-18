@@ -108,7 +108,8 @@ if tx is not None:
                  if len(tx) != len(spend) else None),
             dict(label="Total spent", value=f"${spend['amount'].sum():,.2f}",
                  help="Excludes card payments and transfers, same as Spending breakdown."),
-            dict(label="Date range", value=f"{tx['date'].min():%b %d, %Y} to {tx['date'].max():%b %d, %Y}"),
+            dict(label="Date range", value=f"{tx['date'].min():%b %Y} to {tx['date'].max():%b %Y}",
+                 help=f"{tx['date'].min():%b %d, %Y} to {tx['date'].max():%b %d, %Y}"),
         ])
         st.caption(f"Source: {st.session_state.get('source_name', 'unknown')}")
         with st.container(horizontal=True, key="loaded_actions"):

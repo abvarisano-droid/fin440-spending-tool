@@ -1,7 +1,8 @@
 import altair as alt
 import streamlit as st
 
-from core import tvm, ui
+from core import montecarlo, tvm, ui
+from core.prices import clean_ticker, fetch_history
 from core.state import get_transactions, spending_only
 
 st.title("Roth IRA calculator")
@@ -94,6 +95,78 @@ with ui.section("chart_roth", "Balance by age"):
 
 r = tvm.periodic_rate(rate_pct / 100, 12, convention)
 n = years * 12
+
+
+@st.cache_data(show_spinner=False, max_entries=20)
+def _simulate(*args, **kwargs):
+    return montecarlo.simulate_roth(*args, **kwargs)
+
+
+with ui.section("roth_mc_controls", "With uncertain returns"):
+    st.caption("The chart above earns the same return every month. Real markets don't. Here every "
+               "month draws a random return with the same average, thousands of times.")
+    m1, m2, m3, m4 = st.columns(4)
+    method = m1.radio("Returns", ["normal", "bootstrap"], key="mc_method",
+                      format_func={"normal": "Normal (pick the volatility)",
+                                   "bootstrap": "Replay real fund months"}.get)
+    if method == "normal":
+        vol_pct = m2.slider("Yearly volatility", 0.0, 40.0, 15.0, 0.5, format="%.1f%%", key="mc_vol",
+                            help="About 15% is typical for a broad US stock index.")
+    else:
+        mc_raw = m2.text_input("Fund for history", value="VOO", max_chars=10, key="mc_ticker")
+    target = m3.number_input("Target balance ($)", 0.0, 100_000_000.0,
+                             float(round(final["balance"], -3)), step=10_000.0, key="mc_target",
+                             help="Defaults to the fixed-return balance above.")
+    n_sims = m4.selectbox("Simulations", [1000, 5000, 10000], index=1, key="mc_sims")
+
+mc_kwargs = dict(n_sims=n_sims, seed=0, due=due, enforce_limit=enforce)
+history_note = ""
+if method == "normal":
+    # same average monthly rate as the fixed-return chart, so the mean lines up with it
+    mc = _simulate(int(current_age), int(retirement_age), monthly, starting, method="normal",
+                   annual_mean=r * 12, annual_vol=vol_pct / 100, **mc_kwargs)
+else:
+    mc_ticker = clean_ticker(mc_raw)
+    if mc_ticker is None:
+        st.error("That doesn't look like a ticker.")
+        st.stop()
+    try:
+        with st.spinner(f"Getting 10 years of {mc_ticker}..."):
+            hist = montecarlo.monthly_returns_from_prices(fetch_history(mc_ticker, years=10))
+        mc = _simulate(int(current_age), int(retirement_age), monthly, starting, method="bootstrap",
+                       history=hist.to_numpy(), **mc_kwargs)
+    except (RuntimeError, ValueError) as exc:
+        st.error(str(exc))
+        st.stop()
+    history_note = (f" Bootstrap draws from {len(hist)} real {mc_ticker} months "
+                    f"(average {hist.mean():.2%}/month). Those are nominal returns, so this view is "
+                    "in future dollars, not today's.")
+
+pcts = mc["percentiles"]
+with ui.section("chart_roth_fan", "Range of outcomes by age"):
+    ui.chart_fan(pcts, key="roth_fan")
+    st.caption("Outer band: 5th to 95th percentile. Inner band: 25th to 75th. Line: median.")
+
+end = pcts.iloc[-1]
+odds = montecarlo.prob_reaching(mc["final"], target)
+ui.kpi_row("roth_mc_kpis", [
+    dict(label=f"Median at {int(retirement_age)}", value=f"${end['p50']:,.0f}",
+         help="Half the simulations end above this, half below."),
+    dict(label="Bad case (5th percentile)", value=f"${end['p5']:,.0f}",
+         help="1 in 20 simulations ends below this."),
+    dict(label=f"Odds of reaching \\${target:,.0f}", value=f"{odds:.0%}",
+         help="Share of simulations at or above the target."),
+])
+closed = montecarlo.expected_fv_closed_form(int(current_age), int(retirement_age), monthly, starting,
+                                            r * 12, due, enforce)
+st.caption(
+    f"Check: the average of {mc['n_sims']:,} runs is \\${mc['mean_final']:,.0f}"
+    + (f", vs \\${closed:,.0f} from the fixed-return formula. They should be close, since the "
+       "average return is the same. The median sits below the average because losses compound: "
+       "-50% then +50% leaves you at 75%, not 100% (volatility drag)." if method == "normal" else
+       ".")
+    + history_note
+)
 with st.expander("Show the math", key="roth_math"):
     fv, segments = tvm.fv_segments(starting, pmts, r, due)
     due_term = r"\cdot(1+r)" if due else ""

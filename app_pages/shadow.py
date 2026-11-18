@@ -1,9 +1,11 @@
 import altair as alt
+import pandas as pd
 import streamlit as st
 
-from core import ui
+from core import lab, ui
 from core.categorize import ALL_CATEGORIES
-from core.prices import clean_ticker, fetch_adjusted_close
+from core.portfolios import PRESETS
+from core.prices import clean_ticker, fetch_adjusted_close, fetch_many
 from core.shadow import build_shadow
 from core.state import require_transactions, spending_only
 
@@ -71,6 +73,49 @@ with ui.section("chart_shadow", "Spent vs. shadow value"):
                      alt.Tooltip("dollars:Q", title="Dollars", format="$,.2f")],
         ),
     )
+
+with ui.section("shadow_compare", "Same purchases, four portfolios"):
+    st.caption("Each purchase is split across funds by fixed weights and held, no rebalancing. "
+               "Diversification in practice: compare how far each line swings, not only where it ends.")
+    picks = st.multiselect("Portfolios", list(PRESETS), default=list(PRESETS), max_selections=4,
+                           key="compare_pick")
+    if picks:
+        try:
+            with st.spinner("Getting fund prices..."):
+                cmp_prices = fetch_many(lab.tickers_for(picks), spend["date"].min())
+            ports = lab.preset_portfolios(spend, cmp_prices, picks)
+        except (RuntimeError, ValueError) as exc:
+            st.error(str(exc))
+        else:
+            lines = pd.concat([p.timeline.assign(name=n) for n, p in ports.items()])
+            ui.chart(
+                alt.Chart(lines)
+                .mark_line(interpolate="step-after")
+                .encode(
+                    x=alt.X("date:T", title=None),
+                    y=alt.Y("value:Q", title="Value ($)"),
+                    color=alt.Color("name:N", title=None),
+                    tooltip=[alt.Tooltip("date:T", title="Date"), alt.Tooltip("name:N", title="Portfolio"),
+                             alt.Tooltip("value:Q", title="Value", format="$,.2f")],
+                ),
+                key="compare_chart",
+            )
+            st.dataframe(
+                pd.DataFrame([{
+                    "Portfolio": n, "Spent": p.invested, "Worth now": p.value, "Gain": p.gain,
+                    "Return": p.simple_return * 100,
+                    "XIRR": p.xirr * 100 if p.xirr is not None else None,
+                } for n, p in ports.items()]),
+                hide_index=True,
+                column_config={
+                    "Spent": st.column_config.NumberColumn(format="$%.2f"),
+                    "Worth now": st.column_config.NumberColumn(format="$%.2f"),
+                    "Gain": st.column_config.NumberColumn(format="$%.2f"),
+                    "Return": st.column_config.NumberColumn(format="%.2f%%"),
+                    "XIRR": st.column_config.NumberColumn(format="%.2f%%"),
+                },
+                key="compare_table",
+            )
 
 ledger = res.ledger.assign(value_now=res.ledger["shares"] * prices.iloc[-1])
 ledger["gain"] = ledger["value_now"] - ledger["amount"]

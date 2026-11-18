@@ -6,6 +6,7 @@ from core.categorize import ALL_CATEGORIES, DISCRETIONARY
 from core.state import require_transactions, set_transactions, spending_only
 
 st.title("Spending breakdown")
+st.caption("Totals include only purchases unless you turn on transfers.")
 tx = require_transactions()
 
 include_transfers = st.toggle(
