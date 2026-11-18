@@ -106,6 +106,7 @@ h3 {
 .st-key-chart_timing_hist,
 .st-key-timing_explainer,
 .st-key-proof_checks,
+.st-key-proof_table,
 .st-key-risk_table,
 .st-key-risk_stats,
 .st-key-compare_table {
@@ -274,6 +275,7 @@ h3 {
   .st-key-chart_timing_hist:hover,
   .st-key-timing_explainer:hover,
   .st-key-proof_checks:hover,
+  .st-key-proof_table:hover,
   .st-key-risk_table:hover,
   .st-key-risk_stats:hover,
   .st-key-compare_table:hover {
@@ -332,6 +334,7 @@ h3 {
   .st-key-chart_timing_hist,
   .st-key-timing_explainer,
   .st-key-proof_checks,
+  .st-key-proof_table,
   .st-key-risk_table,
   .st-key-risk_stats,
   .st-key-compare_table,
@@ -362,6 +365,7 @@ h3 {
   .st-key-chart_timing_hist:hover,
   .st-key-timing_explainer:hover,
   .st-key-proof_checks:hover,
+  .st-key-proof_table:hover,
   .st-key-risk_table:hover,
   .st-key-risk_stats:hover,
   .st-key-compare_table:hover,
