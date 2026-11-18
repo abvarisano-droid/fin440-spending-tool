@@ -71,6 +71,8 @@ with ui.section("timing_explainer", "What this says"):
     st.markdown(
         f"Your real dates beat **{res['percentile']:.0%}** of {N_SHUFFLES:,} random ones "
         f"(two-sided p-value {res['p_value_two_sided']:.2f}). "
+        f"Every random set landed between \${res['shuffled_values'].min():,.0f} and "
+        f"\${res['shuffled_values'].max():,.0f}, so for small, steady purchases the dates barely matter. "
         + ("Anywhere from the 5th to the 95th percentile is what luck looks like, so this is "
            "**consistent with market efficiency**: when you spent told the market nothing."
            if luck else

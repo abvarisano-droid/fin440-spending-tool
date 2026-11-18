@@ -73,8 +73,8 @@ st.caption(
     f"{rf_annual:.2%} effective annual (as of {rf['as_of']:%b %d, %Y}). "
     f"{int(head['n'])} daily returns from {series[names[0]].index[0]:%b %d, %Y}."
 )
-if head["n"] < 120:
-    st.info(f"Only {int(head['n'])} trading days of purchases so far. Annualizing a short window "
+if head["n"] < 252:
+    st.info(f"Only {int(head['n'])} trading days of purchases so far (under a year). Annualizing a short window "
             "exaggerates returns, and beta and alpha are noisy. Switch to fund history for a steadier read.")
 
 mkt_ann = lab.market_annual_return(market, series[names[0]].index)
@@ -118,9 +118,14 @@ with ui.section("risk_explainer", "How to read this"):
         "return over the same days). The line on the right is that equation: the **security market "
         "line**. A dot above it earned more than its beta asked for over this window; below, less. "
         "SPY sits exactly on the line (beta 1, alpha 0), which is a built-in check.\n\n"
-        "**Two alphas, on purpose.** *Above SML* is the dot's vertical distance from the line, using "
+        + (f"**Why the line slopes down here:** over this window SPY returned {mkt_ann:.2%}, less "
+           f"than the T-bill's {rf_annual:.2%}, so the realized market risk premium was negative "
+           "and more beta was punished, not paid. That happens over short windows. CAPM is about "
+           "*expected* returns, where the premium is positive; switch to 5 years of fund history "
+           "to see the usual upward line.\n\n" if mkt_ann < rf_annual else "")
+        + "**Two alphas, on purpose.** *Above SML* is the dot's vertical distance from the line, using "
         "compounded (geometric) returns. *Jensen's alpha* is the regression intercept on daily excess "
-        "returns, times 252 (arithmetic). They agree in sign and are close, not identical.\n\n"
+        "returns, times 252 (arithmetic). They are close and usually share a sign, but they are not identical.\n\n"
         "**Diversification:** BND has a low beta, so the 60/40 mix lowers volatility and beta "
         "together. Volatility that beta does not explain (1 minus R squared) is diversifiable, and "
         "CAPM says the market does not pay you for carrying it."
