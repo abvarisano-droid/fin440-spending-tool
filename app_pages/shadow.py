@@ -43,7 +43,9 @@ res = build_shadow(spend, prices)
 ui.kpi_row("shadow_kpis", [
     dict(label="You spent", value=f"${res.invested:,.2f}"),
     dict(label=f"In {ticker} it'd be worth", value=f"${res.value:,.2f}",
-         delta=f"${res.gain:,.2f} ({res.simple_return:+.2%})"),
+         # sign first: Streamlit only colors a delta red/down when it starts with "-"
+         delta=f"{'-' if round(res.gain, 2) < 0 else '+'}${abs(res.gain):,.2f} "
+               f"({res.simple_return:+.2%})"),
     dict(label="Annualized (XIRR)", value=f"{res.xirr:+.2%}" if res.xirr is not None else "n/a",
          help="Money-weighted annual return, accounting for when each dollar went in. "
               "Shown as n/a for spans under a week. Annualizing a short span exaggerates it."),

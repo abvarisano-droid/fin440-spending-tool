@@ -13,7 +13,7 @@ column. Requests between agents still go through HANDOFF.md. Last updated 2026-1
 | Phase | State |
 |---|---|
 | 1 Logic, math, tests | Done, audited, fix round committed (`b21c92c`) |
-| 2 Design system | Done by Grok (`8f9e98a`); needs its audit (lead's subagent) |
+| 2 Design system | Done by Grok (`8f9e98a`); audited, fix round with Grok (HANDOFF) |
 | 3 Design pass on pages | **Active** |
 | 4 Polish, deploy, write-up | Next |
 | 5 Final audit | Last |
@@ -26,14 +26,15 @@ column. Requests between agents still go through HANDOFF.md. Last updated 2026-1
 | 3B.3 | Builder | Shadow/Roth chart colors (Grok request) | Already handled inside `ui.chart`; no page change | closed |
 | 3D.1 | Grok | Run the app, check each page at 1280px and 390px against DESIGN.md, file any layout change as a HANDOFF request | One HANDOFF entry per page, or "no changes" | todo |
 | 3D.2 | Grok | Record the WEB_DESIGN_REFERENCE section 7 checklist results in DESIGN.md | Every box answered yes/no with a note | todo |
-| 3A | Lead | Fresh subagent audits phase 2 + 3D; Grok audits 3B | Findings fixed in one round | todo |
+| 3A | Lead | Fresh subagent audits phase 2 + 3D; Grok audits 3B | Findings fixed in one round | phase 2 audit done; Grok fixing; 3D audit later |
+| 3D.3 | Grok | Phase 2 audit fixes (HANDOFF): palette size, series domain, Clear button color, CSS nits, contrast | Each item done or answered in HANDOFF | todo |
 
 ## Phase 4: polish, deploy, write-up (builder, run as a small team)
 The lead runs three workers in parallel, then reviews and commits. They touch separate files;
 README edits merge through the lead.
 | ID | Worker | Task | Done when | Status |
 |---|---|---|---|---|
-| 4.1 | Robustness | Audit item 7: the amount auto-detect must skip date-like columns; tighten the `lime` / `metro` / `toll` keywords; tests for each. Audit item 9: fix the README note about which test needs network. | New tests pass | todo |
+| 4.1 | Robustness | Audit item 7: the amount auto-detect must skip date-like columns; tighten the `lime` / `metro` / `toll` keywords; tests for each. Audit item 9: fix the README note about which test needs network. | New tests pass | done (`0f69b4c`), item 9 pending |
 | 4.2 | Deploy | Make the repo ready for Streamlit Community Cloud: pinned requirements, no local paths, a deploy section in README | `streamlit run` works from a clean venv | todo |
 | 4.3 | Write-up | Draft the FIN 440 write-up from README + HANDOFF (method, TVM math, sample results, limits) | Matches the rubric | **blocked: needs rubric** |
 
