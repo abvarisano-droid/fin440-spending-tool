@@ -47,12 +47,24 @@ html {
 }
 
 h1, h2, h3 {
-  letter-spacing: -0.02em;
   overflow-wrap: anywhere;
+}
+
+h1 {
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  letter-spacing: -0.015em;
+}
+
+h3 {
+  letter-spacing: -0.01em;
 }
 
 [data-testid="stCaption"] {
   color: var(--ss-muted);
+  font-size: 13px;
 }
 
 /* Tabular money */
@@ -63,6 +75,15 @@ h1, h2, h3 {
 
 [data-testid="stMetricValue"] {
   overflow-wrap: anywhere;
+}
+
+.st-key-loaded_actions {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.st-key-chart_by_category {
+  padding-left: 12px;
 }
 
 /* Cards (upload_source is unbordered on purpose) */
@@ -83,12 +104,21 @@ h1, h2, h3 {
   transition: transform 220ms var(--ss-ease), opacity 220ms var(--ss-ease);
 }
 
-/* KPI type. Wells come from st.metric(border=True). */
+/* KPI type. Wells come from st.metric(border=True) plus a tint fill. */
+.st-key-spend_kpis [data-testid="stMetric"],
+.st-key-shadow_kpis [data-testid="stMetric"],
+.st-key-roth_kpis [data-testid="stMetric"],
+.st-key-loaded_kpis [data-testid="stMetric"] {
+  background: var(--ss-tint);
+}
+
 .st-key-spend_kpis [data-testid="stMetricLabel"],
 .st-key-shadow_kpis [data-testid="stMetricLabel"],
 .st-key-roth_kpis [data-testid="stMetricLabel"],
 .st-key-loaded_kpis [data-testid="stMetricLabel"] {
   color: var(--ss-muted);
+  font-size: 13px;
+  font-weight: 500;
   letter-spacing: 0.04em;
   text-transform: none;
 }
@@ -123,11 +153,7 @@ h1, h2, h3 {
   color: var(--ss-green);
 }
 
-button,
-[data-testid="stBaseButton-primary"],
-[data-testid="stBaseButton-secondary"],
-.st-key-use_sample button,
-.st-key-clear_btn button,
+.stButton button,
 [data-testid="stFileUploaderDropzone"] {
   min-height: 44px;
   touch-action: manipulation;
@@ -140,14 +166,14 @@ button,
   border-color: var(--ss-accent);
   color: #fffbf4;
   border-radius: var(--ss-radius);
-  transition: background-color 160ms var(--ss-ease), transform 160ms var(--ss-ease), opacity 160ms var(--ss-ease);
+  transition: transform 160ms var(--ss-ease), opacity 160ms var(--ss-ease);
 }
 
 .st-key-clear_btn button {
-  color: var(--ss-red);
+  color: var(--ss-accent);
   border-color: var(--ss-border);
   background: var(--ss-surface);
-  transition: background-color 160ms var(--ss-ease), transform 160ms var(--ss-ease), opacity 160ms var(--ss-ease);
+  transition: transform 160ms var(--ss-ease), opacity 160ms var(--ss-ease);
 }
 
 /* Primary buttons */
@@ -157,7 +183,7 @@ button,
   border-color: var(--ss-accent);
   color: #fffbf4;
   border-radius: var(--ss-radius);
-  transition: background-color 160ms var(--ss-ease), transform 160ms var(--ss-ease), opacity 160ms var(--ss-ease);
+  transition: transform 160ms var(--ss-ease), opacity 160ms var(--ss-ease);
 }
 
 /* File uploader, expanders, quiet alerts */
@@ -179,11 +205,21 @@ button,
   max-width: 100%;
 }
 
-.vega-embed,
-[data-testid="stArrowVegaLiteChart"],
 [data-testid="stDataFrame"] {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+}
+
+/* fit-x charts already match the column. overflow:auto on .vega-embed clips y-axis labels. */
+.st-key-chart_by_category [data-testid="stVegaLiteChart"],
+.st-key-chart_by_month [data-testid="stVegaLiteChart"],
+.st-key-chart_shadow [data-testid="stVegaLiteChart"],
+.st-key-chart_roth [data-testid="stVegaLiteChart"],
+.st-key-chart_by_category [data-testid="stVegaLiteChart"] svg,
+.st-key-chart_by_month [data-testid="stVegaLiteChart"] svg,
+.st-key-chart_shadow [data-testid="stVegaLiteChart"] svg,
+.st-key-chart_roth [data-testid="stVegaLiteChart"] svg {
+  overflow: visible !important;
 }
 
 /* Fine pointer only: card lift. Phones skip this so hover does not stick. */
@@ -246,6 +282,7 @@ button,
   .st-key-chart_roth,
   .stButton button[kind="primary"],
   [data-testid="stBaseButton-primary"],
+  [data-testid="stBaseButton-secondary"],
   .st-key-use_sample button,
   .st-key-clear_btn button {
     transition: none;
@@ -263,6 +300,7 @@ button,
   .st-key-chart_roth:hover,
   .stButton button:active,
   [data-testid="stBaseButton-primary"]:active,
+  [data-testid="stBaseButton-secondary"]:active,
   .st-key-use_sample button:active,
   .st-key-clear_btn button:active {
     transform: none;

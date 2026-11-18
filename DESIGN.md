@@ -60,17 +60,17 @@ Lock to this light theme. Do not add a dark variant. Streamlit's settings menu s
 | `border` | `#DDD4C6` | Card and widget hairlines |
 | `green` | `#1E6B45` | Positive delta, growth |
 | `red` | `#A33B32` | Negative delta, errors |
-| `orange` | `#B45309` | Opportunity, shadow series |
-| `yellow` | `#A16207` | Warnings |
+| `orange` | `#B45309` | Chart fill only (shadow series, Shopping). Too light for body text; widget text uses `#8A3F07` |
+| `yellow` | `#A16207` | Chart/icon fill only. Widget text uses `#7A4A05` |
 | `blue` | `#2C4A6E` | Informational, spent series |
 | `violet` | `#5C4A6E` | Spare categorical |
 | `gray` | `#6E675C` | Neutral series |
 
-Chart categorical (in order): `#1E4A3A`, `#A33B32`, `#2C4A6E`, `#B45309`, `#5C6B4A`, `#6B3D4A`, `#6E675C`, `#3D5A4C`.
+Chart categorical, one fill per spending category (14): Transfers `#6E675C`, Dining `#A33B32`, Coffee `#6B5428`, Groceries `#5C6B4A`, Gas `#8A5A4A`, Transport `#4A5A6B`, Subscriptions `#2C4A6E`, Entertainment `#6B3D4A`, Travel `#3A4F3A`, Shopping `#B45309`, Health `#3D5A4C`, Housing `#1E4A3A`, Education `#4A3A5A`, Other `#5A6B5A`.
 
-Chart sequential (paper to pine, 10 stops): `#F4EFE6`, `#E4E0C8`, `#C9D0B0`, `#A8B894`, `#7E9974`, `#5A7D5C`, `#3E6550`, `#2C5444`, `#1E4A3A`, `#16382C`.
+Chart sequential (tint to pine, 10 stops): `#EDE6D9`, `#E4E0C8`, `#C9D0B0`, `#A8B894`, `#7E9974`, `#5A7D5C`, `#3E6550`, `#2C5444`, `#1E4A3A`, `#16382C`.
 
-Primary `#1E4A3A` on white button text is ~10:1. Body `#1C1915` on `#F4EFE6` is well above 4.5:1. Muted `#6E675C` on `#F4EFE6` is ~4.9:1.
+Primary `#1E4A3A` on white button text is ~10:1. Body `#1C1915` on `#F4EFE6` is well above 4.5:1. Muted `#6E675C` on `#F4EFE6` is ~4.9:1. Orange `#B45309` and yellow `#A16207` stay chart fills.
 
 ---
 
@@ -96,7 +96,7 @@ Primary `#1E4A3A` on white button text is ~10:1. Body `#1C1915` on `#F4EFE6` is 
 
 - Easing: `cubic-bezier(0.22, 1, 0.36, 1)`
 - Card lift: 220ms, `translateY(-2px)`, only inside `@media (hover: hover) and (pointer: fine)` so a tap on a phone does not leave a stuck hover
-- Button hover (fine pointer): 160ms, background to `accent-hover`
+- Button hover (fine pointer): background snaps to `accent-hover`; motion is 160ms transform/opacity only
 - Button press (touch / coarse pointer): 160ms, `scale(0.98)` and opacity 0.88
 - `touch-action: manipulation` on buttons (no extra tap delay). Tap highlight is a light pine wash
 - Page transition: Streamlit native rerun (no custom)
@@ -172,7 +172,7 @@ Signatures stay stable: `section(key, title=None, border=True)`, `kpi_row(key, i
 
 - `section`: keyed `st.container`. Bordered card by default (`upload_source` passes `border=False`). Fraunces h3 when `title` is set.
 - `kpi_row`: keyed container, equal `st.columns`, each `st.metric(..., border=True)`. CSS sets Fraunces 28px values. The shadow signature metric is wrapped as `.st-key-shadow_signature` (gain, pine) or `.st-key-shadow_signature_down` (loss, brick), 40px / 2.5rem. Roth growth (third `roth_kpis` value) is green.
-- `chart`: Altair theme `spend_shadow` (also registered globally): legend bottom, no view stroke, axis `#6E675C`, grid `#E6DDD0`, categorical range from the palette. When the color field is `series`, range is `SPENT` then `SHADOW`. When it is `part`, domain is Contributions / Growth in `CONTRIBUTIONS` / `GROWTH`. Named constants: `ui.SPENT`, `ui.SHADOW`, `ui.CONTRIBUTIONS`, `ui.GROWTH`.
+- `chart`: Altair theme `spend_shadow` (also registered globally): legend bottom, no view stroke, axis `#6E675C`, grid `#E6DDD0`, view clip off so long category labels stay whole. Field `series`: domain Spent (cumulative) then Value in {ticker}, range `SPENT` / `SHADOW`. Field `part`: Contributions / Growth in `CONTRIBUTIONS` / `GROWTH`. Field `category`: pinned `CATEGORY_COLORS` (14 distinct fills). If `category` is on x or y and color is unset, `ui.chart` fills the bars and hides the legend (the axis already names them). Named constants: `ui.SPENT`, `ui.SHADOW`, `ui.CONTRIBUTIONS`, `ui.GROWTH`.
 - Primary button: pine fill, white label, 4px radius. Secondary / "Clear data": surface fill, pine text, 1px border.
 - `st.caption` for helper copy. `st.info` for the empty-upload pointer and skip/cap notices only.
 - Tables: header `surface-tint`, hairline borders, tabular nums.
@@ -183,7 +183,7 @@ Signatures stay stable: `section(key, title=None, border=True)`, `kpi_row(key, i
 
 `core/state.load_styles()` injects `styles.css`. Target these keys:
 
-`upload_source`, `column_mapper`, `loaded_summary`, `loaded_kpis`, `spend_kpis`, `chart_by_category`, `table_by_category`, `chart_by_month`, `top_merchants`, `shadow_controls`, `shadow_kpis`, `chart_shadow`, `roth_inputs`, `roth_kpis`, `chart_roth`.
+`upload_source`, `column_mapper`, `loaded_summary`, `loaded_kpis`, `loaded_actions`, `spend_kpis`, `chart_by_category`, `table_by_category`, `chart_by_month`, `top_merchants`, `shadow_controls`, `shadow_kpis`, `chart_shadow`, `roth_inputs`, `roth_kpis`, `chart_roth`.
 
 Plus expanders `all_tx`, `shadow_ledger`, `roth_math`, tables `raw_preview`, `cat_table`, `top_table`, `tx_editor`, `ledger_table`, `roth_table`, and signature wraps `shadow_signature` / `shadow_signature_down`.
 
@@ -208,15 +208,17 @@ Plus expanders `all_tx`, `shadow_ledger`, `roth_math`, tables `raw_preview`, `ca
 
 Streamlit app, so Lighthouse 95 is a stretch goal. Practical targets: no layout-shifting custom fonts after first paint (`display=swap` already in the Google URLs), 4.5:1 text contrast, visible focus ring in pine, captions on every chart via Altair tooltips, reduced-motion respected.
 
-## Section 7 checklist (WEB_DESIGN_REFERENCE)
+## Section 7 checklist (WEB_DESIGN_REFERENCE), phase 3D.2
 
-- [x] Exactly one signature moment (shadow "it'd be worth"), everything else restrained
-- [x] Three layout alternatives compared; Editorial ledger shipped
-- [x] Type scale pinned in the table above
-- [x] Motion in numbers (220ms / 160ms, cubic-bezier(0.22, 1, 0.36, 1), 2px)
-- [x] Transform and opacity only
-- [x] Reduced-motion fallback in `styles.css`
-- [x] No 3D or video, so no cinematic fallback needed
-- [x] Columns wrap at 640px; signature type steps down on small screens
-- [ ] Lighthouse 95 / CLS 0.00: not measurable in the same way on Streamlit Cloud; contrast and focus are specified
-- [x] Specific decision (paper ledger + Fraunces), not a default dark dashboard
+Checked against the running app at 1280px and 390px (sample data, fictional).
+
+- [x] Exactly one signature moment: yes. Shadow "it'd be worth" is the only 40px number.
+- [x] Three layout alternatives compared: yes. Editorial ledger shipped; Night desk and Split studio parked.
+- [x] Type scale pinned: yes. Table in Type. h1 -0.02em, h2 -0.015em, h3 -0.01em, captions 13px.
+- [x] Motion in numbers: yes. 220ms card lift, 160ms press, cubic-bezier(0.22, 1, 0.36, 1), 2px.
+- [x] Transform and opacity only: yes. Button color snaps; transition lists are transform/opacity.
+- [x] Reduced-motion fallback: yes. Transitions off, transforms none, scroll-behavior auto. Includes secondary `:active`.
+- [x] No 3D or video: yes. No cinematic fallback needed.
+- [x] Mobile-first wrap: yes. Columns wrap at 640px. 390px: full-width 44px buttons, title clears sticky header, no page-level sideways scroll. Top nav collapses to Streamlit's `>>` control.
+- [ ] Lighthouse 95 / CLS 0.00: no. Streamlit Cloud is not Lighthouse-clean. Contrast for body/primary passes AA. Orange/yellow fills are not used as body text.
+- [x] Specific decision: yes. Paper ledger + Fraunces + pine, not a default dark dashboard.
