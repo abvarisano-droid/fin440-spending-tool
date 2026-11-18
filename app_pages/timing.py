@@ -15,10 +15,11 @@ st.caption(
 )
 tx = spending_only(require_transactions())
 
-c1, c2 = st.columns([1, 2])
-raw = c1.text_input("Fund ticker", value="VOO", max_chars=10, key="timing_ticker")
-present = [c for c in ALL_CATEGORIES if c in set(tx["category"])]
-cats = c2.multiselect("Categories", present, default=present, key="timing_cats")
+with ui.section("timing_controls"):
+    c1, c2 = st.columns([1, 2])
+    raw = c1.text_input("Fund ticker", value="VOO", max_chars=10, key="timing_ticker")
+    present = [c for c in ALL_CATEGORIES if c in set(tx["category"])]
+    cats = c2.multiselect("Categories", present, default=present, key="timing_cats")
 
 ticker = clean_ticker(raw)
 if ticker is None:
@@ -45,7 +46,7 @@ def ordinal(n: int) -> str:
 
 pct = round(res["percentile"] * 100)
 ui.kpi_row("timing_kpis", [
-    dict(label=f"Your dates, in {ticker}", value=f"${res['actual_value']:,.2f}",
+    dict(label=f"Your dates in {ticker}", value=f"${res['actual_value']:,.2f}",
          help="Each purchase buys at the close of the first trading day on or after it, valued today."),
     dict(label="Median random dates", value=f"${res['median_shuffled']:,.2f}",
          help=f"Median of {N_SHUFFLES:,} reshuffles. Each purchase moves to a random trading day "

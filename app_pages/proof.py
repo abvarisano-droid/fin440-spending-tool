@@ -6,8 +6,8 @@ from core.state import SAMPLE_CSV, require_transactions, spending_only
 
 st.title("Proof")
 st.caption(
-    "Every number in this app is checked live against a second, independent computation, and "
-    "the workbook below lets you redo the math in Excel with real formulas."
+    "The key numbers are checked live against a second computation that doesn't use the app's own "
+    "code, and the workbook below lets you redo the math in Excel with real formulas."
 )
 tx = require_transactions()
 spend = spending_only(tx)
@@ -16,9 +16,10 @@ is_sample = st.session_state.get("source_name", "").startswith("Sample")
 try:
     with st.spinner("Getting prices and running checks..."):
         rf = fetch_risk_free()
-        prices = fetch_many(["VOO", MARKET_PROXY], spend["date"].min())
+        prices = fetch_many(["VOO", "BND", MARKET_PROXY], spend["date"].min())
         checks = proof.run_checks(tx, spend, prices["VOO"], prices[MARKET_PROXY], rf["effective_annual"],
-                                  sample_path=SAMPLE_CSV if is_sample else None)
+                                  sample_path=SAMPLE_CSV if is_sample else None,
+                                  bnd=prices["BND"])
 except (RuntimeError, ValueError) as exc:
     st.error(str(exc))
     st.stop()
@@ -28,6 +29,13 @@ with ui.section("proof_checks", "Live checks"):
     st.markdown(f"**{passed} of {len(checks)} checks pass** on your data and today's prices.")
     st.dataframe(proof.checks_frame(checks), hide_index=True, key="proof_table",
                  column_config={"How": st.column_config.TextColumn("How it's checked", width="large")})
+    st.caption(
+        ("" if is_sample else "The spending-total check runs on the sample only, because your raw file "
+         "isn't kept. ")
+        + "Not live-checked here, but recomputed by hand in the final audit: XIRR, max drawdown, "
+        "Jensen's alpha, CAPM expected return, the BND and QQQ portfolios, the timing percentile and "
+        "the Monte Carlo percentiles."
+    )
 
 by_name = {c.name: c for c in checks}
 risk_row = lab.risk_table(
@@ -41,7 +49,7 @@ workbook = proof.build_workbook(
         vol=by_name["Volatility: app vs numpy"].app,
         sharpe=float(risk_row["sharpe"]),
         rf_effective=rf["effective_annual"],
-        roth_fv=by_name["Roth: app vs a month-by-month loop"].app,
+        roth_fv=by_name["Roth: app vs Excel FV(7%/12, 528, -200)"].app,
     ),
 )
 with ui.section("proof_download", border=False):

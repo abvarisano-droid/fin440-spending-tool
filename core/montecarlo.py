@@ -135,5 +135,12 @@ def expected_fv_closed_form(
 def monthly_returns_from_prices(prices: pd.Series) -> pd.Series:
     """Month-end simple returns from a price series with a DatetimeIndex: take the last price
     of each calendar month ("ME" resample), pct_change, drop the leading NaN. The first
-    (possibly partial) month only serves as the base price."""
-    return prices.resample("ME").last().pct_change().dropna()
+    (possibly partial) month only serves as the base price. A partial final month is dropped, so
+    every sample is a full month: the series counts as partial when it ends more than 4 calendar
+    days before month end (a weekend plus a market holiday, like Good Friday, is at most 4)."""
+    rets = prices.resample("ME").last().pct_change().dropna()
+    if len(prices) and len(rets):
+        last = prices.index[-1]
+        if ((last + pd.offsets.MonthEnd(0)) - last).days > 4:
+            rets = rets.iloc[:-1]
+    return rets

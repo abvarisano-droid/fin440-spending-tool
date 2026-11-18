@@ -69,14 +69,20 @@ spending figures do not.
   bootstrap view replays nominal fund months.
 
 ## Proof page
-- 10 checks. Each pairs an app number with a recompute that doesn't use that engine: a raw CSV
-  re-read, a plain loop, numpy, Excel's FV, or a second engine. Each reports pass or fail with
-  both numbers.
+- 10 checks on the sample. Each pairs an app number with a recompute that doesn't use the app's
+  own code for it: a raw CSV re-read, plain loops (VOO and 60/40), numpy (beta, volatility,
+  Sharpe), Excel's FV and the annuity formula, and the Monte Carlo mean within 3 standard errors.
+  Each reports pass or fail with both numbers.
+- A real upload gets 9 checks. The raw file isn't kept, so the spending check runs on the sample only.
+- *Q: Is every number live-checked?* No, and the page says so. XIRR, drawdown, alpha, CAPM
+  expected, BND/QQQ, the timing percentile and the Monte Carlo percentiles were recomputed by hand
+  in the final audit.
 - The Excel workbook uses live formulas. We recalculated it in Excel, and every difference is 0.
 - *Q: How do you know AI didn't hallucinate?*
   - Every output was recomputed outside the code.
   - Separate agents audited each other's work.
   - Real Excel caught a bug the tests had missed (`#NAME?` on `STDEV.S`).
+  - The final audit caught a circular check (an engine compared with itself), and it was replaced.
 
 ## How AI was used (be ready to tell this)
 - One AI built, one designed, and a third audited. No agent graded its own work.

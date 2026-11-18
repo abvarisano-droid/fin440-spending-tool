@@ -97,9 +97,16 @@ r = tvm.periodic_rate(rate_pct / 100, 12, convention)
 n = years * 12
 
 
-@st.cache_data(show_spinner=False, max_entries=20)
 def _simulate(*args, **kwargs):
-    return montecarlo.simulate_roth(*args, **kwargs)
+    """Memoized per browser session, not in st.cache_data: the inputs can be derived from the
+    upload (redirected spending), and st.cache_data is shared by every visitor on the server."""
+    key = repr((args, sorted((k, v.tobytes() if hasattr(v, "tobytes") else v) for k, v in kwargs.items())))
+    memo = st.session_state.setdefault("_mc_memo", {})
+    if key not in memo:
+        if len(memo) >= 10:
+            memo.clear()
+        memo[key] = montecarlo.simulate_roth(*args, **kwargs)
+    return memo[key]
 
 
 with ui.section("roth_mc_controls", "With uncertain returns"):

@@ -22,9 +22,17 @@
 
 ## What leaves the machine
 
-Uploads live only in the browser session (`st.session_state`) and are never written to disk or
-logged. The only outbound request is a ticker symbol and a start date sent to Yahoo Finance
-(through yfinance) to fetch prices. No transaction data is sent anywhere.
+Uploads live only in the browser session (`st.session_state`); the app never writes them to
+disk or logs them. Outbound requests: a ticker symbol and a start date (your earliest purchase
+date) to Yahoo Finance through yfinance, and the page fonts from Google Fonts in the viewer's
+browser. No transaction rows, merchants or amounts are sent anywhere.
+
+Two caveats, for honesty:
+- If a page ever crashes, Streamlit prints the error traceback to the server log, which the app
+  owner can read in Community Cloud. Upload errors are caught and shown only to that user, so
+  this is unlikely, but "never in a log" is not a guarantee.
+- Prices are cached on the server for an hour, keyed by ticker and start date, and yfinance keeps
+  a small cache of ticker metadata on disk. Neither holds transaction data.
 
 ## Real data
 

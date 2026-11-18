@@ -41,8 +41,8 @@ def test_raw_sample_total():
 
 def test_every_check_passes_on_synthetic_data():
     spend = _spend()
-    checks = proof.run_checks(spend, spend, _prices(1), _prices(2), 0.04)
-    assert len(checks) == 10
+    checks = proof.run_checks(spend, spend, _prices(1), _prices(2), 0.04, bnd=_prices(3, vol=0.003))
+    assert len(checks) == 9  # 10 on the sample, which adds the raw-CSV spending check
     assert all(c.passed for c in checks), [(c.name, c.app, c.independent) for c in checks if not c.passed]
 
 
@@ -66,3 +66,29 @@ def test_workbook_has_live_formulas():
     for f in risk[4:]:
         assert "STDEV.S" not in f.replace("_xlfn.STDEV.S", "")
         assert "VAR.S" not in f.replace("_xlfn.VAR.S", "").replace("_xlfn.COVARIANCE.S", "")
+
+
+def test_sixty_forty_check_catches_a_wrong_engine(monkeypatch):
+    # if the portfolio engine were off by a cent, the independent loop must flag it
+    import core.proof as P
+    real = P.build_portfolio
+
+    def off_by_a_cent(spend, prices, weights, name=""):
+        res = real(spend, prices, weights, name)
+        if len(weights) > 1:
+            res.value += 0.01
+        return res
+
+    monkeypatch.setattr(P, "build_portfolio", off_by_a_cent)
+    spend = _spend()
+    checks = P.run_checks(spend, spend, _prices(1), _prices(2), 0.04, bnd=_prices(3, vol=0.003))
+    failed = [c.name for c in checks if not c.passed]
+    assert failed == ["Portfolio: 60/40 VOO/BND vs a brute-force loop"]
+
+
+def test_bootstrap_drops_a_partial_final_month():
+    from core.montecarlo import monthly_returns_from_prices
+    full = pd.Series(1.0, index=pd.bdate_range("2026-01-02", "2026-04-30"))
+    part = pd.Series(1.0, index=pd.bdate_range("2026-01-02", "2026-05-18"))
+    assert len(monthly_returns_from_prices(full)) == 3  # Feb, Mar, Apr
+    assert len(monthly_returns_from_prices(part)) == 3  # May (partial) dropped

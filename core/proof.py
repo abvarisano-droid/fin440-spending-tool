@@ -79,8 +79,10 @@ def fv_by_loop(monthly: float, rate_apr: float, months: int) -> float:
 # ---------- the live checks ----------
 
 def run_checks(tx_all: pd.DataFrame, spend: pd.DataFrame, voo: pd.Series, spy: pd.Series,
-               rf_annual: float, sample_path=None) -> list[Check]:
-    """tx_all = every normalized row (transfers included); spend = spending only."""
+               rf_annual: float, sample_path=None, bnd: pd.Series | None = None) -> list[Check]:
+    """tx_all = every normalized row (transfers included); spend = spending only. The raw-CSV
+    spending check runs only for the sample (an upload's raw file isn't kept); the 60/40 check
+    runs when BND prices are given."""
     checks: list[Check] = []
 
     if sample_path is not None:
@@ -89,12 +91,6 @@ def run_checks(tx_all: pd.DataFrame, spend: pd.DataFrame, voo: pd.Series, spy: p
             raw_sample_spend_total(sample_path), 0.005,
             "Sum of every negative Amount in the sample file, read line by line with Python's csv "
             "module (before transfers are excluded)."))
-    else:
-        by_cat = spend.groupby("category")["amount"].sum().sum()
-        checks.append(Check(
-            "Spending: category totals add to the total", float(spend["amount"].sum()), float(by_cat),
-            0.005, "Your raw file isn't kept (privacy), so this checks the category table sums to the total."))
-
     voo = voo.dropna().sort_index()
     spy = spy.dropna().sort_index()
     shadow = build_shadow(spend, voo)
@@ -103,9 +99,17 @@ def run_checks(tx_all: pd.DataFrame, spend: pd.DataFrame, voo: pd.Series, spy: p
     checks.append(Check("Shadow: VOO value vs a brute-force loop", shadow.value, brute, 0.005,
                         "Plain Python loop: each purchase buys at the first close on or after its date."))
 
-    port = build_portfolio(spend, {"VOO": voo}, {"VOO": 1.0})
-    checks.append(Check("Portfolio engine (100% VOO) vs shadow engine", port.value, shadow.value, 0.005,
-                        "Two different engines on the same purchases must agree."))
+    port = build_portfolio(spend, {"VOO": voo}, {"VOO": 1.0})  # unit value for the risk checks
+    if bnd is not None:
+        bnd = bnd.dropna().sort_index()
+        both = voo.index.intersection(bnd.index)
+        mix = build_portfolio(spend, {"VOO": voo, "BND": bnd}, {"VOO": 0.6, "BND": 0.4})
+        dates, amts = list(spend["date"]), spend["amount"].to_numpy(dtype=float)
+        brute_mix = sum(brute_force_shadow(dates, list(amts * w), list(both), list(s.loc[both].to_numpy(dtype=float)))
+                        for s, w in ((voo, 0.6), (bnd, 0.4)))
+        checks.append(Check("Portfolio: 60/40 VOO/BND vs a brute-force loop", mix.value, brute_mix, 0.005,
+                            "Plain loop: 60% of each purchase buys VOO and 40% buys BND on the first day "
+                            "both traded, valued at the latest closes."))
 
     tt = timing_test(spend, voo, n_shuffles=50, seed=0)
     checks.append(Check("Timing test 'your dates' vs shadow engine", tt["actual_value"], shadow.value,
@@ -123,10 +127,10 @@ def run_checks(tx_all: pd.DataFrame, spend: pd.DataFrame, voo: pd.Series, spy: p
     vol_np = float(np.std(rv, ddof=1) * np.sqrt(252))
     checks.append(Check("Volatility: app vs numpy", float(table.iloc[0]["ann_vol"]), vol_np, 1e-9,
                         "numpy sample std of daily returns x sqrt(252).", "%"))
-    spy_row = table.iloc[1]
-    checks.append(Check("CAPM: SPY's beta against itself", float(spy_row["beta"]), 1.0, 1e-9,
-                        "The market must sit on its own security market line: beta 1.", "x"))
-
+    rf_d = (1 + rf_annual) ** (1 / 252) - 1
+    sharpe_np = float((rv.mean() - rf_d) / np.std(rv, ddof=1) * np.sqrt(252))
+    checks.append(Check("Sharpe ratio: app vs a hand formula", float(table.iloc[0]["sharpe"]), sharpe_np, 1e-9,
+                        "(average daily return - daily T-bill rate) / std x sqrt(252), in numpy.", "x"))
     d = ROTH_DEFAULTS
     proj = tvm.roth_projection(d["current_age"], d["retirement_age"], d["monthly"], d["rate"],
                                enforce_limit=False)
@@ -134,8 +138,10 @@ def run_checks(tx_all: pd.DataFrame, spend: pd.DataFrame, voo: pd.Series, spy: p
     app_fv = float(proj.iloc[-1]["balance"])
     checks.append(Check("Roth: app vs Excel FV(7%/12, 528, -200)", app_fv, ROTH_EXCEL_FV, 0.005,
                         "Excel's published answer, rounded to the cent."))
-    checks.append(Check("Roth: app vs a month-by-month loop", app_fv, fv_by_loop(d["monthly"], d["rate"], n),
-                        0.005, "Deposit, then grow one month at a time, 528 times."))
+    r = d["rate"] / 12
+    closed = d["monthly"] * ((1 + r) ** n - 1) / r
+    checks.append(Check("Roth: app's month-by-month balance vs the annuity formula", app_fv, closed, 0.005,
+                        "Closed form PMT x ((1+r)^n - 1) / r, typed out here, not the app's TVM code."))
 
     mc = montecarlo.simulate_roth(d["current_age"], d["retirement_age"], d["monthly"], method="normal",
                                   annual_mean=d["rate"], annual_vol=0.15, n_sims=5000, seed=0,

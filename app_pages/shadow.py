@@ -13,7 +13,8 @@ st.title("Shadow portfolio")
 st.caption(
     "What if every purchase had bought an index fund instead? Each dollar buys fractional "
     "shares at the close of the first trading day on or after the purchase. Prices are "
-    "dividend-adjusted, so dividends count as reinvested. No fees or taxes."
+    "dividend-adjusted, so dividends count as reinvested. No fees or taxes. Only the ticker and "
+    "your earliest purchase date go to Yahoo Finance."
 )
 tx = spending_only(require_transactions())
 

@@ -38,8 +38,9 @@ python -m pytest            # math + ingest + headless page tests (tests/test_ap
 Deploying: see [DEPLOY.md](DEPLOY.md) (Streamlit Community Cloud, Python 3.12, pinned requirements).
 
 ## Privacy
-Uploads live only in `st.session_state` for the browser session. Nothing is written to disk or
-logged. The only outbound request carrying anything derived from your data is the ticker and
+Uploads live only in `st.session_state` for the browser session. The app never writes them to
+disk or logs them (yfinance keeps only a ticker-metadata cache on disk; see DEPLOY.md for the
+crash-log caveat). The only outbound request carrying anything derived from your data is the ticker and
 start date (your earliest purchase date) sent to Yahoo Finance. Streamlit's own usage telemetry
 is turned off in `.streamlit/config.toml` (`gatherUsageStats = false`). The browser also loads the app's fonts from Google Fonts; that request carries no data from your file. `data/` is
 gitignored for any real CSVs you keep locally. Never commit real statements.
@@ -60,7 +61,7 @@ Grok (designer) owns the look: `DESIGN.md`, `.streamlit/config.toml`, `styles.cs
   `loaded_summary`, `loaded_kpis`, `loaded_actions`, `spend_kpis`, `chart_by_category`, `table_by_category`,
   `chart_by_month`, `top_merchants`, `shadow_controls`, `shadow_kpis`, `chart_shadow`,
   `shadow_compare`, `roth_inputs`, `roth_kpis`, `chart_roth`, `roth_mc_controls`, `chart_roth_fan`,
-  `roth_mc_kpis`, `risk_kpis`, `chart_risk_return`, `chart_sml`, `risk_table`, `risk_explainer`, `timing_kpis`,
+  `roth_mc_kpis`, `risk_kpis`, `chart_risk_return`, `chart_sml`, `risk_table`, `risk_explainer`, `timing_controls`, `timing_kpis`,
   `chart_timing_hist`, `timing_explainer`, `proof_checks`, `proof_download`, `proof_process`. Phase 7 chart helpers: `chart_fan`, `chart_histogram`,
   `chart_risk_return`, `chart_sml`.
 

@@ -62,6 +62,8 @@ The audits caught real errors before they shipped:
 - The chart palette had fewer colors than spending categories, so two categories shared a color.
 - The security market line sloped downward with no explanation.
 - The Excel workbook showed `#NAME?` until a function-prefix bug was fixed.
+- One Proof check compared an engine with itself, which is circular. It now compares against
+  an independent loop.
 
 ## 5. What the output looks like (on the sample file)
 - **Spending:** $6,963.81 over 6 months ($1,160.63/month). Wants are 53% ($3,684.72). Top
@@ -93,15 +95,18 @@ The audits caught real errors before they shipped:
    to the cent, and the 60/40 portfolio equals a purchase-by-purchase recompute to $0.000001.
 2. **Independent audits every phase,** plus a final three-checker audit (math, data leaks,
    design) by fresh agents that had not seen the code before.
-3. **A live Proof page.** It runs 10 checks on your own data, each pairing an app number with a
-   recompute that does not use that engine:
+3. **A live Proof page.** It runs 10 checks on your own data. Each pairs an app number with a
+   recompute that doesn't use the app's own code for it:
    - the spending total vs. a raw re-read of the CSV;
-   - the shadow value vs. a loop;
-   - three engines agreeing on one value;
-   - beta by regression vs. covariance/variance;
-   - the market's own beta = 1;
-   - the Roth balance vs. Excel and a month-by-month loop;
+   - the VOO and 60/40 portfolio values vs. plain loops;
+   - the timing test vs. the shadow value;
+   - beta vs. numpy covariance/variance;
+   - volatility and Sharpe vs. hand formulas;
+   - the Roth balance vs. Excel's FV and the annuity formula;
    - the Monte Carlo mean within 3 standard errors of the closed form.
+
+   The final math audit flagged a check that compared one engine with itself; we replaced it. The
+   page also says plainly which numbers are verified by the audit rather than live.
 4. **An Excel workbook with live formulas** (`FV`, shares and value per purchase, `SLOPE`,
    `STDEV.S`, the T-bill conversion, Sharpe). We recalculated it in Excel itself: every
    difference cell is 0, to about 16 decimal places.

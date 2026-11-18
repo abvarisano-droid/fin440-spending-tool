@@ -72,6 +72,8 @@ st.caption(
     f"For 100% VOO. Risk-free: 13-week T-bill at {rf['discount_yield']:.3%} discount yield = "
     f"{rf_annual:.2%} effective annual (as of {rf['as_of']:%b %d, %Y}). "
     f"{int(head['n'])} daily returns from {series[names[0]].index[0]:%b %d, %Y}."
+    + (" Today's T-bill rate is applied to the whole window, a simplification: rates were near "
+       "zero in 2021, so Sharpe and alpha are slightly understated." if window == "history" else "")
 )
 if head["n"] < 252:
     st.info(f"Only {int(head['n'])} trading days of purchases so far (under a year). Annualizing a short window "
@@ -127,6 +129,6 @@ with ui.section("risk_explainer", "How to read this"):
         "compounded (geometric) returns. *Jensen's alpha* is the regression intercept on daily excess "
         "returns, times 252 (arithmetic). They are close and usually share a sign, but they are not identical.\n\n"
         "**Diversification:** BND has a low beta, so the 60/40 mix lowers volatility and beta "
-        "together. Volatility that beta does not explain (1 minus R squared) is diversifiable, and "
+        "together. The share of variance beta does not explain (1 minus R squared) is diversifiable, and "
         "CAPM says the market does not pay you for carrying it."
     )
