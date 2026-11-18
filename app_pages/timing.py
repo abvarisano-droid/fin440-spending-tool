@@ -50,7 +50,7 @@ ui.kpi_row("timing_kpis", [
     dict(label="Median random dates", value=f"${res['median_shuffled']:,.2f}",
          help=f"Median of {N_SHUFFLES:,} reshuffles. Each purchase moves to a random trading day "
               "between your first and last buy."),
-    dict(label="Your percentile", value=f"{ordinal(pct)}",
+    dict(label=f"Your percentile, of {N_SHUFFLES:,} shuffles", value=f"{ordinal(pct)}",
          help=f"Share of the {N_SHUFFLES:,} reshuffles your real dates beat (ties count half)."),
 ])
 

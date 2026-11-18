@@ -86,26 +86,27 @@ with c2, ui.section("chart_sml", "Security market line"):
     ui.chart_sml(risk.sml_line(rf_annual, mkt_ann, betas=[0.0, hi]),
                  table[["name", "beta", "ann_return"]], key="sml_chart")
 
-st.dataframe(
-    table.assign(**{c: table[c] * 100 for c in ("ann_return", "ann_vol", "max_drawdown", "alpha_annual",
-                                                "capm_expected", "sml_gap")})
-    [["name", "ann_return", "ann_vol", "sharpe", "max_drawdown", "beta", "r_squared", "capm_expected",
-      "sml_gap", "alpha_annual"]],
-    hide_index=True,
-    column_config={
-        "name": "Portfolio",
-        "ann_return": st.column_config.NumberColumn("Return", format="%.2f%%"),
-        "ann_vol": st.column_config.NumberColumn("Volatility", format="%.2f%%"),
-        "sharpe": st.column_config.NumberColumn("Sharpe", format="%.2f"),
-        "max_drawdown": st.column_config.NumberColumn("Max drawdown", format="%.2f%%"),
-        "beta": st.column_config.NumberColumn("Beta", format="%.2f"),
-        "r_squared": st.column_config.NumberColumn("R squared", format="%.2f"),
-        "capm_expected": st.column_config.NumberColumn("CAPM expected", format="%.2f%%"),
-        "sml_gap": st.column_config.NumberColumn("Above SML", format="%+.2f%%"),
-        "alpha_annual": st.column_config.NumberColumn("Jensen's alpha", format="%+.2f%%"),
-    },
-    key="risk_table",
-)
+with ui.section("risk_table", "All portfolios"):
+    st.dataframe(
+        table.assign(**{c: table[c] * 100 for c in ("ann_return", "ann_vol", "max_drawdown", "alpha_annual",
+                                                    "capm_expected", "sml_gap")})
+        [["name", "ann_return", "ann_vol", "sharpe", "max_drawdown", "beta", "r_squared", "capm_expected",
+          "sml_gap", "alpha_annual"]],
+        hide_index=True,
+        column_config={
+            "name": "Portfolio",
+            "ann_return": st.column_config.NumberColumn("Return", format="%.2f%%"),
+            "ann_vol": st.column_config.NumberColumn("Volatility", format="%.2f%%"),
+            "sharpe": st.column_config.NumberColumn("Sharpe", format="%.2f"),
+            "max_drawdown": st.column_config.NumberColumn("Max drawdown", format="%.2f%%"),
+            "beta": st.column_config.NumberColumn("Beta", format="%.2f"),
+            "r_squared": st.column_config.NumberColumn("R squared", format="%.2f"),
+            "capm_expected": st.column_config.NumberColumn("CAPM expected", format="%.2f%%"),
+            "sml_gap": st.column_config.NumberColumn("Above SML", format="%+.2f%%"),
+            "alpha_annual": st.column_config.NumberColumn("Jensen's alpha", format="%+.2f%%"),
+        },
+        key="risk_stats",
+    )
 
 with ui.section("risk_explainer", "How to read this"):
     st.markdown(
