@@ -34,12 +34,12 @@ The lead runs three workers in parallel, then reviews and commits. They touch se
 README edits merge through the lead.
 | ID | Worker | Task | Done when | Status |
 |---|---|---|---|---|
-| 4.1 | Robustness | Audit item 7: the amount auto-detect must skip date-like columns; tighten the `lime` / `metro` / `toll` keywords; tests for each. Audit item 9: fix the README note about which test needs network. | New tests pass | done (`0f69b4c`), item 9 pending |
-| 4.2 | Deploy | Make the repo ready for Streamlit Community Cloud: pinned requirements, no local paths, a deploy section in README | `streamlit run` works from a clean venv | todo |
+| 4.1 | Robustness | Audit item 7: the amount auto-detect must skip date-like columns; tighten the `lime` / `metro` / `toll` keywords; tests for each. Audit item 9: fix the README note about which test needs network. | New tests pass | done (`0f69b4c`), item 9 done |
+| 4.2 | Deploy | Make the repo ready for Streamlit Community Cloud: pinned requirements, no local paths, a deploy section in README | `streamlit run` works from a clean venv | done: pinned, 35 tests + smoke pass in a clean venv, DEPLOY.md |
 | 4.3 | Write-up | Draft the FIN 440 write-up from README + HANDOFF (method, TVM math, sample results, limits) | Matches the rubric | **blocked: needs rubric** |
 
 ## Needs Ashton
 1. **FIN 440 rubric and due date** for the write-up (4.3). Nothing in the Brain has them.
-2. **Deploy:** a GitHub repo (public or private) and your Streamlit Community Cloud sign-in.
+2. **Deploy (steps in DEPLOY.md):** a GitHub repo (public or private) and your Streamlit Community Cloud sign-in.
    Agents can't create accounts for you.
 3. Say "audit phase N" to Grok when a builder phase lands.

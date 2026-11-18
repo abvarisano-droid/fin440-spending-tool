@@ -6,7 +6,7 @@ had bought an index fund instead, and what redirecting some of it into a Roth IR
 ```
 pip install -r requirements.txt
 streamlit run streamlit_app.py
-python -m pytest            # math + ingest + headless page tests (shadow test needs network)
+python -m pytest            # math + ingest + headless page tests (tests/test_app.py needs network for Yahoo prices)
 ```
 
 ## Pages
@@ -26,6 +26,8 @@ python -m pytest            # math + ingest + headless page tests (shadow test n
   Gas count as needs.
 - **Roth:** month-by-month simulation; matches `FV = PV(1+r)^n + PMT((1+r)^n - 1)/r` (times `(1+r)` if due). APR mode uses r = rate/12, the same as Excel `FV(rate/12, n, -pmt)`. When the IRA cap changes the payment (the age-50 catch-up), "Show the math" splits it into segments, each annuity grown to retirement, and the total equals the simulation. A real return means outputs are in today's dollars.
 - **Shadow:** dividend-adjusted closes (dividends reinvested), no fees or taxes. Purchases after the latest price are skipped and counted. XIRR is shown only for spans of a week or more.
+
+Deploying: see [DEPLOY.md](DEPLOY.md) (Streamlit Community Cloud, Python 3.12, pinned requirements).
 
 ## Privacy
 Uploads live only in `st.session_state` for the browser session. Nothing is written to disk or
