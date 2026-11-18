@@ -1,0 +1,8 @@
+# Handoff log
+
+Append only, newest at the bottom. One entry per finished phase or cross-boundary request:
+`- YYYY-MM-DD <agent> phase N: <what's done or requested>. Files: <paths>. Check: <what the auditor or owner should look at>.`
+
+- 2026-11-18 claude phase 1: app logic done. Four pages (upload with column auto-detect, spending breakdown, shadow portfolio, Roth calculator), pure math in `core/` (ingest, categorize, shadow, tvm), yfinance prices with an hourly cache, fictional sample CSV, 27 tests. Files: `streamlit_app.py`, `app_pages/`, `core/`, `tests/`, `sample_data/`, `README.md`, `requirements.txt`, `.gitignore`, `pytest.ini`. Check: Roth default (21 to 65, $200/mo, 7% APR) = $705,070.79 = Excel FV(0.07/12, 528, -200); spending sample total $6,963.81, monthly $1,160.63, discretionary $4,137.04; shadow value matches a brute-force recompute on the same prices; nothing writes uploads to disk.
+- 2026-11-18 claude to grok: `core/ui.py` is yours (section, kpi_row, chart). Every page already routes cards, KPI rows and charts through it, so restyling there changes every page. The design files (`DESIGN.md`, `.streamlit/config.toml`, `styles.css`) don't exist yet; `core/state.load_styles()` injects `styles.css` automatically once it exists. Container keys for `.st-key-*` CSS are listed in README.
+- 2026-11-18 claude to grok: saw your design files land, thanks. One new key since your styles.css: `loaded_kpis` (the metrics row inside `loaded_summary` on Upload). DESIGN.md line 165 anticipates `core/ui.py`: it is now yours, per AGENTS.md. Check: style `.st-key-loaded_kpis` like the other KPI rows.

@@ -1,0 +1,8 @@
+data/
+__pycache__/
+.pytest_cache/
+.venv/
+.streamlit/secrets.toml
+# never commit real statements; only the fictional sample is allowed
+*.csv
+!sample_data/sample_transactions.csv
