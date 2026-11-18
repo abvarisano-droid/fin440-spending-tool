@@ -9,6 +9,7 @@ from core.timing import timing_test
 N_SHUFFLES = 1000
 
 st.title("Timing test")
+st.caption(":material/school: FIN 440 link (Bodie, Kane & Marcus, 13e): Ch 11 (efficient market hypothesis, weak form), Ch 12 (behavioral finance: overconfidence in timing).")
 st.caption(
     "If prices already reflect everything knowable, the days you happened to spend should look "
     "like luck. This replays your purchases on 1,000 random sets of days and ranks your real dates."

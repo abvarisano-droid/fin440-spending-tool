@@ -6,6 +6,7 @@ from core.prices import clean_ticker, fetch_history
 from core.state import get_transactions, spending_only
 
 st.title("Roth IRA calculator")
+st.caption(":material/school: FIN 440 link (Bodie, Kane & Marcus, 13e): Ch 5 (compounding, APR vs. EAR, real vs. nominal returns, arithmetic vs. geometric averages).")
 st.caption(
     "Monthly contributions grow tax-free. Use a real (after-inflation) return to read every "
     "number in today's dollars. Roth eligibility has income limits, which this calculator "

@@ -1,5 +1,7 @@
 # Spend Shadow: FIN 440 project write-up
 
+**Live app:** https://fin440-spending-to-uaoynqbehwjlulmegnfrpf.streamlit.app/ (click "Use sample data" on the first page)
+
 *Draft for the group. Market figures use Yahoo Finance prices as of Nov 18, 2026 and move daily;
 spending figures come from the fictional sample file and never change.*
 
@@ -25,15 +27,17 @@ the usual "latte calculator" trap of assuming a smooth 7%. It shows risk, a rang
 and whether the market paid you for the risk you would have taken.
 
 ## 3. How it works (and the class topic behind each part)
-| Page | What it computes | Class topic |
+Chapters refer to Bodie, Kane & Marcus, *Investments*, 13th edition, as covered in FIN 440.
+
+| Page | What it computes | BKM 13e chapters |
 |---|---|---|
-| Spending breakdown | Gross purchases by category; discretionary (wants) share | Budgeting as the source of investable cash |
-| Shadow portfolio | Each purchase buys fractional shares at the first close on or after its date, using dividend-adjusted prices (dividends reinvested). Value today, gain, money-weighted return (XIRR) | Returns, holding-period vs. annualized, dividends |
-| Shadow: compare | The same purchases split 100% VOO, 60/40 VOO/BND, 100% BND, 100% QQQ | Diversification, asset allocation |
-| Risk & CAPM | Volatility, Sharpe ratio, max drawdown, beta and Jensen's alpha by regression against SPY; the security market line, with the 13-week T-bill as the risk-free rate (bank discount yield converted to an effective annual rate) | Risk and return, CAPM, SML, systematic vs. diversifiable risk |
-| Timing test | Moves every purchase to a random trading day 1,000 times and ranks your real dates | Market efficiency, behavioral finance |
-| Roth calculator | FV of a monthly annuity with the 2026 IRA limit and age-50 catch-up; APR vs. effective rate; ordinary annuity vs. annuity due | Time value of money |
-| Roth: uncertain returns | 5,000 simulated paths (normal returns, or replayed real fund months); percentile bands; odds of a target | Risk over long horizons, volatility drag |
+| Spending breakdown | Gross purchases by category; discretionary (wants) share | Ch 1 (saving vs. consumption), Ch 12 (impulse spending, mental accounting) |
+| Shadow portfolio | Each purchase buys fractional shares at the first close on or after its date, using dividend-adjusted prices (dividends reinvested). Value today, gain, money-weighted return (XIRR) | Ch 2 (asset classes, stock and bond indexes), Ch 5 (holding-period returns, compounding) |
+| Shadow: compare | The same purchases split 100% VOO, 60/40 VOO/BND, 100% BND, 100% QQQ | Ch 7 (efficient diversification: the stock-bond mix) |
+| Risk & CAPM | Volatility, Sharpe ratio, max drawdown, beta and alpha against SPY; the security market line, with the 13-week T-bill as the risk-free rate (bank discount yield converted to an effective annual rate) | Ch 2 (T-bill discount yield), Ch 5 (standard deviation, Sharpe ratio), Ch 6 (risk-free vs. risky assets), Ch 7 (systematic vs. diversifiable risk), Ch 9 (CAPM, beta, alpha, SML) |
+| Timing test | Moves every purchase to a random trading day 1,000 times and ranks your real dates | Ch 11 (efficient market hypothesis, weak form), Ch 12 (overconfidence in timing) |
+| Roth calculator | FV of a monthly annuity with the 2026 IRA limit and age-50 catch-up; APR vs. effective rate; ordinary annuity vs. annuity due | Ch 5 (compounding, APR vs. EAR, real vs. nominal returns) |
+| Roth: uncertain returns | 5,000 simulated paths (normal returns, or replayed real fund months); percentile bands; odds of a target | Ch 5 (normal distribution, arithmetic vs. geometric averages: volatility drag) |
 
 Two technical choices matter for correctness:
 - **Time-weighted unit value.** A portfolio that keeps receiving new purchases has a balance that
@@ -42,7 +46,16 @@ Two technical choices matter for correctness:
 - **Two risk windows.** Your purchase dates (real, but often only months of data) or five years
   of fund history (statistically steadier).
 
-*Exact course chapter references to be added once we confirm the syllabus.*
+
+## What changed from the original plan
+- **Plaid and email or Shop Pay scraping became CSV upload.** Plaid needs API keys, a developer
+  account and bank logins, and reading email needs inbox access. A CSV export works with any bank
+  or card, needs no credentials, and keeps the data in the browser session. Another person can
+  still run it on their own real data, which was the goal.
+- **The scope grew from "spending and a Roth calculator" into an investments lab.** We added
+  risk, CAPM and the SML, a diversification comparison, a market-efficiency test, Monte Carlo
+  uncertainty and a Proof page. Each addition ties back to a course chapter.
+- **The Roth default is ages 21 to 65.** It is editable, so 60 is one click away.
 
 ## 4. How AI was used
 We built this with three AI agents, each with its own job and its own files:

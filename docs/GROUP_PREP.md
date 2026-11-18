@@ -88,3 +88,49 @@ spending figures do not.
 - One AI built, one designed, and a third audited. No agent graded its own work.
 - Rules, handoffs and audit results are all in the repo (`AGENTS.md`, `HANDOFF.md`, `PLAN.md`).
 - People made every scope and ship decision.
+
+## Class check-ins (be ready for these questions)
+**Game plan check-in**
+- *The idea:* turn a bank or card statement into an investments lab on your own spending.
+- *How it relates to investments:* it covers returns, risk, CAPM, diversification, market
+  efficiency and TVM (BKM Ch 2, 5, 6, 7, 9, 11, 12).
+- *AI tools:*
+  - Claude Code built the app.
+  - Grok designed the look.
+  - Each audited the other.
+- *How we avoid slop:*
+  - hand-checked tests (Excel FV, brute-force loops, numpy);
+  - an independent audit every phase;
+  - a live Proof page;
+  - an Excel workbook built from formulas.
+- *Challenges we expected:*
+  - bank CSV formats vary, so the app auto-detects the columns;
+  - a short purchase window makes the statistics noisy, so there's a 5-year view;
+  - privacy.
+
+**Progress check-in**
+- *Built and working:* all 7 pages, live at the Streamlit URL, with 92 tests passing.
+- *What changed:*
+  - Plaid and email scraping became CSV upload: no credentials, any bank, data stays in the session.
+  - The scope grew from a calculator into an investments lab.
+- *What didn't work at first, and how we caught it:*
+  - the Roth cap ignored the age-50 catch-up;
+  - a loss displayed as a gain;
+  - the SML sloped downward with no explanation;
+  - Excel showed `#NAME?`;
+  - one Proof check was circular.
+- *What's left:* the presentation deck, and practice explaining each number.
+
+## Chapter map (cite only covered chapters: 1, 2, 3, 5, 6, 7, 9, 11, 12)
+- **Ch 2:** T-bills (bank discount yield), stock and bond indexes, asset classes.
+- **Ch 5:** holding-period return, compounding, APR vs EAR, real vs nominal, standard deviation,
+  Sharpe ratio, arithmetic vs geometric averages (volatility drag), the normal distribution.
+- **Ch 6:** the risk-free asset vs risky assets, capital allocation.
+- **Ch 7:** efficient diversification, the stock-bond mix, systematic vs diversifiable risk.
+- **Ch 9:** CAPM, beta, alpha, the security market line.
+- **Ch 11:** the efficient market hypothesis (the timing test).
+- **Ch 12:** behavioral finance (impulse spending, overconfidence in timing).
+- **Not covered, so don't cite them:**
+  - Ch 4: ETFs as investment companies. Say "asset classes, Ch 2" instead.
+  - Ch 8: estimating beta by regression. Say "beta, Ch 9".
+  - Ch 10.

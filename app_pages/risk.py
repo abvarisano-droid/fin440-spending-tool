@@ -7,6 +7,7 @@ from core.prices import MARKET_PROXY, fetch_history, fetch_many, fetch_risk_free
 from core.state import require_transactions, spending_only
 
 st.title("Risk and CAPM")
+st.caption(":material/school: FIN 440 link (Bodie, Kane & Marcus, 13e): Ch 2 (T-bill discount yield), Ch 5 (standard deviation, Sharpe ratio, drawdown), Ch 6 (risk-free vs. risky assets), Ch 7 (systematic vs. diversifiable risk), Ch 9 (CAPM, beta, alpha, the SML).")
 st.caption(
     "How much each portfolio swung, and whether its return was fair pay for its market risk. "
     "Volatility and beta use a time-weighted unit value, so new purchases never look like "

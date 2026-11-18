@@ -10,6 +10,7 @@ from core.shadow import build_shadow
 from core.state import require_transactions, spending_only
 
 st.title("Shadow portfolio")
+st.caption(":material/school: FIN 440 link (Bodie, Kane & Marcus, 13e): Ch 2 (asset classes, stock and bond indexes), Ch 5 (holding-period returns, compounding), Ch 7 (stock-bond diversification).")
 st.caption(
     "What if every purchase had bought an index fund instead? Each dollar buys fractional "
     "shares at the close of the first trading day on or after the purchase. Prices are "

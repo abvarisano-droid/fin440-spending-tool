@@ -1,5 +1,7 @@
 # Spend Shadow (FIN 440)
 
+**Live:** https://fin440-spending-to-uaoynqbehwjlulmegnfrpf.streamlit.app/
+
 Upload a bank or card CSV and see where the money went, what it would be worth if every purchase
 had bought an index fund instead, and what redirecting some of it into a Roth IRA could grow to.
 
