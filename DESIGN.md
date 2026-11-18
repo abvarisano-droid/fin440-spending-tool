@@ -110,6 +110,7 @@ No scroll libraries, no grain overlay, no parallax. Streamlit reruns make cinema
 - Top `st.navigation` stays. Hide the Streamlit deploy button via CSS.
 - Empty state (no CSV yet): one `st.info` plus a page link to Upload. Caption weight, not a second hero.
 - Privacy line lives under the Upload title as `st.caption`. Repeat a one-line caption on Shadow (Yahoo Finance ticker only) and Roth (no income-limit check).
+- Streamlit usage telemetry is off: `[browser] gatherUsageStats = false` in `.streamlit/config.toml`. The only outbound request remains the ticker and start date to Yahoo Finance.
 
 ---
 
@@ -132,7 +133,7 @@ Empty: only title, caption, and `upload_source`. No mapper, no summary.
 
 Order:
 
-1. Title. Toggle "Include transfers and card payments" immediately under the title (filter, not a card).
+1. Title plus a one-line caption (builder: add this; other pages already have one). Toggle "Include transfers and card payments" immediately under that (filter, not a card).
 2. **`spend_kpis`**: four metrics in one row: Total spent, Per month (avg), Discretionary, Discretionary share. The row container is unbordered; each metric uses `st.metric(border=True)` as a paper well.
 3. Two-column row **3:2**: **`chart_by_category`** (bar, dollars on x, category on y) | **`table_by_category`** (totals + share progress).
 4. **`chart_by_month`**: full-width stacked bars by month.
@@ -167,8 +168,8 @@ This page holds the signature moment.
 Signatures stay stable: `section(key, title=None, border=True)`, `kpi_row(key, items)`, `chart(c, key=None)`.
 
 - `section`: keyed `st.container`. Bordered card by default (`upload_source` passes `border=False`). Fraunces h3 when `title` is set.
-- `kpi_row`: keyed container, equal `st.columns`, each `st.metric(..., border=True)`. CSS sets Fraunces 28px values. Signature override only on `.st-key-shadow_kpis` column 2 (40px / 2.5rem).
-- `chart`: Altair theme `spend_shadow` (also registered globally): legend bottom, no view stroke, axis `#6E675C`, grid `#E6DDD0`, categorical range from the palette. Named series constants: `ui.SPENT`, `ui.SHADOW`, `ui.CONTRIBUTIONS`, `ui.GROWTH`.
+- `kpi_row`: keyed container, equal `st.columns`, each `st.metric(..., border=True)`. CSS sets Fraunces 28px values. The shadow signature metric is wrapped as `.st-key-shadow_signature` (gain, pine) or `.st-key-shadow_signature_down` (loss, brick), 40px / 2.5rem. Roth growth (third `roth_kpis` value) is green.
+- `chart`: Altair theme `spend_shadow` (also registered globally): legend bottom, no view stroke, axis `#6E675C`, grid `#E6DDD0`, categorical range from the palette. When the color field is `series`, range is `SPENT` then `SHADOW`. When it is `part`, domain is Contributions / Growth in `CONTRIBUTIONS` / `GROWTH`. Named constants: `ui.SPENT`, `ui.SHADOW`, `ui.CONTRIBUTIONS`, `ui.GROWTH`.
 - Primary button: pine fill, white label, 4px radius. Secondary / "Clear data": surface fill, pine text, 1px border.
 - `st.caption` for helper copy. `st.info` for the empty-upload pointer and skip/cap notices only.
 - Tables: header `surface-tint`, hairline borders, tabular nums.
@@ -181,7 +182,7 @@ Signatures stay stable: `section(key, title=None, border=True)`, `kpi_row(key, i
 
 `upload_source`, `column_mapper`, `loaded_summary`, `loaded_kpis`, `spend_kpis`, `chart_by_category`, `table_by_category`, `chart_by_month`, `top_merchants`, `shadow_controls`, `shadow_kpis`, `chart_shadow`, `roth_inputs`, `roth_kpis`, `chart_roth`.
 
-Plus expanders `all_tx`, `shadow_ledger`, `roth_math` and tables `raw_preview`, `cat_table`, `top_table`, `tx_editor`, `ledger_table`, `roth_table`.
+Plus expanders `all_tx`, `shadow_ledger`, `roth_math`, tables `raw_preview`, `cat_table`, `top_table`, `tx_editor`, `ledger_table`, `roth_table`, and signature wraps `shadow_signature` / `shadow_signature_down`.
 
 ---
 

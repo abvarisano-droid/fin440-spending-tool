@@ -16,7 +16,8 @@
 }
 
 /* Chrome */
-.stAppDeployButton {
+.stAppDeployButton,
+[data-testid="stDecoration"] {
   display: none;
 }
 
@@ -33,6 +34,10 @@
 
 h1, h2, h3 {
   letter-spacing: -0.02em;
+}
+
+[data-testid="stCaption"] {
+  color: var(--ss-muted);
 }
 
 /* Tabular money */
@@ -94,10 +99,44 @@ h1, h2, h3 {
   color: var(--ss-text);
 }
 
-/* Signature moment: shadow "it'd be worth" is the second KPI */
-.st-key-shadow_kpis [data-testid="stHorizontalBlock"] > div:nth-child(2) [data-testid="stMetricValue"] {
+/* Signature moment: oversized shadow value. Pine on a gain, brick on a loss. */
+.st-key-shadow_signature [data-testid="stMetricValue"],
+.st-key-shadow_signature_down [data-testid="stMetricValue"] {
   font-size: 2.5rem;
+}
+
+.st-key-shadow_signature [data-testid="stMetricValue"] {
   color: var(--ss-accent);
+}
+
+.st-key-shadow_signature_down [data-testid="stMetricValue"] {
+  color: var(--ss-red);
+}
+
+/* Roth growth reads as the earned amount. */
+.st-key-roth_kpis [data-testid="stHorizontalBlock"] > div:nth-child(3) [data-testid="stMetricValue"] {
+  color: var(--ss-green);
+}
+
+/* Upload: sample data is the invitation at the door. */
+.st-key-use_sample button {
+  background: var(--ss-accent);
+  border-color: var(--ss-accent);
+  color: #fffbf4;
+  border-radius: var(--ss-radius);
+  transition: background-color 160ms var(--ss-ease);
+}
+
+.st-key-use_sample button:hover {
+  background: var(--ss-accent-hover);
+  border-color: var(--ss-accent-hover);
+  color: #fffbf4;
+}
+
+.st-key-clear_btn button {
+  color: var(--ss-red);
+  border-color: var(--ss-border);
+  background: var(--ss-surface);
 }
 
 /* Primary buttons */
@@ -116,11 +155,15 @@ h1, h2, h3 {
   border-color: var(--ss-accent-hover);
 }
 
-/* File uploader and expanders sit on paper */
+/* File uploader, expanders, quiet alerts */
 [data-testid="stFileUploaderDropzone"],
 [data-testid="stExpander"] {
   background: var(--ss-surface);
   border-color: var(--ss-border);
+  border-radius: var(--ss-radius);
+}
+
+[data-testid="stAlert"] {
   border-radius: var(--ss-radius);
 }
 
@@ -142,7 +185,8 @@ h1, h2, h3 {
   .st-key-roth_inputs,
   .st-key-chart_roth,
   .stButton button[kind="primary"],
-  [data-testid="stBaseButton-primary"] {
+  [data-testid="stBaseButton-primary"],
+  .st-key-use_sample button {
     transition: none;
   }
 
@@ -165,7 +209,8 @@ h1, h2, h3 {
     padding-top: 1rem;
   }
 
-  .st-key-shadow_kpis [data-testid="stHorizontalBlock"] > div:nth-child(2) [data-testid="stMetricValue"] {
+  .st-key-shadow_signature [data-testid="stMetricValue"],
+  .st-key-shadow_signature_down [data-testid="stMetricValue"] {
     font-size: 2rem;
   }
 }
