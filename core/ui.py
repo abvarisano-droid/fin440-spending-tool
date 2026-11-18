@@ -48,6 +48,8 @@ ACCENT = "#1E4A3A"
 FAN_OUTER = "#EDE6D9"
 FAN_INNER = "#A8B894"
 HIST_FILL = "#C9D0B0"
+# 3:1 non-text stroke on paper/surface (fills alone are too light).
+BAND_STROKE = "#5A7D5C"
 PORTFOLIO_ORDER = list(PRESETS.keys()) + ["SPY (market)", "SPY"]
 PORTFOLIO_COLORS = {
     "100% VOO": SHADOW,
@@ -251,7 +253,6 @@ def chart(c: alt.Chart, key: str | None = None) -> None:
         .configure_range(category=CATEGORICAL)
         .configure_line(strokeWidth=2.5)
         .configure_area(opacity=0.9)
-        .configure_bar(stroke=None)
     )
     st.altair_chart(c, width="stretch", key=key)
 
@@ -278,7 +279,7 @@ def chart_fan(
     x_enc = alt.X(f"{x}:Q", title="Age")
     outer = (
         alt.Chart(df)
-        .mark_area(opacity=0.9, color=FAN_OUTER)
+        .mark_area(opacity=0.9, color=FAN_OUTER, stroke=BAND_STROKE, strokeWidth=1)
         .encode(
             x=x_enc,
             y=alt.Y("p5:Q", title=y_title, axis=alt.Axis(format="$,.0f")),
@@ -316,7 +317,7 @@ def chart_histogram(
     df = pd.DataFrame({"value": list(values)})
     layers: list[alt.Chart] = [
         alt.Chart(df)
-        .mark_bar(color=HIST_FILL)
+        .mark_bar(color=HIST_FILL, stroke=BAND_STROKE, strokeWidth=1)
         .encode(
             x=alt.X(
                 "value:Q",

@@ -6,6 +6,7 @@
   --ss-tint: #ede6d9;
   --ss-text: #1c1915;
   --ss-muted: #6e675c;
+  --ss-muted-on-tint: #5a544c;
   --ss-accent: #1e4a3a;
   --ss-accent-hover: #16382c;
   --ss-border: #ddd4c6;
@@ -82,11 +83,7 @@ h3 {
   gap: 8px;
 }
 
-.st-key-chart_by_category {
-  padding-left: 12px;
-}
-
-/* Cards (upload_source is unbordered on purpose) */
+/* Cards (upload_source and proof_download stay unbordered). 16px Streamlit + 4px. */
 .st-key-column_mapper,
 .st-key-loaded_summary,
 .st-key-chart_by_category,
@@ -105,16 +102,19 @@ h3 {
 .st-key-risk_explainer,
 .st-key-chart_timing_hist,
 .st-key-timing_explainer,
+.st-key-timing_controls,
 .st-key-proof_checks,
-.st-key-proof_table,
-.st-key-risk_table,
-.st-key-risk_stats,
-.st-key-compare_table {
+.st-key-risk_table {
   background: var(--ss-surface);
   border-color: var(--ss-border) !important;
   border-radius: var(--ss-radius) !important;
-  padding: 4px;
+  padding: 20px;
   transition: transform 220ms var(--ss-ease), opacity 220ms var(--ss-ease);
+}
+
+/* Extra left pad so long y-axis labels (Housing & Utilities) stay inside the card. */
+.st-key-chart_by_category {
+  padding-left: 32px;
 }
 
 /* KPI type. Wells come from st.metric(border=True) plus a tint fill. */
@@ -135,7 +135,7 @@ h3 {
 .st-key-risk_kpis [data-testid="stMetricLabel"],
 .st-key-timing_kpis [data-testid="stMetricLabel"],
 .st-key-loaded_kpis [data-testid="stMetricLabel"] {
-  color: var(--ss-muted);
+  color: var(--ss-muted-on-tint);
   font-size: 13px;
   font-weight: 500;
   letter-spacing: 0.04em;
@@ -176,25 +176,27 @@ h3 {
 }
 
 .stButton button,
+.stDownloadButton button,
+[data-testid="stDownloadButton"] button,
+[data-testid="stMain"] [data-testid="stPageLink-NavLink"],
 [data-testid="stFileUploaderDropzone"] {
   min-height: 44px;
   touch-action: manipulation;
   -webkit-tap-highlight-color: rgba(30, 74, 58, 0.14);
 }
 
-/* Upload: sample data is the invitation at the door. */
-.st-key-use_sample button {
-  background: var(--ss-accent);
-  border-color: var(--ss-accent);
-  color: #fffbf4;
-  border-radius: var(--ss-radius);
-  transition: transform 160ms var(--ss-ease), opacity 160ms var(--ss-ease);
+[data-testid="stMain"] [data-testid="stPageLink-NavLink"] {
+  display: inline-flex;
+  align-items: center;
 }
 
+/* Secondary actions: sample data and Clear data. Load / download stay pine. */
+.st-key-use_sample button,
 .st-key-clear_btn button {
   color: var(--ss-accent);
   border-color: var(--ss-border);
   background: var(--ss-surface);
+  border-radius: var(--ss-radius);
   transition: transform 160ms var(--ss-ease), opacity 160ms var(--ss-ease);
 }
 
@@ -274,18 +276,16 @@ h3 {
   .st-key-risk_explainer:hover,
   .st-key-chart_timing_hist:hover,
   .st-key-timing_explainer:hover,
+  .st-key-timing_controls:hover,
   .st-key-proof_checks:hover,
-  .st-key-proof_table:hover,
-  .st-key-risk_table:hover,
-  .st-key-risk_stats:hover,
-  .st-key-compare_table:hover {
+  .st-key-risk_table:hover {
     transform: translateY(-2px);
     opacity: 1;
   }
 
-  .st-key-use_sample button:hover,
   .stButton button[kind="primary"]:hover,
-  [data-testid="stBaseButton-primary"]:hover {
+  [data-testid="stBaseButton-primary"]:hover,
+  .stDownloadButton button[kind="primary"]:hover {
     background: var(--ss-accent-hover);
     border-color: var(--ss-accent-hover);
     color: #fffbf4;
@@ -295,8 +295,10 @@ h3 {
 /* Touch press: short opacity + scale, transform/opacity only. */
 @media (hover: none), (pointer: coarse) {
   .stButton button:active,
+  .stDownloadButton button:active,
   [data-testid="stBaseButton-primary"]:active,
   [data-testid="stBaseButton-secondary"]:active,
+  [data-testid="stMain"] [data-testid="stPageLink-NavLink"]:active,
   .st-key-use_sample button:active,
   .st-key-clear_btn button:active {
     transform: scale(0.98);
@@ -333,14 +335,14 @@ h3 {
   .st-key-risk_explainer,
   .st-key-chart_timing_hist,
   .st-key-timing_explainer,
+  .st-key-timing_controls,
   .st-key-proof_checks,
-  .st-key-proof_table,
   .st-key-risk_table,
-  .st-key-risk_stats,
-  .st-key-compare_table,
   .stButton button[kind="primary"],
+  .stDownloadButton button,
   [data-testid="stBaseButton-primary"],
   [data-testid="stBaseButton-secondary"],
+  [data-testid="stMain"] [data-testid="stPageLink-NavLink"],
   .st-key-use_sample button,
   .st-key-clear_btn button {
     transition: none;
@@ -364,14 +366,14 @@ h3 {
   .st-key-risk_explainer:hover,
   .st-key-chart_timing_hist:hover,
   .st-key-timing_explainer:hover,
+  .st-key-timing_controls:hover,
   .st-key-proof_checks:hover,
-  .st-key-proof_table:hover,
   .st-key-risk_table:hover,
-  .st-key-risk_stats:hover,
-  .st-key-compare_table:hover,
   .stButton button:active,
+  .stDownloadButton button:active,
   [data-testid="stBaseButton-primary"]:active,
   [data-testid="stBaseButton-secondary"]:active,
+  [data-testid="stMain"] [data-testid="stPageLink-NavLink"]:active,
   .st-key-use_sample button:active,
   .st-key-clear_btn button:active {
     transform: none;
@@ -417,8 +419,12 @@ h3 {
 
   [data-testid="stMain"] .stButton,
   [data-testid="stMain"] .stButton button,
+  [data-testid="stMain"] .stDownloadButton,
+  [data-testid="stMain"] .stDownloadButton button,
   [data-testid="stMain"] button[data-testid="stBaseButton-primary"],
   [data-testid="stMain"] button[data-testid="stBaseButton-secondary"],
+  [data-testid="stMain"] .stPageLink,
+  [data-testid="stMain"] [data-testid="stPageLink-NavLink"],
   [data-testid="stMain"] .st-key-use_sample,
   [data-testid="stMain"] .st-key-clear_btn {
     width: 100% !important;

@@ -54,7 +54,8 @@ Lock to this light theme. Do not add a dark variant. Streamlit's settings menu s
 | `surface` | `#FFFBF4` | Cards, widgets, secondary background |
 | `surface-tint` | `#EDE6D9` | Dataframe headers, KPI wells, code blocks |
 | `text` | `#1C1915` | Body, headings, metric values |
-| `muted` | `#6E675C` | Captions, help, inactive nav |
+| `muted` | `#6E675C` | Captions, help, inactive nav (~4.9:1 on paper) |
+| `muted-on-tint` | `#5A544C` | KPI labels on `surface-tint` wells (~6.0:1). `#6E675C` on `#EDE6D9` is only 4.50:1 |
 | `accent` / primary | `#1E4A3A` | Primary buttons, links, active nav, focus |
 | `accent-hover` | `#16382C` | Primary button hover |
 | `border` | `#DDD4C6` | Card and widget hairlines |
@@ -70,7 +71,7 @@ Chart categorical, one fill per spending category (14): Transfers `#6E675C`, Din
 
 Chart sequential (tint to pine, 10 stops): `#EDE6D9`, `#E4E0C8`, `#C9D0B0`, `#A8B894`, `#7E9974`, `#5A7D5C`, `#3E6550`, `#2C5444`, `#1E4A3A`, `#16382C`.
 
-Primary `#1E4A3A` on white button text is ~10:1. Body `#1C1915` on `#F4EFE6` is well above 4.5:1. Muted `#6E675C` on `#F4EFE6` is ~4.9:1. Orange `#B45309` and yellow `#A16207` stay chart fills.
+Primary `#1E4A3A` on white button text is ~10:1. Body `#1C1915` on `#F4EFE6` is well above 4.5:1. Muted `#6E675C` on `#F4EFE6` is ~4.9:1. KPI labels use `#5A544C` on tint. Histogram fill `#C9D0B0` and fan outer `#EDE6D9` stay light; a `#5A7D5C` stroke (~4.1:1 on paper) meets the 3:1 non-text guideline. Orange `#B45309` and yellow `#A16207` stay chart fills.
 
 ---
 
@@ -88,7 +89,7 @@ Primary `#1E4A3A` on white button text is ~10:1. Body `#1C1915` on `#F4EFE6` is 
 - Borders: **1px solid `border`**
 - Shadows: none on rest; hover only on fine pointers (see Motion)
 - Header/nav: paper background, 1px bottom hairline `#DDD4C6`; horizontal scroll on a phone if the seven top-nav labels overflow
-- Phone (max 640px): side padding 16px plus `env(safe-area-inset-*)`, h1 28px, KPI values 24px, signature 32px, buttons 44px min-height and full width, file dropzone at least 88px tall
+- Phone (max 640px): side padding 16px plus `env(safe-area-inset-*)`, h1 28px, KPI values 24px, signature 32px, buttons, download buttons, and in-page `stPageLink` 44px min-height and full width, file dropzone at least 88px tall
 
 ---
 
@@ -126,7 +127,7 @@ Keyed containers already exist. CSS targets `.st-key-<key>`. Keep these keys sta
 Order, top to bottom:
 
 1. Title: "Upload your transactions". Caption: session-only privacy line.
-2. **`upload_source`**: file uploader, then secondary "Use sample data" button on the same block. Sample is the participatory moment at the door (one click, fictional CSV).
+2. **`upload_source`**: file uploader, then secondary "Use sample data" button on the same block (surface fill, pine text: same as Clear data). After a real file, "Load transactions" is the only pine primary. Sample is still one click for the fictional CSV.
 3. **`column_mapper`** (only after a real file): bordered card, subheader "Check the columns", three columns (date/description | amount mode | sign). Preview table `raw_preview` directly under the card. Primary "Load transactions" under the preview.
 4. **`loaded_summary`**: bordered card after a successful load. Subheader "Loaded". Nested **`loaded_kpis`**: three metrics (Purchases, Total spent, Date range). Caption with source name. Two actions in a horizontal row: page link to spending, "Clear data" as a secondary button.
 
@@ -164,7 +165,7 @@ This page holds the signature moment.
 4. Cap `st.info` only when the monthly amount exceeds the 2026 limit.
 5. **`chart_roth`**: stacked area, contributions (`blue`) under growth (`green`).
 6. **`roth_mc_controls`**: bordered card under the deterministic chart. Title "With uncertain returns". Method (normal vs bootstrap), annual vol (normal) or a caption that bootstrap uses fund history, optional target balance, run size. Keep it on one row that wraps; this is TVM under uncertainty, not a second hero.
-7. **`chart_roth_fan`**: percentile fan. Outer band p5-p95 (`surface-tint` `#EDE6D9`), inner band p25-p75 (`#A8B894`), median p50 pine line `#1E4A3A`. X is age, Y is balance. Call `ui.chart_fan` with `simulate_roth(...)["percentiles"]`.
+7. **`chart_roth_fan`**: percentile fan. Outer band p5-p95 (`surface-tint` `#EDE6D9` fill, `#5A7D5C` 1px stroke), inner band p25-p75 (`#A8B894`), median p50 pine line `#1E4A3A`. X is age, Y is balance. Call `ui.chart_fan` with `simulate_roth(...)["percentiles"]`.
 8. **`roth_mc_kpis`**: Median (p50), Bad case (p5), Odds of the target. 28px Fraunces, same wells. No 40px number here.
 9. Expander **`roth_math`**: closed-form FV, then the year table. Collapsed.
 
@@ -186,15 +187,16 @@ Class topic: risk/return, CAPM, SML. Needs loaded transactions. Market series is
 Class topic: market efficiency, behavioral finance. Needs loaded transactions. Default ticker matches Shadow (VOO).
 
 1. Title: "Timing test". Caption: if prices already reflect what is knowable, the dates you spent should look like luck.
-2. **`timing_kpis`**: Your dates in {ticker}, Median random dates, Your percentile. Value is `37th` (a percentile, not rank 37 of 1,000). Label: "Your percentile, of 1,000 shuffles". Neutral color; luck is not a gain/loss.
-3. **`chart_timing_hist`**: histogram of the 1,000 shuffled end values (`#C9D0B0` bars). Pine rule at the actual value, muted dashed rule at the median shuffle. Call `ui.chart_histogram`.
-4. **`timing_explainer`**: bordered card. 5th to 95th percentile is consistent with luck. Give the min/max of the 1,000 shuffles in the body (small steady purchases barely move). Lump-sum-on-day-one in the body, not as a fourth KPI.
+2. **`timing_controls`**: bordered card. Ticker (1/3) and category multiselect (2/3), same split as `shadow_controls`.
+3. **`timing_kpis`**: Your dates in {ticker}, Median random dates, Your percentile. Value is `37th` (a percentile, not rank 37 of 1,000). Label: "Your percentile, of 1,000 shuffles". Neutral color; luck is not a gain/loss.
+4. **`chart_timing_hist`**: histogram of the 1,000 shuffled end values (`#C9D0B0` bars, `#5A7D5C` 1px stroke). Pine rule at the actual value, muted dashed rule at the median shuffle. Call `ui.chart_histogram`.
+5. **`timing_explainer`**: bordered card. 5th to 95th percentile is consistent with luck. Give the min/max of the 1,000 shuffles in the body (small steady purchases barely move). Lump-sum-on-day-one in the body, not as a fourth KPI.
 
 ### 7. Proof (`app_pages/proof.py`, new)
 
 Class topic: validation. Works with sample data; still `require_transactions` so every check has a CSV.
 
-1. Title: "Proof". Caption: every number is checked live against a second independent computation; the workbook lets a grader redo the math in Excel with real formulas.
+1. Title: "Proof". Caption: key numbers are checked live against a second computation that does not use the app's own code; the workbook lets a grader redo the math in Excel with real formulas. The page lists what the live checks cover vs what the final audit recomputed by hand.
 2. **`proof_checks`**: bordered card, title "Live checks". Lead line: "{n} of {m} checks pass" on this data. Dataframe widget key `proof_table` (a container and a widget cannot share a key). Columns: Check, App, Independent, Difference, Result (Pass or Fail), How (header "How it's checked"). Tabular nums.
 3. **`proof_download`**: unbordered block. Primary pine download button, key `proof_xlsx`, label "Download the cross-check workbook". Caption: built in memory; sheets Roth (FV), Shadow (purchases, shares, value), Risk (SLOPE beta, volatility, T-bill, Sharpe).
 4. **`proof_process`**: expander, collapsed, key `proof_process`. Title "How AI built this, and how we kept it honest". Drawn from HANDOFF (no transaction rows, no account numbers).
@@ -208,8 +210,8 @@ Signatures stay stable: `section(key, title=None, border=True)`, `kpi_row(key, i
 - `section`: keyed `st.container`. Bordered card by default (`upload_source` passes `border=False`). Fraunces h3 when `title` is set.
 - `kpi_row`: keyed container, equal `st.columns`, each `st.metric(..., border=True)`. CSS sets Fraunces 28px values. The shadow signature metric is wrapped as `.st-key-shadow_signature` (gain, pine) or `.st-key-shadow_signature_down` (loss, brick), 40px / 2.5rem. Roth growth (third `roth_kpis` value) is green.
 - `chart`: Altair theme `spend_shadow` (also registered globally): legend bottom, no view stroke, axis `#6E675C`, grid `#E6DDD0`, view clip off so long category labels stay whole. Field `series`: domain Spent (cumulative) then Value in {ticker}, range `SPENT` / `SHADOW`. Field `part`: Contributions / Growth in `CONTRIBUTIONS` / `GROWTH`. Field `category`: pinned `CATEGORY_COLORS` (14 distinct fills). If `category` is on x or y and color is unset, `ui.chart` fills the bars and hides the legend (the axis already names them). Field `name` or `portfolio`: `PORTFOLIO_COLORS` (VOO orange, 60/40 blue, BND muted, QQQ pine, SPY violet). Named constants: `ui.SPENT`, `ui.SHADOW`, `ui.CONTRIBUTIONS`, `ui.GROWTH`, `ui.PORTFOLIO_COLORS`.
-- Extra helpers (Phase 7): `chart_fan(percentiles_df, key=...)`, `chart_histogram(values, markers=[...], key=...)`, `chart_risk_return(df, key=...)`, `chart_sml(line_df, points_df, key=...)`. Pages pass engine frames; they do not restyle these.
-- Primary button: pine fill, white label, 4px radius. Secondary / "Clear data": surface fill, pine text, 1px border.
+- Extra helpers (Phase 7): `chart_fan(percentiles_df, key=...)`, `chart_histogram(values, markers=[...], key=...)`, `chart_risk_return(df, key=...)`, `chart_sml(line_df, points_df, key=...)`. Fan outer and histogram bars take a `#5A7D5C` stroke. Pages pass engine frames; they do not restyle these.
+- Primary button: pine fill, white label, 4px radius. Secondary / "Use sample data" / "Clear data": surface fill, pine text, 1px border. Download (`proof_xlsx`) is primary. In-page `stPageLink` is 44px tall like buttons.
 - `st.caption` for helper copy. `st.info` for the empty-upload pointer and skip/cap notices only.
 - Tables: header `surface-tint`, hairline borders, tabular nums.
 
@@ -219,9 +221,9 @@ Signatures stay stable: `section(key, title=None, border=True)`, `kpi_row(key, i
 
 `core/state.load_styles()` injects `styles.css`. Target these keys:
 
-`upload_source`, `column_mapper`, `loaded_summary`, `loaded_kpis`, `loaded_actions`, `spend_kpis`, `chart_by_category`, `table_by_category`, `chart_by_month`, `top_merchants`, `shadow_controls`, `shadow_kpis`, `chart_shadow`, `shadow_compare`, `roth_inputs`, `roth_kpis`, `chart_roth`, `roth_mc_controls`, `chart_roth_fan`, `roth_mc_kpis`, `risk_kpis`, `chart_risk_return`, `chart_sml`, `risk_explainer`, `timing_kpis`, `chart_timing_hist`, `timing_explainer`, `proof_checks`, `proof_download`, `proof_process`.
+`upload_source`, `column_mapper`, `loaded_summary`, `loaded_kpis`, `loaded_actions`, `spend_kpis`, `chart_by_category`, `table_by_category`, `chart_by_month`, `top_merchants`, `shadow_controls`, `shadow_kpis`, `chart_shadow`, `shadow_compare`, `roth_inputs`, `roth_kpis`, `chart_roth`, `roth_mc_controls`, `chart_roth_fan`, `roth_mc_kpis`, `risk_window`, `risk_kpis`, `chart_risk_return`, `chart_sml`, `risk_table`, `risk_explainer`, `timing_controls`, `timing_kpis`, `chart_timing_hist`, `timing_explainer`, `proof_checks`, `proof_download`, `proof_process`.
 
-Plus expanders `all_tx`, `shadow_ledger`, `roth_math`, tables `raw_preview`, `cat_table`, `top_table`, `tx_editor`, `ledger_table`, `roth_table`, `risk_stats`, `compare_table`, `proof_table`, download `proof_xlsx`, and signature wraps `shadow_signature` / `shadow_signature_down`. Radio `risk_window` is unkeyed chrome above the Risk KPIs. `proof_download` stays unbordered.
+Plus expanders `all_tx`, `shadow_ledger`, `roth_math`, tables `raw_preview`, `cat_table`, `top_table`, `tx_editor`, `ledger_table`, `roth_table`, `risk_stats`, `compare_table`, `proof_table`, download `proof_xlsx`, and signature wraps `shadow_signature` / `shadow_signature_down`. Radio `risk_window` is unkeyed chrome above the Risk KPIs. `proof_download` stays unbordered. Dataframe keys (`risk_stats`, `compare_table`, `proof_table`) sit inside cards: they do not get their own padding or hover lift.
 
 ---
 
@@ -256,5 +258,5 @@ Checked against the running app at 1280px and 390px (sample data, fictional).
 - [x] Reduced-motion fallback: yes. Transitions off, transforms none, scroll-behavior auto. Includes secondary `:active`.
 - [x] No 3D or video: yes. No cinematic fallback needed.
 - [x] Mobile-first wrap: yes. Columns wrap at 640px. 390px: full-width 44px buttons, title clears sticky header, no page-level sideways scroll. Top nav collapses to Streamlit's `>>` control.
-- [ ] Lighthouse 95 / CLS 0.00: no. Streamlit Cloud is not Lighthouse-clean. Contrast for body/primary passes AA. Orange/yellow fills are not used as body text.
+- [ ] Lighthouse 95 / CLS 0.00: no. Streamlit Cloud is not Lighthouse-clean. Contrast for body/primary passes AA. KPI labels on tint use `#5A544C`. Histogram and fan fills keep a `#5A7D5C` stroke. Orange/yellow fills are not used as body text.
 - [x] Specific decision: yes. Paper ledger + Fraunces + pine, not a default dark dashboard.
