@@ -111,8 +111,8 @@ if tx is not None:
             dict(label="Date range", value=f"{tx['date'].min():%b %d, %Y} to {tx['date'].max():%b %d, %Y}"),
         ])
         st.caption(f"Source: {st.session_state.get('source_name', 'unknown')}")
-        b1, b2 = st.columns([1, 1])
-        b1.page_link("app_pages/spending.py", label="See spending breakdown", icon=":material/arrow_forward:")
-        if b2.button("Clear data", icon=":material/delete:", key="clear_btn"):
-            clear_transactions()
-            st.rerun()
+        with st.container(horizontal=True, key="loaded_actions"):
+            st.page_link("app_pages/spending.py", label="See spending breakdown", icon=":material/arrow_forward:")
+            if st.button("Clear data", icon=":material/delete:", key="clear_btn"):
+                clear_transactions()
+                st.rerun()

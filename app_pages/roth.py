@@ -60,11 +60,14 @@ final = proj.iloc[-1]
 years = int(retirement_age - current_age)
 pmts = tvm.monthly_payments_by_age(int(current_age), int(retirement_age), monthly, enforce)
 capped = any(p < monthly for p in pmts)
+put_in = final["total_contributed"] + starting
 
 ui.kpi_row("roth_kpis", [
     dict(label=f"Balance at {int(retirement_age)}", value=f"${final['balance']:,.0f}"),
-    dict(label="You put in", value=f"${final['total_contributed'] + starting:,.0f}"),
-    dict(label="Growth", value=f"${final['growth']:,.0f}"),
+    dict(label="You put in", value=f"${put_in:,.0f}"),
+    dict(label="Growth", value=f"${final['growth']:,.0f}",
+         delta=f"+{final['growth'] / put_in:.0%} on contributions" if put_in > 0 else None,
+         help="Growth divided by everything you put in (contributions plus starting balance)."),
 ])
 if capped:
     capped_ages = [a for a, p in zip(range(int(current_age), int(retirement_age)), pmts) if p < monthly]

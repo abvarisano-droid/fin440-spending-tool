@@ -47,7 +47,7 @@ Grok (designer) owns the look: `DESIGN.md`, `.streamlit/config.toml`, `styles.cs
   call these.
 - `core/state.load_styles()` injects `styles.css` automatically once it exists.
 - Every block is keyed, so CSS can target `.st-key-<key>`: `upload_source`, `column_mapper`,
-  `loaded_summary`, `loaded_kpis`, `spend_kpis`, `chart_by_category`, `table_by_category`,
+  `loaded_summary`, `loaded_kpis`, `loaded_actions`, `spend_kpis`, `chart_by_category`, `table_by_category`,
   `chart_by_month`, `top_merchants`, `shadow_controls`, `shadow_kpis`, `chart_shadow`,
   `roth_inputs`, `roth_kpis`, `chart_roth`.
 
