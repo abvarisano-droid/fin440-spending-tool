@@ -15,6 +15,8 @@ Three agents share this repo. Each one edits only the files it owns.
 | Auditor | a fresh Claude Code session | nothing; read-only |
 | Shared | all | `HANDOFF.md` (append only), this file (change only when Ashton asks) |
 
+**Claude subagents** (`.claude/agents/`, added at Ashton's request 2026-11-18): `spend-designer` (the Designer row while Grok is out; same files), `spend-auditor` (the Auditor row; read-only tools), `spend-qa` (phone and desktop walkthrough via `tools/walkthrough.py`; no repo edits) and `spend-deck` (the Nov 30 Google Slides deck). Each follows this file.
+
 **Builder:** app logic, data handling, math and tests. Pages call `core/ui.py` for every card,
 KPI row and chart, and never style inline (no raw `st.container(border=True)`, `st.metric`
 rows or `st.altair_chart` in pages).
