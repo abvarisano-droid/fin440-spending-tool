@@ -98,7 +98,7 @@ with ui.section("risk_table", "All portfolios"):
           "max_drawdown", "r_squared"]],
         hide_index=True,
         column_config={
-            "name": st.column_config.TextColumn("Portfolio", pinned=True),
+            "name": "Portfolio",
             "ann_return": st.column_config.NumberColumn("Return", format="%.2f%%"),
             "ann_vol": st.column_config.NumberColumn("Volatility", format="%.2f%%"),
             "sharpe": st.column_config.NumberColumn("Sharpe", format="%.2f"),

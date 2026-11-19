@@ -110,7 +110,6 @@ with ui.section("shadow_compare", "Same purchases, four portfolios"):
                 } for n, p in ports.items()]),
                 hide_index=True,
                 column_config={
-                    "Portfolio": st.column_config.TextColumn("Portfolio", pinned=True),
                     "Spent": st.column_config.NumberColumn(format="dollar"),
                     "Worth now": st.column_config.NumberColumn(format="dollar"),
                     "Gain": st.column_config.NumberColumn(format="dollar"),

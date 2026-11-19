@@ -94,7 +94,7 @@ with ui.section("top_merchants", "Top 10 merchants"):
         top,
         hide_index=True,
         column_config={
-            "description": st.column_config.TextColumn("Merchant", pinned=True),
+            "description": "Merchant",
             "spent": st.column_config.NumberColumn("Spent", format="dollar"),
             "visits": "Visits",
             "category": "Category",
