@@ -61,8 +61,9 @@ Two technical choices matter for correctness:
 We built this with three AI agents, each with its own job and its own files:
 - **Builder (Claude Code):** wrote the app logic, the math engines and the tests.
 - **Designer (Grok):** designed the look: the colors, fonts, layout and chart styling.
-- **Auditor:** reviewed each phase and did not fix anything. Grok audited Claude's phases, and a
-  fresh Claude session audited Grok's, so no agent graded its own work.
+- **Auditor:** a separate, read-only Claude session reviewed each phase, reported, and never
+  fixed anything, so no agent graded its own work. It ran the final audit and the Nov 19 re-audits.
+  Grok also audited some of Claude's earlier phases (logged in `HANDOFF.md`).
 
 The agents coordinated through a written rulebook (`AGENTS.md`), an append-only log of every
 handoff and audit (`HANDOFF.md`) and a phase plan (`PLAN.md`), all in the repository. The group
