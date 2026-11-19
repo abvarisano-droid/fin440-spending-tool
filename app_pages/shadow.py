@@ -104,12 +104,13 @@ with ui.section("shadow_compare", "Same purchases, four portfolios"):
             )
             st.dataframe(
                 pd.DataFrame([{
-                    "Portfolio": n, "Spent": p.invested, "Worth now": p.value, "Gain": p.gain,
+                    "Portfolio": n, "Worth now": p.value, "Gain": p.gain, "Spent": p.invested,
                     "Return": p.simple_return * 100,
                     "XIRR": p.xirr * 100 if p.xirr is not None else None,
                 } for n, p in ports.items()]),
                 hide_index=True,
                 column_config={
+                    "Portfolio": st.column_config.TextColumn("Portfolio", pinned=True),
                     "Spent": st.column_config.NumberColumn(format="dollar"),
                     "Worth now": st.column_config.NumberColumn(format="dollar"),
                     "Gain": st.column_config.NumberColumn(format="dollar"),
@@ -118,6 +119,8 @@ with ui.section("shadow_compare", "Same purchases, four portfolios"):
                 },
                 key="compare_table",
             )
+            with st.container(key="swipe_hint_compare"):
+                st.caption(":material/swipe: Swipe the table sideways for more columns.")
 
 ledger = res.ledger.assign(value_now=res.ledger["shares"] * prices.iloc[-1])
 ledger["gain"] = ledger["value_now"] - ledger["amount"]

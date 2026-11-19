@@ -30,8 +30,11 @@ passed = sum(c.passed for c in checks)
 with ui.section("proof_checks", "Live checks"):
     st.markdown(f"**{passed} of {len(checks)} checks pass** on your data and today's prices.")
     st.dataframe(proof.checks_frame(checks), hide_index=True, key="proof_table",
+                 column_order=["Result", "Check", "App", "Difference", "Independent"],
                  column_config={"Result": st.column_config.TextColumn("Result", width="small"),
-                                "Check": st.column_config.TextColumn("Check", width="large")})
+                                "Check": st.column_config.TextColumn("Check", width="medium")})
+    with st.container(key="swipe_hint_proof"):
+        st.caption(":material/swipe: Swipe the table sideways for more columns.")
     with st.expander("How each check is computed", key="proof_how"):
         st.markdown(proof.how_list(checks))
     st.caption(

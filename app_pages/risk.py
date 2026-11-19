@@ -94,11 +94,11 @@ with ui.section("risk_table", "All portfolios"):
     st.dataframe(
         table.assign(**{c: table[c] * 100 for c in ("ann_return", "ann_vol", "max_drawdown", "alpha_annual",
                                                     "capm_expected", "sml_gap")})
-        [["name", "ann_return", "ann_vol", "sharpe", "max_drawdown", "beta", "r_squared", "capm_expected",
-          "sml_gap", "alpha_annual"]],
+        [["name", "beta", "alpha_annual", "sml_gap", "capm_expected", "ann_return", "ann_vol", "sharpe",
+          "max_drawdown", "r_squared"]],
         hide_index=True,
         column_config={
-            "name": "Portfolio",
+            "name": st.column_config.TextColumn("Portfolio", pinned=True),
             "ann_return": st.column_config.NumberColumn("Return", format="%.2f%%"),
             "ann_vol": st.column_config.NumberColumn("Volatility", format="%.2f%%"),
             "sharpe": st.column_config.NumberColumn("Sharpe", format="%.2f"),
@@ -111,6 +111,8 @@ with ui.section("risk_table", "All portfolios"):
         },
         key="risk_stats",
     )
+    with st.container(key="swipe_hint_risk"):
+        st.caption(":material/swipe: Swipe the table sideways for more columns.")
 
 with ui.section("risk_explainer", "How to read this"):
     st.markdown(
