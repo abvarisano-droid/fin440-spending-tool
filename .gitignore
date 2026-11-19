@@ -9,3 +9,6 @@ __pycache__/
 docs/deck/*.png
 docs/deck/*.pptx
 docs/deck/numbers.json
+
+# Proof workbook downloads
+*.xlsx

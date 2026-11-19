@@ -66,8 +66,9 @@ ui.kpi_row("risk_kpis", [
          help=f"Slope of excess returns on SPY's excess returns. R squared {head['r_squared']:.2f}, "
               f"{int(head['n'])} days."),
     dict(label="Alpha (yearly)", value=f"{alpha:+.2%}",
-         delta=f"{'-' if alpha < 0 else '+'}{abs(alpha):.2%} vs CAPM",
-         help="Jensen's alpha: the regression intercept on excess returns x 252. Positive = beat what its beta asked for."),
+         delta=f"{'-' if head['sml_gap'] < 0 else '+'}{abs(head['sml_gap']):.2%} above the SML",
+         help="Jensen's alpha: the regression intercept on excess returns x 252. Positive = beat what its beta asked for. "
+              "The delta is the other alpha: the dot's distance above the SML, from compounded returns."),
 ])
 st.caption(
     f"For 100% VOO. Risk-free: 13-week T-bill at {rf['discount_yield']:.3%} discount yield = "

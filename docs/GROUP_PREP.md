@@ -56,6 +56,9 @@ spending figures do not.
 ## Roth calculator
 - **FV = PMT x ((1+r)^n - 1)/r** with r = 7%/12 and n = 528 months gives $705,070.79. That is
   exactly Excel `FV(0.07/12,528,-200)`. Annuity due multiplies by (1+r).
+- **Why the return slider runs 6% to 10%:** a Roth earns whatever it holds. 7% is the usual
+  long-run real (after-inflation) return for an S&P 500 fund, about 10% before inflation, and 6%
+  is a conservative mix with bonds or a bad decade.
 - **APR vs effective:** APR uses r/12. An effective annual rate uses (1+R)^(1/12) - 1, which is
   slightly lower per month.
 - **IRA cap:** $7,500/yr ($625/month), plus $1,100 from age 50. When the cap binds, "Show the
