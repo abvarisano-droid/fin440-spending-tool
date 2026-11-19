@@ -6,3 +6,6 @@ __pycache__/
 # never commit real statements; only the fictional sample is allowed
 *.csv
 !sample_data/sample_transactions.csv
+docs/deck/*.png
+docs/deck/*.pptx
+docs/deck/numbers.json
