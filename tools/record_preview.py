@@ -91,7 +91,8 @@ def to_mp4(src, dst):
     import imageio_ffmpeg
     ff = imageio_ffmpeg.get_ffmpeg_exe()
     os.makedirs(os.path.dirname(dst), exist_ok=True)
-    subprocess.run([ff, "-y", "-i", src, "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "28",
+    # skip the first 4 s (the empty Upload page), so the video opens on the loaded sample
+    subprocess.run([ff, "-y", "-ss", "4", "-i", src, "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "28",
                     "-preset", "slow", "-movflags", "+faststart", "-an", dst], check=True,
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
