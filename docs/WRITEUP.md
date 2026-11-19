@@ -1,3 +1,9 @@
+---
+title: "Spend Shadow write-up"
+type: project-doc
+updated: 2026-11-19
+---
+
 # Spend Shadow: FIN 440 project write-up
 
 **Live app:** https://fin440-spending-to-uaoynqbehwjlulmegnfrpf.streamlit.app/ (click "Use sample data" on the first page)
