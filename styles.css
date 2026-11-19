@@ -129,14 +129,9 @@ h3 {
 .st-key-chart_roth,
 .st-key-roth_mc_controls,
 .st-key-chart_roth_fan,
-.st-key-chart_risk_return,
-.st-key-chart_sml,
-.st-key-risk_explainer,
-.st-key-chart_timing_hist,
-.st-key-timing_explainer,
-.st-key-timing_controls,
 .st-key-proof_checks,
-.st-key-risk_table {
+.st-key-roth_redirect,
+.st-key-landing_preview {
   background: var(--ss-surface);
   border-color: var(--ss-border) !important;
   border-radius: var(--ss-radius) !important;
@@ -155,8 +150,6 @@ h3 {
 .st-key-shadow_kpis [data-testid="stMetric"],
 .st-key-roth_kpis [data-testid="stMetric"],
 .st-key-roth_mc_kpis [data-testid="stMetric"],
-.st-key-risk_kpis [data-testid="stMetric"],
-.st-key-timing_kpis [data-testid="stMetric"],
 .st-key-loaded_kpis [data-testid="stMetric"] {
   background: var(--ss-tint);
   border-radius: var(--ss-radius-control);
@@ -166,8 +159,6 @@ h3 {
 .st-key-shadow_kpis [data-testid="stMetricLabel"],
 .st-key-roth_kpis [data-testid="stMetricLabel"],
 .st-key-roth_mc_kpis [data-testid="stMetricLabel"],
-.st-key-risk_kpis [data-testid="stMetricLabel"],
-.st-key-timing_kpis [data-testid="stMetricLabel"],
 .st-key-loaded_kpis [data-testid="stMetricLabel"] {
   color: var(--ss-muted-on-tint);
   font-size: 11px;
@@ -180,8 +171,6 @@ h3 {
 .st-key-shadow_kpis [data-testid="stMetricValue"],
 .st-key-roth_kpis [data-testid="stMetricValue"],
 .st-key-roth_mc_kpis [data-testid="stMetricValue"],
-.st-key-risk_kpis [data-testid="stMetricValue"],
-.st-key-timing_kpis [data-testid="stMetricValue"],
 .st-key-loaded_kpis [data-testid="stMetricValue"] {
   font-family: Geist, ui-sans-serif, system-ui, sans-serif;
   font-weight: 500;
@@ -277,18 +266,12 @@ h3 {
 .st-key-chart_roth [data-testid="stVegaLiteChart"],
 .st-key-chart_roth_fan [data-testid="stVegaLiteChart"],
 .st-key-shadow_compare [data-testid="stVegaLiteChart"],
-.st-key-chart_risk_return [data-testid="stVegaLiteChart"],
-.st-key-chart_sml [data-testid="stVegaLiteChart"],
-.st-key-chart_timing_hist [data-testid="stVegaLiteChart"],
 .st-key-chart_by_category [data-testid="stVegaLiteChart"] svg,
 .st-key-chart_by_month [data-testid="stVegaLiteChart"] svg,
 .st-key-chart_shadow [data-testid="stVegaLiteChart"] svg,
 .st-key-chart_roth [data-testid="stVegaLiteChart"] svg,
 .st-key-chart_roth_fan [data-testid="stVegaLiteChart"] svg,
-.st-key-shadow_compare [data-testid="stVegaLiteChart"] svg,
-.st-key-chart_risk_return [data-testid="stVegaLiteChart"] svg,
-.st-key-chart_sml [data-testid="stVegaLiteChart"] svg,
-.st-key-chart_timing_hist [data-testid="stVegaLiteChart"] svg {
+.st-key-shadow_compare [data-testid="stVegaLiteChart"] svg {
   overflow: visible !important;
 }
 
@@ -307,14 +290,9 @@ h3 {
   .st-key-chart_roth:hover,
   .st-key-roth_mc_controls:hover,
   .st-key-chart_roth_fan:hover,
-  .st-key-chart_risk_return:hover,
-  .st-key-chart_sml:hover,
-  .st-key-risk_explainer:hover,
-  .st-key-chart_timing_hist:hover,
-  .st-key-timing_explainer:hover,
-  .st-key-timing_controls:hover,
   .st-key-proof_checks:hover,
-  .st-key-risk_table:hover {
+  .st-key-roth_redirect:hover,
+  .st-key-landing_preview:hover {
     transform: translateY(-3px);
     box-shadow: var(--ss-shadow-lift);
   }
@@ -374,14 +352,9 @@ h3 {
   .st-key-chart_roth,
   .st-key-roth_mc_controls,
   .st-key-chart_roth_fan,
-  .st-key-chart_risk_return,
-  .st-key-chart_sml,
-  .st-key-risk_explainer,
-  .st-key-chart_timing_hist,
-  .st-key-timing_explainer,
-  .st-key-timing_controls,
   .st-key-proof_checks,
-  .st-key-risk_table,
+  .st-key-roth_redirect,
+  .st-key-landing_preview,
   .stButton button[kind="primary"],
   .stDownloadButton button,
   [data-testid="stBaseButton-primary"],
@@ -405,14 +378,9 @@ h3 {
   .st-key-chart_roth:hover,
   .st-key-roth_mc_controls:hover,
   .st-key-chart_roth_fan:hover,
-  .st-key-chart_risk_return:hover,
-  .st-key-chart_sml:hover,
-  .st-key-risk_explainer:hover,
-  .st-key-chart_timing_hist:hover,
-  .st-key-timing_explainer:hover,
-  .st-key-timing_controls:hover,
   .st-key-proof_checks:hover,
-  .st-key-risk_table:hover,
+  .st-key-roth_redirect:hover,
+  .st-key-landing_preview:hover,
   .stButton button:active,
   .stDownloadButton button:active,
   [data-testid="stBaseButton-primary"]:active,
@@ -450,8 +418,6 @@ h3 {
   .st-key-shadow_kpis [data-testid="stMetricValue"],
   .st-key-roth_kpis [data-testid="stMetricValue"],
   .st-key-roth_mc_kpis [data-testid="stMetricValue"],
-  .st-key-risk_kpis [data-testid="stMetricValue"],
-  .st-key-timing_kpis [data-testid="stMetricValue"],
   .st-key-loaded_kpis [data-testid="stMetricValue"] {
     font-size: 1.5rem;
   }
@@ -702,11 +668,9 @@ h3 {
   .st-key-shadow_compare,
   .st-key-roth_inputs,
   .st-key-roth_mc_controls,
-  .st-key-risk_explainer,
-  .st-key-timing_explainer,
-  .st-key-timing_controls,
   .st-key-proof_checks,
-  .st-key-risk_table,
+  .st-key-roth_redirect,
+  .st-key-landing_preview,
   .st-key-table_by_category,
   .st-key-top_merchants {
     padding: 16px;
@@ -812,11 +776,9 @@ h2, h3 {
 .st-key-shadow_compare,
 .st-key-roth_inputs,
 .st-key-roth_mc_controls,
-.st-key-risk_explainer,
-.st-key-timing_explainer,
-.st-key-timing_controls,
 .st-key-proof_checks,
-.st-key-risk_table,
+.st-key-roth_redirect,
+.st-key-landing_preview,
 [class*="st-key-chart_"] {
   position: relative;
   isolation: isolate;
@@ -834,11 +796,9 @@ h2, h3 {
 .st-key-shadow_compare::after,
 .st-key-roth_inputs::after,
 .st-key-roth_mc_controls::after,
-.st-key-risk_explainer::after,
-.st-key-timing_explainer::after,
-.st-key-timing_controls::after,
 .st-key-proof_checks::after,
-.st-key-risk_table::after,
+.st-key-roth_redirect::after,
+.st-key-landing_preview::after,
 [class*="st-key-chart_"]::after {
   content: "";
   position: absolute;
@@ -860,11 +820,9 @@ h2, h3 {
   .st-key-shadow_compare:hover::after,
   .st-key-roth_inputs:hover::after,
   .st-key-roth_mc_controls:hover::after,
-  .st-key-risk_explainer:hover::after,
-  .st-key-timing_explainer:hover::after,
-  .st-key-timing_controls:hover::after,
   .st-key-proof_checks:hover::after,
-  .st-key-risk_table:hover::after,
+  .st-key-roth_redirect:hover::after,
+  .st-key-landing_preview:hover::after,
   [class*="st-key-chart_"]:hover::after {
     opacity: 1;
   }
@@ -1030,7 +988,8 @@ h2, h3 {
   [data-testid="stHeader"],
   [class*="st-key-chart_"],
   .st-key-proof_checks,
-  .st-key-risk_table,
+  .st-key-roth_redirect,
+  .st-key-landing_preview,
   [class*="_kpis"] [data-testid="stMetric"] {
     background: #ffffff;
     backdrop-filter: none;
@@ -1042,7 +1001,8 @@ h2, h3 {
   [data-testid="stHeader"],
   [class*="st-key-chart_"],
   .st-key-proof_checks,
-  .st-key-risk_table,
+  .st-key-roth_redirect,
+  .st-key-landing_preview,
   [class*="_kpis"] [data-testid="stMetric"] {
     border-color: #8f958f !important;
   }
@@ -1114,4 +1074,22 @@ h2, h3 {
   [data-testid="stHeader"] [data-testid="stExpandSidebarButton"] {
     border-color: #4f5752;
   }
+}
+
+
+/* Landing preview: the video fills the card width with the card's control radius. */
+.st-key-landing_preview [data-testid="stVideo"],
+.st-key-landing_preview video {
+  display: block;
+  width: 100% !important;
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--ss-radius-control);
+  overflow: hidden;
+}
+
+.st-key-landing_preview video {
+  background: #ffffff;
+  border: 1px solid var(--lg-edge);
+  box-shadow: 0 1px 2px rgba(26, 29, 27, 0.06);
 }
