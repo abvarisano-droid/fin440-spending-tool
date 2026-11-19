@@ -18,7 +18,7 @@ spending really costing you as an investor?**
 
 Five pages:
 1. **Upload:** reads any bank or card CSV and auto-detects the date, merchant and amount columns.
-   Before anything is loaded it plays a 45-second preview of the app on the fictional sample.
+   Before anything is loaded it plays a one-minute tutorial: six captioned steps on a fictional statement.
 2. **Spending breakdown:** totals, categories, needs vs. wants.
 3. **Shadow portfolio:** what every purchase would be worth had it bought an index fund that day,
    compared across four portfolios.

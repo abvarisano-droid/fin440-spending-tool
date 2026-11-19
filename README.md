@@ -14,7 +14,7 @@ python -m pytest            # math + ingest + headless page tests (tests/test_ap
 ## Pages
 | Page | What it does |
 |---|---|
-| Upload | Shows a 45-second preview video of the app (`assets/preview.mp4`, recorded on the fictional sample with `tools/record_preview.py`) until data is loaded. Reads any bank CSV, auto-detects date/description/amount (or debit/credit) columns, lets you fix the mapping and the purchase sign. "Use sample data" loads a fictional CSV. |
+| Upload | Shows a one-minute tutorial video until data is loaded (`assets/tutorial.mp4`: six captioned steps on the fictional sample, from uploading a CSV to Proof; re-record with `python tools/record_tutorial.py <url>`). Reads any bank CSV, auto-detects date/description/amount (or debit/credit) columns, lets you fix the mapping and the purchase sign. "Use sample data" loads a fictional CSV. |
 | Spending breakdown | Totals, monthly average, discretionary share, by-category and by-month charts, top merchants, editable categories. Card payments and transfers are excluded by default. |
 | Shadow portfolio | Each purchase buys fractional shares of a ticker (VOO default) at the first trading day's adjusted close on or after the purchase. Shows value now, gain, XIRR and a per-purchase ledger. |
 | Shadow: compare | The same purchases in up to 4 portfolios (100% VOO, 60/40 VOO/BND, 100% BND, 100% QQQ): value lines plus a table of value, gain, return and XIRR. |

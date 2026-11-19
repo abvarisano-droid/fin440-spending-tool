@@ -120,9 +120,9 @@ if tx is not None:
                 clear_transactions()
                 st.rerun()
 
-PREVIEW = Path(__file__).resolve().parent.parent / "assets" / "preview.mp4"
-if tx is None and PREVIEW.exists():
-    with ui.section("landing_preview", "See it in 45 seconds"):
-        st.video(str(PREVIEW), autoplay=True, muted=True, loop=True)
-        st.caption("A tour on the fictional sample: spending, the shadow portfolio, the Roth with your "
-                   "wants spending redirected, and the Proof checks. Click \"Use sample data\" to try it.")
+TUTORIAL = Path(__file__).resolve().parent.parent / "assets" / "tutorial.mp4"
+if tx is None and TUTORIAL.exists():
+    with ui.section("landing_preview", "How to use it, in about a minute"):
+        st.video(str(TUTORIAL), autoplay=True, muted=True, loop=True)
+        st.caption("Six steps on a fictional statement: upload a CSV and check the columns, then Spending, "
+                   "the Shadow portfolio, the Roth (with your wants spending redirected) and Proof.")
