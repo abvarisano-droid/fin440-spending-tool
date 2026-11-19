@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import streamlit as st
 
 from core import ingest, ui
@@ -117,3 +119,10 @@ if tx is not None:
             if st.button("Clear data", icon=":material/delete:", key="clear_btn"):
                 clear_transactions()
                 st.rerun()
+
+PREVIEW = Path(__file__).resolve().parent.parent / "assets" / "preview.mp4"
+if tx is None and PREVIEW.exists():
+    with ui.section("landing_preview", "See it in 45 seconds"):
+        st.video(str(PREVIEW), autoplay=True, muted=True, loop=True)
+        st.caption("A tour on the fictional sample: spending, the shadow portfolio, the Roth with your "
+                   "wants spending redirected, and the Proof checks. Click \"Use sample data\" to try it.")

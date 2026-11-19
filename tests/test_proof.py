@@ -41,8 +41,8 @@ def test_raw_sample_total():
 
 def test_every_check_passes_on_synthetic_data():
     spend = _spend()
-    checks = proof.run_checks(spend, spend, _prices(1), _prices(2), 0.04, bnd=_prices(3, vol=0.003))
-    assert len(checks) == 9  # 10 on the sample, which adds the raw-CSV spending check
+    checks = proof.run_checks(spend, spend, _prices(1), bnd=_prices(3, vol=0.003), disc_monthly=150.0)
+    assert len(checks) == 6  # 7 on the sample, which adds the raw-CSV spending check
     assert all(c.passed for c in checks), [(c.name, c.app, c.independent) for c in checks if not c.passed]
 
 
@@ -53,19 +53,13 @@ def test_a_wrong_number_fails():
 
 def test_workbook_has_live_formulas():
     spend = _spend()
-    app = dict(shadow_value=1.0, beta=1.0, vol=0.1, sharpe=0.5, rf_effective=0.043, roth_fv=705_070.79)
-    wb = load_workbook(io.BytesIO(proof.build_workbook(spend, _prices(1), _prices(2), 0.0414, app)))
-    assert wb.sheetnames == ["Start here", "Roth", "Shadow", "Risk"]
+    app = dict(shadow_value=1.0, roth_fv=705_070.79)
+    wb = load_workbook(io.BytesIO(proof.build_workbook(spend, _prices(1), app)))
+    assert wb.sheetnames == ["Start here", "Roth", "Shadow"]
     assert wb["Roth"]["B7"].value == "=FV(B2/12,B3*12,-B4,-B5,0)"
     sh = wb["Shadow"]
     assert sh["E2"].value == "=B2/D2" and sh["F2"].value == "=E2*$I$1"
     assert sh["I6"].value == "=I5-I4"
-    risk = [wb["Risk"].cell(i, 8).value for i in range(2, 9)]
-    assert risk[3].startswith("=SLOPE(")
-    # Excel 2010+ functions need the _xlfn. prefix in the file, or Excel shows #NAME?
-    for f in risk[4:]:
-        assert "STDEV.S" not in f.replace("_xlfn.STDEV.S", "")
-        assert "VAR.S" not in f.replace("_xlfn.VAR.S", "").replace("_xlfn.COVARIANCE.S", "")
 
 
 def test_sixty_forty_check_catches_a_wrong_engine(monkeypatch):
@@ -81,7 +75,7 @@ def test_sixty_forty_check_catches_a_wrong_engine(monkeypatch):
 
     monkeypatch.setattr(P, "build_portfolio", off_by_a_cent)
     spend = _spend()
-    checks = P.run_checks(spend, spend, _prices(1), _prices(2), 0.04, bnd=_prices(3, vol=0.003))
+    checks = P.run_checks(spend, spend, _prices(1), bnd=_prices(3, vol=0.003))
     failed = [c.name for c in checks if not c.passed]
     assert failed == ["Portfolio: 60/40 VOO/BND vs a brute-force loop"]
 
@@ -92,3 +86,12 @@ def test_bootstrap_drops_a_partial_final_month():
     part = pd.Series(1.0, index=pd.bdate_range("2026-01-02", "2026-05-18"))
     assert len(monthly_returns_from_prices(full)) == 3  # Feb, Mar, Apr
     assert len(monthly_returns_from_prices(part)) == 3  # May (partial) dropped
+
+
+def test_redirect_check_uses_the_discretionary_average():
+    spend = _spend()
+    checks = proof.run_checks(spend, spend, _prices(1), disc_monthly=614.12)
+    c = [c for c in checks if c.name.startswith("Roth: redirected")][0]
+    r = 0.07 / 12
+    assert abs(c.independent - 614.12 * ((1 + r) ** 528 - 1) / r) < 1e-6
+    assert c.passed

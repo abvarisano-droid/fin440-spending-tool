@@ -3,7 +3,7 @@ import streamlit as st
 
 from core import montecarlo, tvm, ui
 from core.prices import clean_ticker, fetch_history
-from core.state import get_transactions, spending_only
+from core.state import discretionary_monthly, get_transactions, spending_only
 
 st.title("Roth IRA calculator")
 st.caption(":material/school: FIN 440 link (Bodie, Kane & Marcus, 13e): Ch 5 (compounding, APR vs. EAR, real vs. nominal returns, arithmetic vs. geometric averages).")
@@ -16,9 +16,7 @@ st.caption(
 tx = get_transactions()
 disc_monthly = None
 if tx is not None and not tx.empty:
-    s = spending_only(tx)
-    months = max(s["date"].dt.to_period("M").nunique(), 1)
-    disc_monthly = s.loc[s["discretionary"], "amount"].sum() / months
+    disc_monthly = discretionary_monthly(spending_only(tx)) or None
 
 with ui.section("roth_inputs"):
     c1, c2, c3 = st.columns(3)
@@ -79,6 +77,28 @@ if capped:
     st.info(f"\\${monthly:,.2f}/month is over the IRA limit at ages {capped_ages[0]} to {capped_ages[-1]}, "
             f"so those years use the cap: \\${tvm.IRA_LIMIT_2026 / 12:,.2f}/month before {tvm.CATCHUP_AGE}, "
             f"\\${tvm.annual_limit(tvm.CATCHUP_AGE) / 12:,.2f}/month from {tvm.CATCHUP_AGE} (catch-up).")
+
+if disc_monthly:
+    def _balance(pmt: float) -> float:
+        return float(tvm.roth_projection(int(current_age), int(retirement_age), pmt, rate_pct / 100, starting,
+                                         convention, due, enforce).iloc[-1]["balance"])
+
+    rows = [{"Plan": label, f"Balance at {int(retirement_age)}": _balance(pmt), "Per month": pmt}
+            for label, pmt in ([("Your plan above", monthly)] if source == "Enter an amount" else [])
+            + [("25% of wants", disc_monthly * 0.25), ("50% of wants", disc_monthly * 0.5),
+               ("All your wants", disc_monthly)]]
+    all_in = rows[-1][f"Balance at {int(retirement_age)}"]
+    with ui.section("roth_redirect", "What your wants spending could become"):
+        st.markdown(f"Your data averages **\\${disc_monthly:,.2f}/month** of wants (dining, coffee, "
+                    f"entertainment, shopping, subscriptions, travel). Put all of it in a Roth from "
+                    f"{int(current_age)} to {int(retirement_age)} and it grows to **\\${all_in:,.0f}**.")
+        st.dataframe(
+            rows, hide_index=True, key="redirect_table",
+            column_config={"Per month": st.column_config.NumberColumn(format="dollar"),
+                           f"Balance at {int(retirement_age)}": st.column_config.NumberColumn(format="dollar")},
+        )
+        st.caption("Same age, return and settings as above. Pick \"Redirect discretionary spending\" in "
+                   "Monthly contribution to chart any share.")
 
 chart_df = proj.assign(principal=proj["total_contributed"] + starting)[["age", "principal", "growth"]]
 chart_df = chart_df.melt("age", var_name="part", value_name="dollars")

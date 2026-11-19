@@ -14,14 +14,12 @@ python -m pytest            # math + ingest + headless page tests (tests/test_ap
 ## Pages
 | Page | What it does |
 |---|---|
-| Upload | Reads any bank CSV, auto-detects date/description/amount (or debit/credit) columns, lets you fix the mapping and the purchase sign. "Use sample data" loads a fictional CSV. |
+| Upload | Shows a 45-second preview video of the app (`assets/preview.mp4`, recorded on the fictional sample with `tools/record_preview.py`) until data is loaded. Reads any bank CSV, auto-detects date/description/amount (or debit/credit) columns, lets you fix the mapping and the purchase sign. "Use sample data" loads a fictional CSV. |
 | Spending breakdown | Totals, monthly average, discretionary share, by-category and by-month charts, top merchants, editable categories. Card payments and transfers are excluded by default. |
 | Shadow portfolio | Each purchase buys fractional shares of a ticker (VOO default) at the first trading day's adjusted close on or after the purchase. Shows value now, gain, XIRR and a per-purchase ledger. |
 | Shadow: compare | The same purchases in up to 4 portfolios (100% VOO, 60/40 VOO/BND, 100% BND, 100% QQQ): value lines plus a table of value, gain, return and XIRR. |
-| Risk & CAPM | Volatility, Sharpe, max drawdown, beta and Jensen's alpha vs SPY, a risk vs return scatter and the security market line. Two windows: your purchase dates (time-weighted unit value) or 5 years of fund history (daily-rebalanced mix). Risk-free is the 13-week T-bill (^IRX). |
-| Timing test | Replays your purchases on 1,000 random sets of trading days and ranks your real dates (market efficiency), plus the lump-sum comparison. |
-| Roth calculator | Monthly contributions (typed, or a % of your discretionary spending), editable return, APR vs effective rate, end vs start of month, 2026 IRA cap ($7,500 + $1,100 catch-up at 50+). "Show the math" prints the closed-form FV. "With uncertain returns" runs a Monte Carlo (normal or bootstrap from real fund months): percentile fan, median, 5th percentile, odds of a target. |
-| Proof | 10 live checks, each pairing an app number with an independent recompute (raw-CSV re-read, brute-force loop, numpy, Excel's FV figure, a second engine), pass/fail with both numbers. Downloads an Excel workbook built in memory whose cells are real formulas (FV, shares and value per purchase, SLOPE beta, STDEV.S volatility, T-bill conversion, Sharpe) next to the app's values. Plus how AI built and audited the app. |
+| Roth calculator | Monthly contributions (typed, or a % of your discretionary spending), editable return, APR vs effective rate, end vs start of month, 2026 IRA cap ($7,500 + $1,100 catch-up at 50+). "What your wants spending could become" shows 25%, 50% and all of your discretionary average redirected into the Roth. "Show the math" prints the closed-form FV. "With uncertain returns" runs a Monte Carlo (normal or bootstrap from real fund months): percentile fan, median, 5th percentile, odds of a target. |
+| Proof | 7 live checks on the sample (6 on an upload), each pairing an app number with an independent recompute (raw-CSV re-read, brute-force loops, Excel's FV figure, the annuity formula for the default and the redirected-wants Roth, a second engine for Monte Carlo), pass/fail with both numbers. Downloads an Excel workbook built in memory whose cells are real formulas (FV, shares and value per purchase) next to the app's values. Plus how AI built and audited the app. |
 
 ## Math conventions
 - **Spending is gross purchases.** Refunds, deposits and other money coming in are dropped, not
@@ -33,8 +31,8 @@ python -m pytest            # math + ingest + headless page tests (tests/test_ap
 - **Roth:** month-by-month simulation; matches `FV = PV(1+r)^n + PMT((1+r)^n - 1)/r` (times `(1+r)` if due). APR mode uses r = rate/12, the same as Excel `FV(rate/12, n, -pmt)`. When the IRA cap changes the payment (the age-50 catch-up), "Show the math" splits it into segments, each annuity grown to retirement, and the total equals the simulation. A real return means outputs are in today's dollars.
 - **Shadow:** dividend-adjusted closes (dividends reinvested), no fees or taxes. Purchases after the latest price are skipped and counted. XIRR is shown only for spans of a week or more.
 - **Portfolios:** each purchase is split by fixed weights and held (no rebalancing). All slices buy on the first day every fund in the mix traded.
-- **Risk:** simple daily returns; vol = sample std x sqrt(252); Sharpe on excess returns over the T-bill; beta and alpha by OLS on excess returns (alpha x 252, arithmetic). The purchase window uses a time-weighted unit value (NAV method) so deposits never count as returns. T-bill: bank discount yield to effective annual, `(1/(1 - d*91/360))^(365/91) - 1`. "Above SML" = realized geometric return minus the CAPM expected return.
-- **Timing test:** each shuffle moves every purchase to a uniform random trading day between the first and last real buy (seed 0). Percentile = share of shuffles beaten, ties count half.
+- **Risk (engine kept, page removed):** simple daily returns; vol = sample std x sqrt(252); Sharpe on excess returns over the T-bill; beta and alpha by OLS on excess returns (alpha x 252, arithmetic). The purchase window uses a time-weighted unit value (NAV method) so deposits never count as returns. T-bill: bank discount yield to effective annual, `(1/(1 - d*91/360))^(365/91) - 1`. "Above SML" = realized geometric return minus the CAPM expected return.
+- **Timing test (engine kept, page removed):** each shuffle moves every purchase to a uniform random trading day between the first and last real buy (seed 0). Percentile = share of shuffles beaten, ties count half.
 - **Monte Carlo:** the normal method uses the same average monthly rate as the fixed-return chart, so the mean of the runs should match the closed-form FV (a check shown on the page); the median is lower because of volatility drag. Bootstrap returns are nominal.
 
 Deploying: see [DEPLOY.md](DEPLOY.md) (Streamlit Community Cloud, Python 3.12, pinned requirements).
@@ -63,9 +61,10 @@ Grok (designer) owns the look: `DESIGN.md`, `.streamlit/config.toml`, `styles.cs
   `loaded_summary`, `loaded_kpis`, `loaded_actions`, `spend_kpis`, `chart_by_category`, `table_by_category`,
   `chart_by_month`, `top_merchants`, `shadow_controls`, `shadow_kpis`, `chart_shadow`,
   `shadow_compare`, `roth_inputs`, `roth_kpis`, `chart_roth`, `roth_mc_controls`, `chart_roth_fan`,
-  `roth_mc_kpis`, `risk_kpis`, `chart_risk_return`, `chart_sml`, `risk_table`, `risk_explainer`, `timing_controls`, `timing_kpis`,
-  `chart_timing_hist`, `timing_explainer`, `proof_checks`, `proof_download`, `proof_process`. Phase 7 chart helpers: `chart_fan`, `chart_histogram`,
-  `chart_risk_return`, `chart_sml`.
+  `roth_mc_kpis`, `roth_redirect` (table `redirect_table`), `landing_preview`, `proof_checks`, `proof_download`,
+  `proof_process`. Chart helpers: `chart_fan`, `chart_histogram`. The Risk & CAPM and Timing test pages were
+  removed on Nov 19, 2026 at Ashton's request; their engines (`core/risk.py`, `core/timing.py`, `core/lab.py`) and
+  tests stay in the repo.
 
 ## Agent setup (one terminal tab each, all in this folder)
 | Tab | Command | Role |

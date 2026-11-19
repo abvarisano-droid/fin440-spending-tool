@@ -20,8 +20,8 @@ TAG = sys.argv[2] if len(sys.argv) > 2 else "run"
 BASE = sys.argv[3] if len(sys.argv) > 3 else os.path.join(tempfile.gettempdir(), "spend-shadow-walkthrough")
 OUT = os.path.join(BASE, TAG)
 os.makedirs(OUT, exist_ok=True)
-PAGES = [("Spending breakdown", "spending", 5), ("Shadow portfolio", "shadow", 12), ("Risk & CAPM", "risk", 14),
-         ("Timing test", "timing", 8), ("Roth calculator", "roth", 8), ("Proof", "proof", 14)]
+PAGES = [("Spending breakdown", "spending", 5), ("Shadow portfolio", "shadow", 12),
+         ("Roth calculator", "roth", 8), ("Proof", "proof", 14)]
 VIEWS = {"desktop": dict(width=1280, height=860), "phone": dict(width=390, height=844)}
 SCROLLER = "document.querySelector('[data-testid=\"stMain\"]') || document.scrollingElement"
 

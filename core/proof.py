@@ -15,10 +15,9 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 
-from core import lab, montecarlo, risk, tvm
+from core import montecarlo, tvm
 from core.portfolios import build_portfolio
 from core.shadow import build_shadow
-from core.timing import timing_test
 
 # Roth defaults and Excel's own answer: =FV(0.07/12, 528, -200) in Excel 365 = 705,070.79
 ROTH_DEFAULTS = dict(current_age=21, retirement_age=65, monthly=200.0, rate=0.07)
@@ -78,11 +77,12 @@ def fv_by_loop(monthly: float, rate_apr: float, months: int) -> float:
 
 # ---------- the live checks ----------
 
-def run_checks(tx_all: pd.DataFrame, spend: pd.DataFrame, voo: pd.Series, spy: pd.Series,
-               rf_annual: float, sample_path=None, bnd: pd.Series | None = None) -> list[Check]:
+def run_checks(tx_all: pd.DataFrame, spend: pd.DataFrame, voo: pd.Series, sample_path=None,
+               bnd: pd.Series | None = None, disc_monthly: float | None = None) -> list[Check]:
     """tx_all = every normalized row (transfers included); spend = spending only. The raw-CSV
     spending check runs only for the sample (an upload's raw file isn't kept); the 60/40 check
-    runs when BND prices are given."""
+    runs when BND prices are given; the redirected-spending Roth check runs when the data has
+    discretionary spending (disc_monthly = its monthly average)."""
     checks: list[Check] = []
 
     if sample_path is not None:
@@ -92,14 +92,12 @@ def run_checks(tx_all: pd.DataFrame, spend: pd.DataFrame, voo: pd.Series, spy: p
             "Sum of every negative Amount in the sample file, read line by line with Python's csv "
             "module (before transfers are excluded)."))
     voo = voo.dropna().sort_index()
-    spy = spy.dropna().sort_index()
     shadow = build_shadow(spend, voo)
     brute = brute_force_shadow(list(spend["date"]), list(spend["amount"]), list(voo.index),
                                list(voo.to_numpy(dtype=float)))
     checks.append(Check("Shadow: VOO value vs a brute-force loop", shadow.value, brute, 0.005,
                         "Plain Python loop: each purchase buys at the first close on or after its date."))
 
-    port = build_portfolio(spend, {"VOO": voo}, {"VOO": 1.0})  # unit value for the risk checks
     if bnd is not None:
         bnd = bnd.dropna().sort_index()
         both = voo.index.intersection(bnd.index)
@@ -111,26 +109,6 @@ def run_checks(tx_all: pd.DataFrame, spend: pd.DataFrame, voo: pd.Series, spy: p
                             "Plain loop: 60% of each purchase buys VOO and 40% buys BND on the first day "
                             "both traded, valued at the latest closes."))
 
-    tt = timing_test(spend, voo, n_shuffles=50, seed=0)
-    checks.append(Check("Timing test 'your dates' vs shadow engine", tt["actual_value"], shadow.value,
-                        0.005, "The timing test's unshuffled value is the shadow value."))
-
-    # beta on the purchase window: unit value of 100% VOO is VOO's own price relative
-    table = lab.risk_table({"VOO": port.unit_value, "SPY": spy.loc[port.unit_value.index[0]:]}, spy, rf_annual)
-    b_app = float(table.iloc[0]["beta"])
-    w = pd.concat([voo, spy], axis=1, join="inner").loc[port.unit_value.index[0]:]
-    rv, rs = w.iloc[:, 0].pct_change().dropna(), w.iloc[:, 1].pct_change().dropna()
-    b_np = float(np.cov(rv, rs, ddof=1)[0, 1] / np.var(rs, ddof=1))
-    checks.append(Check("Beta: regression vs cov/var", b_app, b_np, 1e-9,
-                        "numpy cov(VOO, SPY) / var(SPY) on daily price returns. Subtracting a constant "
-                        "risk-free rate doesn't change the slope.", "x"))
-    vol_np = float(np.std(rv, ddof=1) * np.sqrt(252))
-    checks.append(Check("Volatility: app vs numpy", float(table.iloc[0]["ann_vol"]), vol_np, 1e-9,
-                        "numpy sample std of daily returns x sqrt(252).", "%"))
-    rf_d = (1 + rf_annual) ** (1 / 252) - 1
-    sharpe_np = float((rv.mean() - rf_d) / np.std(rv, ddof=1) * np.sqrt(252))
-    checks.append(Check("Sharpe ratio: app vs a hand formula", float(table.iloc[0]["sharpe"]), sharpe_np, 1e-9,
-                        "(average daily return - daily T-bill rate) / std x sqrt(252), in numpy.", "x"))
     d = ROTH_DEFAULTS
     proj = tvm.roth_projection(d["current_age"], d["retirement_age"], d["monthly"], d["rate"],
                                enforce_limit=False)
@@ -142,6 +120,14 @@ def run_checks(tx_all: pd.DataFrame, spend: pd.DataFrame, voo: pd.Series, spy: p
     closed = d["monthly"] * ((1 + r) ** n - 1) / r
     checks.append(Check("Roth: app's month-by-month balance vs the annuity formula", app_fv, closed, 0.005,
                         "Closed form PMT x ((1+r)^n - 1) / r, typed out here, not the app's TVM code."))
+    if disc_monthly:
+        app_redirect = float(tvm.roth_projection(d["current_age"], d["retirement_age"], disc_monthly, d["rate"],
+                                                 enforce_limit=False).iloc[-1]["balance"])
+        checks.append(Check("Roth: redirected discretionary spending vs the annuity formula", app_redirect,
+                            disc_monthly * ((1 + r) ** n - 1) / r, 0.005,
+                            f"Your discretionary average (${disc_monthly:,.2f}/month) put into the Roth from 21 "
+                            f"to 65 at 7% APR, closed form typed out here. Uncapped, so it matches the Roth "
+                            f"page only while that amount is under the IRA limit (${tvm.IRA_LIMIT_2026 / 12:,.2f}/month)."))
 
     mc = montecarlo.simulate_roth(d["current_age"], d["retirement_age"], d["monthly"], method="normal",
                                   annual_mean=d["rate"], annual_vol=0.15, n_sims=5000, seed=0,
@@ -187,16 +173,12 @@ def how_list(checks: list[Check]) -> str:
 
 # ---------- Excel workbook with live formulas ----------
 
-def build_workbook(spend: pd.DataFrame, voo: pd.Series, spy: pd.Series, rf_discount: float,
-                   app: dict) -> bytes:
+def build_workbook(spend: pd.DataFrame, voo: pd.Series, app: dict) -> bytes:
     """Return .xlsx bytes. Every recomputed cell is an Excel formula; app values sit beside them
     with a difference cell, so a grader can audit the math in Excel. `app` holds the app's numbers:
-    shadow_value, beta, vol, sharpe, rf_effective, roth_fv. Built in memory, never saved to disk."""
+    shadow_value, roth_fv. Built in memory, never saved to disk."""
     from openpyxl import Workbook
     from openpyxl.styles import Font
-
-    # Excel 2010+ functions (STDEV.S, VAR.S, COVARIANCE.S) must carry the _xlfn. prefix in the
-    # file, or Excel shows #NAME?. Excel displays them without it.
 
     bold = Font(bold=True)
     wb = Workbook()
@@ -210,7 +192,6 @@ def build_workbook(spend: pd.DataFrame, voo: pd.Series, spy: pd.Series, rf_disco
         "The Difference cells should all be 0 (or a rounding speck). Change any input to see it flow.",
         "Roth: Excel FV() on the app's default inputs.",
         "Shadow: every purchase buys VOO at the first close on or after it; value at the latest close.",
-        "Risk: daily returns, SLOPE() for beta, STDEV.S for volatility, the T-bill conversion, Sharpe.",
         "Prices are Yahoo Finance dividend-adjusted closes as of the download.",
     ]
     for i, t in enumerate(notes, start=3):
@@ -260,41 +241,6 @@ def build_workbook(spend: pd.DataFrame, voo: pd.Series, spy: pd.Series, rf_disco
     for c in ("H3", "H4", "H5", "H6"):
         s[c].font = bold
     s.column_dimensions["H"].width = 18
-
-    # Risk
-    k = wb.create_sheet("Risk")
-    w = pd.concat([voo.rename("VOO"), spy.dropna().rename("SPY")], axis=1, join="inner")
-    w = w.loc[w.index >= idx[idx.searchsorted(spend["date"].min(), side="left")]]
-    for j, h in enumerate(["Date", "VOO", "SPY", "VOO return", "SPY return"], start=1):
-        k.cell(1, j, h).font = bold
-    for i, (dt, rowv) in enumerate(w.iterrows(), start=2):
-        k.cell(i, 1, dt.to_pydatetime()).number_format = "yyyy-mm-dd"
-        k.cell(i, 2, float(rowv["VOO"]))
-        k.cell(i, 3, float(rowv["SPY"]))
-        if i > 2:
-            k.cell(i, 4, f"=B{i}/B{i - 1}-1")
-            k.cell(i, 5, f"=C{i}/C{i - 1}-1")
-    end = 1 + len(w)
-    rv, rs = f"D3:D{end}", f"E3:E{end}"
-    calc = [
-        ("T-bill discount yield", rf_discount, None),
-        ("T-bill effective annual", "=(1/(1-H2*91/360))^(365/91)-1", app["rf_effective"]),
-        ("Daily risk-free", "=(1+H3)^(1/252)-1", None),
-        ("Beta (SLOPE)", f"=SLOPE({rv},{rs})", app["beta"]),
-        ("Beta (COVARIANCE.S / VAR.S)", f"=_xlfn.COVARIANCE.S({rv},{rs})/_xlfn.VAR.S({rs})", app["beta"]),
-        ("Volatility (yearly)", f"=_xlfn.STDEV.S({rv})*SQRT(252)", app["vol"]),
-        ("Sharpe ratio", f"=(AVERAGE({rv})-H4)/_xlfn.STDEV.S({rv})*SQRT(252)", app["sharpe"]),
-    ]
-    k["G1"], k["H1"], k["I1"], k["J1"] = "Measure", "Excel", "App", "Difference"
-    for c in ("G1", "H1", "I1", "J1"):
-        k[c].font = bold
-    for i, (label, formula, app_v) in enumerate(calc, start=2):
-        k.cell(i, 7, label)
-        k.cell(i, 8, formula)
-        if app_v is not None:
-            k.cell(i, 9, float(app_v))
-            k.cell(i, 10, f"=I{i}-H{i}")
-    k.column_dimensions["G"].width = 30
 
     buf = io.BytesIO()
     wb.save(buf)

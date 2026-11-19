@@ -35,6 +35,14 @@ def spending_only(df: pd.DataFrame, include_transfers: bool = False) -> pd.DataF
     return df if include_transfers else df[~df["category"].isin(NON_SPEND)]
 
 
+def discretionary_monthly(spend: pd.DataFrame) -> float:
+    """Average discretionary ("wants") spending per calendar month that has any spending."""
+    if spend.empty:
+        return 0.0
+    months = max(spend["date"].dt.to_period("M").nunique(), 1)
+    return float(spend.loc[spend["discretionary"], "amount"].sum() / months)
+
+
 def require_transactions() -> pd.DataFrame:
     """Stop the page with a pointer to Upload if nothing is loaded yet."""
     df = get_transactions()

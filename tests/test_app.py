@@ -12,8 +12,7 @@ def _loaded():
 def test_pages_render_with_sample():
     at = _loaded()
     assert "transactions" in at.session_state
-    for page in ("app_pages/spending.py", "app_pages/roth.py", "app_pages/shadow.py",
-                 "app_pages/risk.py", "app_pages/timing.py", "app_pages/proof.py"):
+    for page in ("app_pages/spending.py", "app_pages/roth.py", "app_pages/shadow.py", "app_pages/proof.py"):
         at.switch_page(page).run()
         assert not at.exception, (page, at.exception)
         assert not at.error, (page, [e.value for e in at.error])
@@ -21,10 +20,6 @@ def test_pages_render_with_sample():
 
 def test_lab_pages_alternate_paths():
     at = _loaded()
-    at.switch_page("app_pages/risk.py").run()
-    at.radio(key="risk_window").set_value("history").run()
-    assert not at.exception and not at.error
-    assert len(at.metric) >= 5
     at.switch_page("app_pages/roth.py").run()
     at.radio(key="mc_method").set_value("bootstrap").run()
     assert not at.exception and not at.error
@@ -36,7 +31,17 @@ def test_proof_page_all_checks_pass_on_sample():
     at = _loaded()
     at.switch_page("app_pages/proof.py").run()
     assert not at.exception and not at.error
-    assert any("10 of 10 checks pass" in m.value for m in at.markdown)
+    assert any("7 of 7 checks pass" in m.value for m in at.markdown)
+
+
+def test_roth_shows_redirected_wants_on_sample():
+    # sample wants: $3,684.72 over 6 months = $614.12/month, under the $625/month IRA limit
+    at = _loaded()
+    at.switch_page("app_pages/roth.py").run()
+    assert not at.exception and not at.error
+    assert any("614.12/month" in m.value for m in at.markdown)
+    at.radio(key="roth_source").set_value("Redirect discretionary spending").run()
+    assert not at.exception and not at.error
 
 
 def test_roth_monte_carlo_mean_near_closed_form():

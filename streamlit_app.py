@@ -16,8 +16,6 @@ page = st.navigation(
         st.Page("app_pages/upload.py", title="Upload", icon=":material/upload:", default=True),
         st.Page("app_pages/spending.py", title="Spending breakdown", icon=":material/pie_chart:"),
         st.Page("app_pages/shadow.py", title="Shadow portfolio", icon=":material/trending_up:"),
-        st.Page("app_pages/risk.py", title="Risk & CAPM", icon=":material/query_stats:"),
-        st.Page("app_pages/timing.py", title="Timing test", icon=":material/shuffle:"),
         st.Page("app_pages/roth.py", title="Roth calculator", icon=":material/savings:"),
         st.Page("app_pages/proof.py", title="Proof", icon=":material/verified:"),
     ],
