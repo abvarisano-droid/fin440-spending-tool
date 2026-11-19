@@ -1,6 +1,10 @@
 # Presentation deck (Nov 30)
 
 Google Slides: "Spend Shadow: FIN 440 AI Project" in Ashton's Drive (15 slides, speaker notes on each).
+Since Nov 19, 2026 this is the v3 restyle (Liquid Glass light, matching the app), made by the `spend-deck`
+agent on a copy and then promoted. The v1 deck is kept as "Spend Shadow: FIN 440 AI Project (old v1,
+replaced)". The v3 slide charts were built in the app palette from the same Nov 18 prices and are
+inserted by hand from Drive (`spend-shadow-v3-*.png`); the matplotlib scripts below still make the v1 charts.
 
 The deck's charts and numbers come from the app's own engines on one Yahoo price snapshot, so they
 can be regenerated and checked:
