@@ -8,11 +8,11 @@ toolbarMode = "minimal"
 # Theme: Ashton Capes site, Liquid Glass v8 light (live site assets/glass.css + v8.css + kronos.css).
 [theme]
 base = "light"
-primaryColor = "#0B7A75"
+primaryColor = "#0A716C"
 backgroundColor = "#F0F6FA"
 secondaryBackgroundColor = "#FFFFFF"
 textColor = "#1A1D1B"
-linkColor = "#0B7A75"
+linkColor = "#0A716C"
 borderColor = "#DCDFD8"
 codeTextColor = "#1A1D1B"
 codeBackgroundColor = "#EEF0EC"
@@ -36,7 +36,7 @@ codeFont = "'Geist Mono':https://fonts.googleapis.com/css2?family=Geist+Mono:wgh
 redColor = "#A3311F"
 orangeColor = "#A8480A"
 yellowColor = "#6B5208"
-greenColor = "#0B7A75"
+greenColor = "#0A716C"
 blueColor = "#2F4A66"
 violetColor = "#553A73"
 grayColor = "#4F5752"
@@ -68,8 +68,8 @@ chartCategoricalColors = [
     "#553A73",
     "#C9A227",
     "#2F4A66",
-    "#0B7A75",
-    "#34B8B0",
+    "#0A716C",
+    "#B04C82",
     "#4F5752",
     "#9B7BB5",
     "#B4BAB5",
@@ -83,7 +83,7 @@ chartSequentialColors = [
     "#47C3BB",
     "#2FA59E",
     "#178C86",
-    "#0B7A75",
+    "#0A716C",
     "#19575A",
     "#19373F",
 ]

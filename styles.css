@@ -9,13 +9,13 @@
   --ss-text: #1a1d1b;
   --ss-muted: #4f5752;
   --ss-muted-on-tint: #4f5752;
-  --ss-accent: #0b7a75;
+  --ss-accent: #0a716c;
   --ss-accent-hover: #19373f;
   --ss-accent-soft: #defaf8;
   --ss-forest: #0a1420;
   --ss-lime: #34e0d6;
   --ss-border: #dcdfd8;
-  --ss-green: #0b7a75;
+  --ss-green: #0a716c;
   --ss-red: #a3311f;
   --ss-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   --ss-radius: 22px;
@@ -190,7 +190,7 @@ h3 {
   color: var(--ss-text);
 }
 
-/* Signature moment: oversized shadow value. Pine on a gain, brick on a loss. */
+/* Signature moment: oversized shadow value. Teal on a gain, red on a loss. */
 .st-key-shadow_signature [data-testid="stMetricValue"],
 .st-key-shadow_signature_down [data-testid="stMetricValue"] {
   font-size: 2.5rem;
@@ -216,7 +216,7 @@ h3 {
 [data-testid="stFileUploaderDropzone"] {
   min-height: 44px;
   touch-action: manipulation;
-  -webkit-tap-highlight-color: rgba(11, 122, 117, 0.14);
+  -webkit-tap-highlight-color: rgba(10, 113, 108, 0.14);
 }
 
 [data-testid="stMain"] [data-testid="stPageLink-NavLink"] {
@@ -224,7 +224,7 @@ h3 {
   align-items: center;
 }
 
-/* Secondary actions: sample data and Clear data. Site ghost pill. Load / download stay fairway. */
+/* Secondary actions: sample data and Clear data. Site ghost pill. Load and download are the cyan primary pill. */
 .st-key-use_sample button,
 .st-key-clear_btn button {
   color: var(--ss-text);
@@ -583,7 +583,7 @@ h3 {
 [data-baseweb="select"] > div:focus-within,
 [data-baseweb="textarea"]:focus-within {
   border-color: var(--ss-accent) !important;
-  box-shadow: 0 0 0 3px rgba(11, 122, 117, 0.28);
+  box-shadow: 0 0 0 3px rgba(10, 113, 108, 0.28);
 }
 
 /* Buttons: focus halo, and a press that every pointer can feel. */
@@ -591,7 +591,7 @@ h3 {
 .stDownloadButton button:focus-visible,
 [data-testid="stMain"] [data-testid="stPageLink-NavLink"]:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(11, 122, 117, 0.35);
+  box-shadow: 0 0 0 3px rgba(10, 113, 108, 0.35);
 }
 
 .stButton button:active,
@@ -738,7 +738,7 @@ h3 {
    Liquid Glass layer (v8, light), matched to the live Ashton Capes site
    (assets/glass.css, v8.css, kronos.css). Visual only: no copy, keys or layout order change.
    Paper #f0f6fa with three faint static glows, frosted white glass cards, serif titles and
-   big numbers, one cyan accent (#34e0d6 with #0a1420 ink, 9.1:1), teal text #0b7a75 (5.0:1).
+   big numbers, one cyan accent (#34e0d6 with #0a1420 ink, 9.1:1), teal text #0a716c (4.9:1 on the sky glow, 5.9:1 on white).
    Real blur only on desktop; phones get a near-opaque fill that reads the same.
    ===================================================================== */
 
@@ -922,7 +922,7 @@ h2, h3 {
   background: var(--lg-cyan);
   border-color: var(--lg-cyan);
   color: var(--lg-cyan-ink);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), 0 6px 18px -8px rgba(11, 122, 117, 0.6);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), 0 6px 18px -8px rgba(10, 113, 108, 0.6);
   transition: transform 200ms var(--ss-ease), box-shadow 200ms var(--ss-ease);
 }
 
@@ -951,7 +951,7 @@ h2, h3 {
     background: var(--lg-cyan);
     border-color: var(--lg-cyan);
     color: var(--lg-cyan-ink);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 10px 24px -10px rgba(11, 122, 117, 0.65);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 10px 24px -10px rgba(10, 113, 108, 0.65);
     transform: translateY(-2px);
   }
 
@@ -1058,4 +1058,60 @@ h2, h3 {
 /* Loaded actions: the page link and Clear data share one baseline. */
 .st-key-loaded_actions {
   align-items: center;
+}
+
+/* Swipe hints under wide tables are for phones only: desktop tables fit. */
+@media (min-width: 641px) {
+  [class*="st-key-swipe_hint"] {
+    display: none !important;
+  }
+}
+
+/* Collapsed nav (phone): the header pill held only a bare double arrow. Give it a visible
+   "Menu" label and a ghost-pill frame so it reads as the way to the other pages. The text
+   also gives the button an accessible name (Streamlit ships it with an empty aria-label). */
+[data-testid="stHeader"] [data-testid="stExpandSidebarButton"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 14px 0 8px;
+  border: 1px solid var(--lg-ghost-edge);
+  border-radius: var(--ss-radius-pill);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--ss-text);
+  touch-action: manipulation;
+}
+
+[data-testid="stHeader"] [data-testid="stExpandSidebarButton"] [data-testid="stIconMaterial"],
+[data-testid="stHeader"] [data-testid="stExpandSidebarButton"] span {
+  color: var(--ss-text) !important;
+}
+
+[data-testid="stHeader"] [data-testid="stExpandSidebarButton"]::after {
+  content: "Menu";
+  font-family: Geist, ui-sans-serif, system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--ss-text);
+}
+
+@media (hover: none), (pointer: coarse) {
+  [data-testid="stHeader"] [data-testid="stExpandSidebarButton"]:active {
+    transform: scale(0.98);
+    opacity: 0.88;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-testid="stHeader"] [data-testid="stExpandSidebarButton"]:active {
+    transform: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  [data-testid="stHeader"] [data-testid="stExpandSidebarButton"] {
+    border-color: #4f5752;
+  }
 }

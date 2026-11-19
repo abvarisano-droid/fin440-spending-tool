@@ -23,9 +23,9 @@ MUTED = "#4F5752"
 BORDER = "#DCDFD8"
 GRID = "#E4E8E6"
 SPENT = "#B0603A"  # cumulative spending: the baseline, in site chart copper (clearly apart from teal)
-SHADOW = "#0B7A75"  # fund value: the hero series, in site teal
+SHADOW = "#0A716C"  # fund value: the hero series, in site teal
 CONTRIBUTIONS = "#3F6F9E"
-GROWTH = "#0B7A75"
+GROWTH = "#0A716C"
 # 14 fills, one per ALL_CATEGORIES entry (13 rules + Other), from the site chart palette.
 # Chart fills, not body text.
 CATEGORICAL = [
@@ -38,23 +38,23 @@ CATEGORICAL = [
     "#553A73",  # Subscriptions
     "#C9A227",  # Entertainment
     "#2F4A66",  # Travel
-    "#0B7A75",  # Shopping
-    "#34B8B0",  # Health
+    "#0A716C",  # Shopping
+    "#B04C82",  # Health (rose: apart from the Shopping teal)
     "#4F5752",  # Housing & Utilities
     "#9B7BB5",  # Education
     "#B4BAB5",  # Other
 ]
 CATEGORY_COLORS = dict(zip(ALL_CATEGORIES, CATEGORICAL))
-ACCENT = "#0B7A75"
+ACCENT = "#0A716C"
 FAN_OUTER = "#C4F6F3"
 FAN_INNER = "#6FD9D1"
 HIST_FILL = "#2FA59E"  # solid bars, about 3:1 on white
 # 3:1 non-text stroke on white/paper (the light fills alone are too faint).
-BAND_STROKE = "#0B7A75"
+BAND_STROKE = "#0A716C"
 PORTFOLIO_ORDER = list(PRESETS.keys()) + ["SPY (market)", "SPY"]
 # Lines need 3:1 on white, so QQQ uses burnt orange, not the site gold.
 PORTFOLIO_COLORS = {
-    "100% VOO": "#0B7A75",
+    "100% VOO": "#0A716C",
     "60/40 VOO/BND": "#3F6F9E",
     "100% BND": "#4F5752",
     "100% QQQ": "#B0603A",
@@ -216,6 +216,15 @@ def _apply_named_series_colors(c: alt.Chart) -> alt.Chart:
     return c
 
 
+def _tight_age_axis(c: alt.Chart) -> alt.Chart:
+    """An age axis starts at the first age in the data (no zero, no nice rounding down to 20)."""
+    if not isinstance(c, alt.Chart) or _channel_field(c, "x") != "age":
+        return c
+    x = _channel_encoding(c, "x").copy(deep=True)
+    x.scale = alt.Scale(zero=False, nice=False)
+    return c.encode(x=x)
+
+
 def _delta_is_loss(delta: object) -> bool:
     return str(delta).lstrip().startswith("-")
 
@@ -247,6 +256,7 @@ def kpi_row(key: str, items: list[dict]) -> None:
 def chart(c: alt.Chart, key: str | None = None) -> None:
     """Every chart goes through here so axis, legend and font styling live in one place."""
     c = _apply_named_series_colors(c)
+    c = _tight_age_axis(c)
     c = (
         c.properties(padding={"left": 12, "right": 8, "top": 8, "bottom": 8})
         # Legends wrap into columns so they never run off a phone screen.
@@ -290,9 +300,9 @@ def chart_fan(
     y_title: str = "Balance ($)",
     key: str | None = None,
 ) -> None:
-    """Percentile fan: p5-p95 tint, p25-p75 sage, p50 pine. Pass simulate_roth()['percentiles']."""
+    """Percentile fan: p5-p95 pale cyan, p25-p75 mid cyan, p50 teal. Pass simulate_roth()['percentiles']."""
     df = _frame_with_x(bands, x)
-    x_enc = alt.X(f"{x}:Q", title="Age")
+    x_enc = alt.X(f"{x}:Q", title="Age", scale=alt.Scale(zero=False, nice=False))
     outer = (
         alt.Chart(df)
         .mark_area(opacity=0.9, color=FAN_OUTER, stroke=BAND_STROKE, strokeWidth=1)
@@ -361,29 +371,50 @@ def chart_histogram(
     chart(alt.layer(*layers), key=key)
 
 
-def chart_risk_return(df: pd.DataFrame, *, key: str | None = None) -> None:
-    """Scatter: one portfolio per dot. Columns: name, ann_vol, ann_return."""
+MARKET_NAMES = ("SPY (market)", "SPY")
+
+
+def _is_market(name: object) -> bool:
+    return str(name) in MARKET_NAMES
+
+
+def _dots_with_market_ring(df: pd.DataFrame, x: alt.X, y: alt.Y, tooltip: list) -> alt.LayerChart:
+    """Portfolios as filled dots; the market (SPY) as a hollow ring drawn on top, so a portfolio
+    that sits on the market (VOO, beta 0.99) still shows through inside the ring."""
     names = list(dict.fromkeys(str(v) for v in df["name"].tolist()))
-    c = (
-        alt.Chart(df)
-        .mark_circle(size=110, opacity=1, stroke='#ffffff', strokeWidth=1.5)
-        .encode(
-            x=alt.X("ann_vol:Q", title="Annualized volatility", axis=alt.Axis(format="%")),
-            y=alt.Y("ann_return:Q", title="Annualized return", axis=alt.Axis(format="%")),
-            color=alt.Color("name:N", title=None, scale=_portfolio_scale(names), legend=_legend(2)),
-            tooltip=[
-                alt.Tooltip("name:N", title="Portfolio"),
-                alt.Tooltip("ann_vol:Q", title="Vol", format=".1%"),
-                alt.Tooltip("ann_return:Q", title="Return", format=".1%"),
-            ],
-        )
+    color = alt.Color("name:N", title=None, scale=_portfolio_scale(names), legend=_legend(2))
+    is_mkt = df["name"].map(_is_market)
+    dots = (
+        alt.Chart(df[~is_mkt])
+        .mark_circle(size=110, opacity=1, stroke="#ffffff", strokeWidth=1.5)
+        .encode(x=x, y=y, color=color, tooltip=tooltip)
+    )
+    ring = (
+        alt.Chart(df[is_mkt])
+        .mark_point(shape="circle", filled=False, size=300, strokeWidth=2.5, opacity=1)
+        .encode(x=x, y=y, color=color, tooltip=tooltip)
+    )
+    return alt.layer(dots, ring)
+
+
+def chart_risk_return(df: pd.DataFrame, *, key: str | None = None) -> None:
+    """Scatter: one portfolio per dot, the market as a ring. Columns: name, ann_vol, ann_return."""
+    c = _dots_with_market_ring(
+        df,
+        alt.X("ann_vol:Q", title="Annualized volatility", axis=alt.Axis(format="%")),
+        alt.Y("ann_return:Q", title="Annualized return", axis=alt.Axis(format="%")),
+        [
+            alt.Tooltip("name:N", title="Portfolio"),
+            alt.Tooltip("ann_vol:Q", title="Vol", format=".1%"),
+            alt.Tooltip("ann_return:Q", title="Return", format=".1%"),
+        ],
     )
     chart(c, key=key)
 
 
 def chart_sml(line_df: pd.DataFrame, points_df: pd.DataFrame, *, key: str | None = None) -> None:
-    """Security market line plus portfolio dots. line: beta, expected_return. points: name, beta, ann_return."""
-    names = list(dict.fromkeys(str(v) for v in points_df["name"].tolist()))
+    """Security market line plus portfolio dots (market as a ring). line: beta, expected_return.
+    points: name, beta, ann_return."""
     line = (
         alt.Chart(line_df)
         .mark_line(color=ACCENT, strokeWidth=2)
@@ -392,18 +423,14 @@ def chart_sml(line_df: pd.DataFrame, points_df: pd.DataFrame, *, key: str | None
             y=alt.Y("expected_return:Q", title="Annual return", axis=alt.Axis(format="%")),
         )
     )
-    points = (
-        alt.Chart(points_df)
-        .mark_circle(size=110, opacity=1, stroke='#ffffff', strokeWidth=1.5)
-        .encode(
-            x=alt.X("beta:Q", title="Beta"),
-            y=alt.Y("ann_return:Q", title="Annual return", axis=alt.Axis(format="%")),
-            color=alt.Color("name:N", title=None, scale=_portfolio_scale(names), legend=_legend(2)),
-            tooltip=[
-                alt.Tooltip("name:N", title="Portfolio"),
-                alt.Tooltip("beta:Q", title="Beta", format=".2f"),
-                alt.Tooltip("ann_return:Q", title="Return", format=".1%"),
-            ],
-        )
+    points = _dots_with_market_ring(
+        points_df,
+        alt.X("beta:Q", title="Beta"),
+        alt.Y("ann_return:Q", title="Annual return", axis=alt.Axis(format="%")),
+        [
+            alt.Tooltip("name:N", title="Portfolio"),
+            alt.Tooltip("beta:Q", title="Beta", format=".2f"),
+            alt.Tooltip("ann_return:Q", title="Return", format=".1%"),
+        ],
     )
-    chart((line + points).resolve_scale(y="shared"), key=key)
+    chart(alt.layer(line, points).resolve_scale(y="shared"), key=key)
