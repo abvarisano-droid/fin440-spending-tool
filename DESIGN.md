@@ -114,6 +114,7 @@ No scroll libraries, no grain overlay, no parallax. Streamlit reruns make cinema
 - Top `st.navigation` stays. Hide the Streamlit deploy button via CSS.
 - Empty state (no CSV yet): one `st.info` plus a page link to Upload. Caption weight, not a second hero.
 - Privacy line lives under the Upload title as `st.caption`. Repeat a one-line caption on Shadow (Yahoo Finance ticker only) and Roth (no income-limit check).
+- Lab pages (Spending, Shadow, Risk, Timing, Roth) put a FIN 440 / BKM chapter line first, with `:material/school:`. CSS paints that caption pine 500 (not muted). Upload and Proof have no school line.
 - Streamlit usage telemetry is off: `[browser] gatherUsageStats = false` in `.streamlit/config.toml`. The only outbound request remains tickers, a start date, and the T-bill (`^IRX`) to Yahoo Finance.
 
 ---
@@ -137,7 +138,7 @@ Empty: only title, caption, and `upload_source`. No mapper, no summary.
 
 Order:
 
-1. Title plus a one-line caption (builder: add this; other pages already have one). Toggle "Include transfers and card payments" immediately under that (filter, not a card).
+1. Title. Course caption (`:material/school:` FIN 440 / BKM chapters). Then "Totals include only purchases unless you turn on transfers." Toggle "Include transfers and card payments" immediately under that (filter, not a card).
 2. **`spend_kpis`**: four metrics in one row: Total spent, Per month (avg), Discretionary, Discretionary share. The row container is unbordered; each metric uses `st.metric(border=True)` as a paper well.
 3. Two-column row **3:2**: **`chart_by_category`** (bar, dollars on x, category on y) | **`table_by_category`** (totals + share progress).
 4. **`chart_by_month`**: full-width stacked bars by month.
@@ -148,7 +149,7 @@ Order:
 
 This page holds the signature moment.
 
-1. Title. Caption: fractional shares, dividend-adjusted, no fees or taxes.
+1. Title. Course caption (Ch 2, 5, 7). Then: fractional shares, dividend-adjusted, no fees or taxes.
 2. **`shadow_controls`**: bordered card. Ticker (1/3) and category multiselect (2/3).
 3. **`shadow_kpis`**: four metrics: You spent, **In {ticker} it'd be worth** (signature: 40px Fraunces, pine if gain / brick if loss), Annualized (XIRR), Priced as of. The second metric is the only oversized number in the product.
 4. Skip-count `st.info` only when purchases sit after the latest close.
@@ -159,7 +160,7 @@ This page holds the signature moment.
 
 ### 4. Roth IRA calculator (`app_pages/roth.py`)
 
-1. Title. Caption: real return = today's dollars; income limits unchecked.
+1. Title. Course caption (Ch 5). Then: real return = today's dollars; income limits unchecked.
 2. **`roth_inputs`**: bordered card, three columns. Age/start | contribution source | rate, convention, due, cap. Radio for contribution source; slider appears in-column when redirecting discretionary spending.
 3. **`roth_kpis`**: three metrics: Balance at {age}, You put in, Growth. Growth uses the green delta color when positive.
 4. Cap `st.info` only when the monthly amount exceeds the 2026 limit.
@@ -173,7 +174,7 @@ This page holds the signature moment.
 
 Class topic: risk/return, CAPM, SML. Needs loaded transactions. Market series is SPY.
 
-1. Title: "Risk and CAPM". Caption: volatility and beta come from unit value (deposits do not look like returns); prices and the T-bill are Yahoo only.
+1. Title: "Risk and CAPM". Course caption (Ch 2, 5, 6, 7, 9; not 4 or 8). Then: volatility and beta come from unit value (deposits do not look like returns); prices and the T-bill are Yahoo only.
 2. **`risk_window`**: horizontal radio, not a card. "Your purchase dates" (default) vs "Last 5 years of fund history". Purchase dates replay buys via `unit_value`. History uses a daily-rebalanced mix (`lab.constant_mix_index`) so a six-month sample is not the only read. Prefer history for the presentation.
 3. **`risk_kpis`**: five wells for the default portfolio (100% VOO vs SPY): Vol, Sharpe, Max drawdown, Beta, Alpha. Wrap on a phone. Alpha uses green/brick delta coloring via a signed string. Caption under the row: T-bill yield, EAR, day count. `st.info` when the window is under 252 trading days.
 4. Two-column row **1:1**: **`chart_risk_return`** | **`chart_sml`**.
@@ -186,7 +187,7 @@ Class topic: risk/return, CAPM, SML. Needs loaded transactions. Market series is
 
 Class topic: market efficiency, behavioral finance. Needs loaded transactions. Default ticker matches Shadow (VOO).
 
-1. Title: "Timing test". Caption: if prices already reflect what is knowable, the dates you spent should look like luck.
+1. Title: "Timing test". Course caption (Ch 11, 12). Then: if prices already reflect what is knowable, the dates you spent should look like luck.
 2. **`timing_controls`**: bordered card. Ticker (1/3) and category multiselect (2/3), same split as `shadow_controls`.
 3. **`timing_kpis`**: Your dates in {ticker}, Median random dates, Your percentile. Value is `37th` (a percentile, not rank 37 of 1,000). Label: "Your percentile, of 1,000 shuffles". Neutral color; luck is not a gain/loss.
 4. **`chart_timing_hist`**: histogram of the 1,000 shuffled end values (`#C9D0B0` bars, `#5A7D5C` 1px stroke). Pine rule at the actual value, muted dashed rule at the median shuffle. Call `ui.chart_histogram`.
@@ -212,7 +213,7 @@ Signatures stay stable: `section(key, title=None, border=True)`, `kpi_row(key, i
 - `chart`: Altair theme `spend_shadow` (also registered globally): legend bottom, no view stroke, axis `#6E675C`, grid `#E6DDD0`, view clip off so long category labels stay whole. Field `series`: domain Spent (cumulative) then Value in {ticker}, range `SPENT` / `SHADOW`. Field `part`: Contributions / Growth in `CONTRIBUTIONS` / `GROWTH`. Field `category`: pinned `CATEGORY_COLORS` (14 distinct fills). If `category` is on x or y and color is unset, `ui.chart` fills the bars and hides the legend (the axis already names them). Field `name` or `portfolio`: `PORTFOLIO_COLORS` (VOO orange, 60/40 blue, BND muted, QQQ pine, SPY violet). Named constants: `ui.SPENT`, `ui.SHADOW`, `ui.CONTRIBUTIONS`, `ui.GROWTH`, `ui.PORTFOLIO_COLORS`.
 - Extra helpers (Phase 7): `chart_fan(percentiles_df, key=...)`, `chart_histogram(values, markers=[...], key=...)`, `chart_risk_return(df, key=...)`, `chart_sml(line_df, points_df, key=...)`. Fan outer and histogram bars take a `#5A7D5C` stroke. Pages pass engine frames; they do not restyle these.
 - Primary button: pine fill, white label, 4px radius. Secondary / "Use sample data" / "Clear data": surface fill, pine text, 1px border. Download (`proof_xlsx`) is primary. In-page `stPageLink` is 44px tall like buttons.
-- `st.caption` for helper copy. `st.info` for the empty-upload pointer and skip/cap notices only.
+- `st.caption` for helper copy. Course lines with `:material/school:` are pine 500 (`[aria-label="school icon"]`); other captions stay muted. `st.info` for the empty-upload pointer and skip/cap notices only.
 - Tables: header `surface-tint`, hairline borders, tabular nums.
 
 ---
@@ -223,7 +224,7 @@ Signatures stay stable: `section(key, title=None, border=True)`, `kpi_row(key, i
 
 `upload_source`, `column_mapper`, `loaded_summary`, `loaded_kpis`, `loaded_actions`, `spend_kpis`, `chart_by_category`, `table_by_category`, `chart_by_month`, `top_merchants`, `shadow_controls`, `shadow_kpis`, `chart_shadow`, `shadow_compare`, `roth_inputs`, `roth_kpis`, `chart_roth`, `roth_mc_controls`, `chart_roth_fan`, `roth_mc_kpis`, `risk_window`, `risk_kpis`, `chart_risk_return`, `chart_sml`, `risk_table`, `risk_explainer`, `timing_controls`, `timing_kpis`, `chart_timing_hist`, `timing_explainer`, `proof_checks`, `proof_download`, `proof_process`.
 
-Plus expanders `all_tx`, `shadow_ledger`, `roth_math`, tables `raw_preview`, `cat_table`, `top_table`, `tx_editor`, `ledger_table`, `roth_table`, `risk_stats`, `compare_table`, `proof_table`, download `proof_xlsx`, and signature wraps `shadow_signature` / `shadow_signature_down`. Radio `risk_window` is unkeyed chrome above the Risk KPIs. `proof_download` stays unbordered. Dataframe keys (`risk_stats`, `compare_table`, `proof_table`) sit inside cards: they do not get their own padding or hover lift.
+Plus expanders `all_tx`, `shadow_ledger`, `roth_math`, tables `raw_preview`, `cat_table`, `top_table`, `tx_editor`, `ledger_table`, `roth_table`, `risk_stats`, `compare_table`, `proof_table`, download `proof_xlsx`, and signature wraps `shadow_signature` / `shadow_signature_down`. Radio `risk_window` is unkeyed chrome above the Risk KPIs. `proof_download` stays unbordered. Dataframe keys (`risk_stats`, `compare_table`, `proof_table`) sit inside cards: they do not get their own padding or hover lift. Course captions have no widget key: CSS targets `[data-testid="stCaption"]:has([aria-label="school icon"])`.
 
 ---
 

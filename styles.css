@@ -68,6 +68,19 @@ h3 {
   font-size: 13px;
 }
 
+/* Lab-page course line. Streamlit renders :material/school: as this aria-label. */
+[data-testid="stCaption"]:has([aria-label="school icon"]) {
+  color: var(--ss-accent);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  overflow-wrap: anywhere;
+}
+
+[data-testid="stCaption"]:has([aria-label="school icon"]) [aria-label="school icon"] {
+  color: var(--ss-accent);
+  margin-right: 0.2em;
+}
+
 /* Tabular money */
 [data-testid="stMetricValue"],
 [data-testid="stDataFrame"] {
