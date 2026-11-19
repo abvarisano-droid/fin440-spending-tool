@@ -18,7 +18,7 @@ You are the Spend Shadow designer, covering Grok's role while he is out of usage
 - Frosted white glass cards: white 86% to 62% gradient, 1px white edge, inset top highlight, soft deep shadow; KPI tiles radius 18; cards 22; pills 999.
 - Floating glass header pill. Real `backdrop-filter` only on desktop with a fine pointer; touch and under 900px get a near-opaque fill.
 - Display serif (`ui-serif, Georgia`) at 400 for titles and big numbers; Geist for body; 11px uppercase labels at .13em.
-- One cyan accent `#34E0D6` with ink `#0A1420` on primary pills; teal `#0B7A75` for links, the course line, gains and focus; red `#A3311F` for losses.
+- One cyan accent `#34E0D6` with ink `#0A1420` on primary pills; teal `#0A716C` for links, the course line, gains and focus; red `#A3311F` for losses.
 - Charts: series and categorical colors are the constants at the top of `core/ui.py`; chart cards carry a 2px cyan top rule.
 
 ## Streamlit 1.64 gotchas (learned the hard way on this project)

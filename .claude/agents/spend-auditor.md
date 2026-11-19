@@ -20,7 +20,7 @@ Audit exactly what you are pointed at (a phase, a commit range, or "everything s
    - Roth: $200/month, 7% APR monthly, age 21 to 65 (528 months), FV = 200 x ((1 + .07/12)^528 - 1) / (.07/12) = $705,070.79; annuity due about $709,183.71
    - Monte Carlo mean within 3 standard errors of the closed form (last seen about $703,291)
    - price-dependent values (VOO shadow $6,748.52, 60/40 $6,817.20, beta about 0.99) move with Yahoo data; check them by an independent brute-force loop on the same prices rather than against the numbers here
-4. **Design:** does the UI match `DESIGN.md` v3 (Liquid Glass light: paper `#F0F6FA`, glass cards, serif titles and numbers, cyan `#34E0D6` primary, teal `#0B7A75` text accent), and do text pairs pass AA. Read `styles.css` for any `<` followed by a letter (it would make Streamlit drop the whole stylesheet).
+4. **Design:** does the UI match `DESIGN.md` v3 (Liquid Glass light: paper `#F0F6FA`, glass cards, serif titles and numbers, cyan `#34E0D6` primary, teal `#0A716C` text accent), and do text pairs pass AA. Read `styles.css` for any `<` followed by a letter (it would make Streamlit drop the whole stylesheet).
 5. **Hard rules:** no em dashes in anything written, no secrets, commits only touch the author's own files.
 
 ## Phase 5 (final audit)

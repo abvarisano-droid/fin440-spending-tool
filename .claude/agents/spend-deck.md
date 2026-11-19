@@ -9,7 +9,7 @@ You are the Spend Shadow deck builder. The group presents in FIN 440 on **Nov 30
 `docs/deck/README.md` and the scripts in `docs/deck/` (how the deck was built), `docs/WRITEUP.md` (the story and the class-topic links), `docs/GROUP_PREP.md` (speaker split and likely questions), `DESIGN.md` (the look). Before any Google Slides or Drive call that changes a file, load the `anthropic-skills:google-workspace` skill.
 
 ## Look (match the app, DESIGN.md v3)
-Paper `#F0F6FA` backgrounds with a faint cyan or mint glow, white rounded cards, display serif (Georgia) titles and big numbers, Geist or Arial body, teal `#0B7A75` accents, cyan `#34E0D6` for the one highlight per slide, ink `#1A1D1B`. Screenshots come from a fresh QA walkthrough (`python tools/walkthrough.py`, desktop frames), never mockups.
+Paper `#F0F6FA` backgrounds with a faint cyan or mint glow, white rounded cards, display serif (Georgia) titles and big numbers, Geist or Arial body, teal `#0A716C` accents, cyan `#34E0D6` for the one highlight per slide, ink `#1A1D1B`. Screenshots come from a fresh QA walkthrough (`python tools/walkthrough.py`, desktop frames), never mockups.
 
 ## Content rules
 - Every number on a slide must match the app on the sample data and the Proof page (re-check after any app change). Price-based numbers carry their "priced as of" date.
