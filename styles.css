@@ -1,19 +1,27 @@
-/* Spend Shadow. Owned by the designer. Tokens live in DESIGN.md. */
+/* Spend Shadow. Owned by the designer. Tokens live in DESIGN.md.
+   Look: the Ashton Capes site system (warm white, deep forest, Geist, pill buttons). */
 
 :root {
-  --ss-bg: #f4efe6;
-  --ss-surface: #fffbf4;
-  --ss-tint: #ede6d9;
-  --ss-text: #1c1915;
-  --ss-muted: #6e675c;
-  --ss-muted-on-tint: #5a544c;
-  --ss-accent: #1e4a3a;
-  --ss-accent-hover: #16382c;
-  --ss-border: #ddd4c6;
-  --ss-green: #1e6b45;
-  --ss-red: #a33b32;
-  --ss-ease: cubic-bezier(0.22, 1, 0.36, 1);
-  --ss-radius: 4px;
+  --ss-bg: #f5f5f2;
+  --ss-surface: #ffffff;
+  --ss-tint: #eceee9;
+  --ss-text: #17251e;
+  --ss-muted: #42574b;
+  --ss-muted-on-tint: #42574b;
+  --ss-accent: #17603a;
+  --ss-accent-hover: #10482b;
+  --ss-accent-soft: #e3eee5;
+  --ss-forest: #0c281d;
+  --ss-lime: #c8f4aa;
+  --ss-border: #ccd5cb;
+  --ss-green: #17603a;
+  --ss-red: #a3311f;
+  --ss-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ss-radius: 22px;
+  --ss-radius-control: 14px;
+  --ss-radius-pill: 999px;
+  --ss-shadow: 0 8px 28px #132b1c0a;
+  --ss-shadow-lift: 0 20px 50px #10271c14;
 }
 
 html {
@@ -32,7 +40,9 @@ html {
 }
 
 [data-testid="stHeader"] {
-  background: var(--ss-bg);
+  background: #f5f5f2db;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border-bottom: 1px solid var(--ss-border);
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -52,31 +62,39 @@ h1, h2, h3 {
 }
 
 h1 {
-  letter-spacing: -0.02em;
+  font-weight: 600 !important;
+  letter-spacing: -0.045em;
+  line-height: 1.14;
 }
 
 h2 {
-  letter-spacing: -0.015em;
+  font-weight: 600 !important;
+  letter-spacing: -0.04em;
 }
 
 h3 {
-  letter-spacing: -0.01em;
+  font-weight: 500 !important;
+  letter-spacing: -0.03em;
 }
 
-[data-testid="stCaption"] {
+[data-testid="stCaptionContainer"],
+[data-testid="stCaptionContainer"] p {
   color: var(--ss-muted);
   font-size: 13px;
 }
 
 /* Lab-page course line. Streamlit renders :material/school: as this aria-label. */
-[data-testid="stCaption"]:has([aria-label="school icon"]) {
+[data-testid="stCaptionContainer"]:has([aria-label="school icon"]),
+[data-testid="stCaptionContainer"]:has([aria-label="school icon"]) p {
   color: var(--ss-accent);
-  font-weight: 500;
-  letter-spacing: 0.02em;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
   overflow-wrap: anywhere;
 }
 
-[data-testid="stCaption"]:has([aria-label="school icon"]) [aria-label="school icon"] {
+[data-testid="stCaptionContainer"]:has([aria-label="school icon"]) [aria-label="school icon"] {
   color: var(--ss-accent);
   margin-right: 0.2em;
 }
@@ -121,8 +139,9 @@ h3 {
   background: var(--ss-surface);
   border-color: var(--ss-border) !important;
   border-radius: var(--ss-radius) !important;
+  box-shadow: var(--ss-shadow);
   padding: 20px;
-  transition: transform 220ms var(--ss-ease), opacity 220ms var(--ss-ease);
+  transition: transform 300ms var(--ss-ease), box-shadow 300ms var(--ss-ease);
 }
 
 /* Extra left pad so long y-axis labels (Housing & Utilities) stay inside the card. */
@@ -139,6 +158,7 @@ h3 {
 .st-key-timing_kpis [data-testid="stMetric"],
 .st-key-loaded_kpis [data-testid="stMetric"] {
   background: var(--ss-tint);
+  border-radius: var(--ss-radius-control);
 }
 
 .st-key-spend_kpis [data-testid="stMetricLabel"],
@@ -149,10 +169,10 @@ h3 {
 .st-key-timing_kpis [data-testid="stMetricLabel"],
 .st-key-loaded_kpis [data-testid="stMetricLabel"] {
   color: var(--ss-muted-on-tint);
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  text-transform: none;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
 }
 
 .st-key-spend_kpis [data-testid="stMetricValue"],
@@ -162,10 +182,10 @@ h3 {
 .st-key-risk_kpis [data-testid="stMetricValue"],
 .st-key-timing_kpis [data-testid="stMetricValue"],
 .st-key-loaded_kpis [data-testid="stMetricValue"] {
-  font-family: Fraunces, "Source Serif 4", Georgia, serif;
-  font-weight: 600;
+  font-family: Geist, ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
   font-size: 1.75rem;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.045em;
   color: var(--ss-text);
 }
 
@@ -195,7 +215,7 @@ h3 {
 [data-testid="stFileUploaderDropzone"] {
   min-height: 44px;
   touch-action: manipulation;
-  -webkit-tap-highlight-color: rgba(30, 74, 58, 0.14);
+  -webkit-tap-highlight-color: rgba(23, 96, 58, 0.14);
 }
 
 [data-testid="stMain"] [data-testid="stPageLink-NavLink"] {
@@ -203,14 +223,15 @@ h3 {
   align-items: center;
 }
 
-/* Secondary actions: sample data and Clear data. Load / download stay pine. */
+/* Secondary actions: sample data and Clear data. Site ghost pill. Load / download stay fairway. */
 .st-key-use_sample button,
 .st-key-clear_btn button {
-  color: var(--ss-accent);
+  color: var(--ss-text);
   border-color: var(--ss-border);
   background: var(--ss-surface);
-  border-radius: var(--ss-radius);
-  transition: transform 160ms var(--ss-ease), opacity 160ms var(--ss-ease);
+  border-radius: var(--ss-radius-pill);
+  font-weight: 500;
+  transition: transform 300ms var(--ss-ease), border-color 300ms var(--ss-ease);
 }
 
 /* Primary buttons */
@@ -218,9 +239,10 @@ h3 {
 [data-testid="stBaseButton-primary"] {
   background: var(--ss-accent);
   border-color: var(--ss-accent);
-  color: #fffbf4;
-  border-radius: var(--ss-radius);
-  transition: transform 160ms var(--ss-ease), opacity 160ms var(--ss-ease);
+  color: #ffffff;
+  border-radius: var(--ss-radius-pill);
+  font-weight: 500;
+  transition: transform 300ms var(--ss-ease), background 300ms var(--ss-ease);
 }
 
 /* File uploader, expanders, quiet alerts */
@@ -228,11 +250,11 @@ h3 {
 [data-testid="stExpander"] {
   background: var(--ss-surface);
   border-color: var(--ss-border);
-  border-radius: var(--ss-radius);
+  border-radius: var(--ss-radius-control);
 }
 
 [data-testid="stAlert"] {
-  border-radius: var(--ss-radius);
+  border-radius: var(--ss-radius-control);
 }
 
 [data-testid="stDataFrameGlideDataEditor"],
@@ -292,8 +314,15 @@ h3 {
   .st-key-timing_controls:hover,
   .st-key-proof_checks:hover,
   .st-key-risk_table:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--ss-shadow-lift);
+  }
+
+  .st-key-use_sample button:hover,
+  .st-key-clear_btn button:hover {
+    border-color: var(--ss-accent);
+    color: var(--ss-text);
     transform: translateY(-2px);
-    opacity: 1;
   }
 
   .stButton button[kind="primary"]:hover,
@@ -301,7 +330,8 @@ h3 {
   .stDownloadButton button[kind="primary"]:hover {
     background: var(--ss-accent-hover);
     border-color: var(--ss-accent-hover);
-    color: #fffbf4;
+    color: #ffffff;
+    transform: translateY(-2px);
   }
 }
 
@@ -403,7 +433,7 @@ h3 {
   }
 
   h1 {
-    font-size: 1.75rem !important;
+    font-size: 2rem !important;
     line-height: 1.2 !important;
   }
 
@@ -446,4 +476,30 @@ h3 {
   [data-testid="stFileUploaderDropzone"] {
     min-height: 88px;
   }
+}
+
+/* Reduced motion also stills the site-style button lifts. */
+@media (prefers-reduced-motion: reduce) {
+  .st-key-use_sample button:hover,
+  .st-key-clear_btn button:hover,
+  .stButton button[kind="primary"]:hover,
+  [data-testid="stBaseButton-primary"]:hover,
+  .stDownloadButton button[kind="primary"]:hover {
+    transform: none;
+  }
+}
+
+/* Streamlit sets size and weight on the label's inner paragraph, so the label style must reach it. */
+[data-testid="stMetricLabel"] p,
+[data-testid="stMetricLabel"] [data-testid="stMarkdownContainer"] {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ss-muted-on-tint);
+}
+
+[data-testid="stCaptionContainer"]:has([aria-label="school icon"]) p {
+  font-size: 11px;
+  font-weight: 600;
 }

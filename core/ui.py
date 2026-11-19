@@ -17,47 +17,49 @@ import pandas as pd
 from core.categorize import ALL_CATEGORIES
 from core.portfolios import PRESETS
 
-# Tokens from DESIGN.md. Pages may pass these into Altair color scales.
-TEXT = "#1C1915"
-MUTED = "#6E675C"
-BORDER = "#DDD4C6"
-GRID = "#E6DDD0"
-SPENT = "#2C4A6E"
-SHADOW = "#B45309"
-CONTRIBUTIONS = "#2C4A6E"
-GROWTH = "#1E6B45"
-# 14 fills, one per ALL_CATEGORIES entry (13 rules + Other). Chart fills, not body text.
+# Tokens from DESIGN.md (Ashton Capes site system). Pages may pass these into Altair color scales.
+TEXT = "#17251E"
+MUTED = "#42574B"
+BORDER = "#CCD5CB"
+GRID = "#E3E6DF"
+SPENT = "#42574B"  # cumulative spending: the baseline, in muted ink
+SHADOW = "#17603A"  # fund value: the hero series, in fairway
+CONTRIBUTIONS = "#5B8FB9"
+GROWTH = "#17603A"
+# 14 fills, one per ALL_CATEGORIES entry (13 rules + Other), from the site chart palette.
+# Chart fills, not body text.
 CATEGORICAL = [
-    "#6E675C",  # Transfers & Payments
-    "#A33B32",  # Dining
-    "#6B5428",  # Coffee
-    "#5C6B4A",  # Groceries
-    "#8A5A4A",  # Gas
-    "#4A5A6B",  # Transport
-    "#2C4A6E",  # Subscriptions
-    "#6B3D4A",  # Entertainment
-    "#3A4F3A",  # Travel
-    "#B45309",  # Shopping
-    "#3D5A4C",  # Health
-    "#1E4A3A",  # Housing & Utilities
-    "#4A3A5A",  # Education
-    "#5A6B5A",  # Other
+    "#86958B",  # Transfers & Payments
+    "#A3311F",  # Dining
+    "#6B5208",  # Coffee
+    "#8FBF7A",  # Groceries
+    "#A8480A",  # Gas
+    "#5B8FB9",  # Transport
+    "#553A73",  # Subscriptions
+    "#C9A227",  # Entertainment
+    "#2F4A66",  # Travel
+    "#17603A",  # Shopping
+    "#4F8A8B",  # Health
+    "#42574B",  # Housing & Utilities
+    "#9B7BB5",  # Education
+    "#A9B4AA",  # Other
 ]
 CATEGORY_COLORS = dict(zip(ALL_CATEGORIES, CATEGORICAL))
-ACCENT = "#1E4A3A"
-FAN_OUTER = "#EDE6D9"
-FAN_INNER = "#A8B894"
-HIST_FILL = "#C9D0B0"
-# 3:1 non-text stroke on paper/surface (fills alone are too light).
-BAND_STROKE = "#5A7D5C"
+ACCENT = "#17603A"
+FAN_OUTER = "#CFE0D4"
+FAN_INNER = "#8FBF7A"
+HIST_FILL = "#B7D3A8"
+# 3:1 non-text stroke on white/paper (the light fills alone are too faint).
+BAND_STROKE = "#3E7A52"
 PORTFOLIO_ORDER = list(PRESETS.keys()) + ["SPY (market)", "SPY"]
+# Lines need 3:1 on white, so QQQ uses burnt orange, not the site gold.
 PORTFOLIO_COLORS = {
-    "100% VOO": SHADOW,
-    "60/40 VOO/BND": SPENT,
-    "100% BND": MUTED,
-    "100% QQQ": ACCENT,
-    "SPY (market)": "#5C4A6E",
-    "SPY": "#5C4A6E",
+    "100% VOO": "#17603A",
+    "60/40 VOO/BND": "#5B8FB9",
+    "100% BND": "#42574B",
+    "100% QQQ": "#A8480A",
+    "SPY (market)": "#17251E",
+    "SPY": "#17251E",
 }
 
 
@@ -72,8 +74,8 @@ def _spend_shadow_theme() -> alt.theme.ThemeConfig:
                 "gridColor": GRID,
                 "domainColor": BORDER,
                 "tickColor": BORDER,
-                "labelFont": "Source Sans 3",
-                "titleFont": "Source Sans 3",
+                "labelFont": "Geist",
+                "titleFont": "Geist",
                 "labelFontSize": 12,
                 "titleFontSize": 12,
             },
@@ -81,7 +83,7 @@ def _spend_shadow_theme() -> alt.theme.ThemeConfig:
                 "orient": "bottom",
                 "title": None,
                 "labelColor": TEXT,
-                "labelFont": "Source Sans 3",
+                "labelFont": "Geist",
                 "labelFontSize": 12,
                 "symbolType": "circle",
             },
@@ -237,7 +239,7 @@ def chart(c: alt.Chart, key: str | None = None) -> None:
     c = _apply_named_series_colors(c)
     c = (
         c.properties(padding={"left": 12, "right": 8, "top": 8, "bottom": 8})
-        .configure_legend(orient="bottom", title=None, labelColor=TEXT, labelFont="Source Sans 3")
+        .configure_legend(orient="bottom", title=None, labelColor=TEXT, labelFont="Geist")
         .configure_view(strokeWidth=0, clip=False)
         .configure_axis(
             labelColor=MUTED,
@@ -245,8 +247,8 @@ def chart(c: alt.Chart, key: str | None = None) -> None:
             gridColor=GRID,
             domainColor=BORDER,
             tickColor=BORDER,
-            labelFont="Source Sans 3",
-            titleFont="Source Sans 3",
+            labelFont="Geist",
+            titleFont="Geist",
             labelLimit=0,
             labelPadding=8,
             labelFlush=False,

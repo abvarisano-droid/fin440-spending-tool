@@ -1,86 +1,88 @@
 [browser]
 gatherUsageStats = false
 
+# Theme: Ashton Capes site system (ashton-capes-site/assets/styles.css, editorial layer).
 [theme]
 base = "light"
-primaryColor = "#1E4A3A"
-backgroundColor = "#F4EFE6"
-secondaryBackgroundColor = "#FFFBF4"
-textColor = "#1C1915"
-linkColor = "#1E4A3A"
-borderColor = "#DDD4C6"
-codeTextColor = "#1C1915"
-codeBackgroundColor = "#EDE6D9"
+primaryColor = "#17603A"
+backgroundColor = "#F5F5F2"
+secondaryBackgroundColor = "#FFFFFF"
+textColor = "#17251E"
+linkColor = "#17603A"
+borderColor = "#CCD5CB"
+codeTextColor = "#17251E"
+codeBackgroundColor = "#ECEEE9"
 showWidgetBorder = true
 showSidebarBorder = false
-baseRadius = "4px"
-buttonRadius = "4px"
+baseRadius = "14px"
+buttonRadius = "999px"
 linkUnderline = false
 
 baseFontSize = 16
 baseFontWeight = 400
 codeFontSize = "13px"
 codeFontWeight = 400
-headingFontSizes = ["40px", "28px", "22px", "18px", "16px", "14px"]
-headingFontWeights = [600, 600, 600, 600, 500, 500]
+headingFontSizes = ["44px", "30px", "22px", "18px", "16px", "14px"]
+headingFontWeights = [600, 600, 500, 500, 500, 500]
 
-font = "'Source Sans 3':https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
-headingFont = "Fraunces:https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap"
-codeFont = "'IBM Plex Mono':https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap"
+font = "Geist:https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap"
+headingFont = "Geist:https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap"
+codeFont = "'Geist Mono':https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&display=swap"
 
-redColor = "#A33B32"
-orangeColor = "#8A3F07"
-yellowColor = "#7A4A05"
-greenColor = "#1E6B45"
-blueColor = "#2C4A6E"
-violetColor = "#5C4A6E"
-grayColor = "#6E675C"
+redColor = "#A3311F"
+orangeColor = "#A8480A"
+yellowColor = "#6B5208"
+greenColor = "#17603A"
+blueColor = "#2F4A66"
+violetColor = "#553A73"
+grayColor = "#42574B"
 
-redBackgroundColor = "#F4E4E1"
-orangeBackgroundColor = "#F6E6D4"
-yellowBackgroundColor = "#F3EBD4"
-greenBackgroundColor = "#DCE8E0"
-blueBackgroundColor = "#DDE4EC"
-violetBackgroundColor = "#E6E0E8"
-grayBackgroundColor = "#EDE6D9"
+redBackgroundColor = "#F6E4E0"
+orangeBackgroundColor = "#F8E8DA"
+yellowBackgroundColor = "#FBF1D3"
+greenBackgroundColor = "#E3EEE5"
+blueBackgroundColor = "#E8EDF3"
+violetBackgroundColor = "#F1EBF6"
+grayBackgroundColor = "#ECEEE9"
 
-redTextColor = "#8A2F28"
-orangeTextColor = "#8A3F07"
-yellowTextColor = "#7A4A05"
-greenTextColor = "#165234"
-blueTextColor = "#223A56"
-violetTextColor = "#46384F"
-grayTextColor = "#6E675C"
+redTextColor = "#A3311F"
+orangeTextColor = "#8A3B08"
+yellowTextColor = "#6B5208"
+greenTextColor = "#10482B"
+blueTextColor = "#2F4A66"
+violetTextColor = "#553A73"
+grayTextColor = "#42574B"
 
+# Same order as core/ui.CATEGORICAL (one per spending category).
 chartCategoricalColors = [
-    "#6E675C",
-    "#A33B32",
-    "#6B5428",
-    "#5C6B4A",
-    "#8A5A4A",
-    "#4A5A6B",
-    "#2C4A6E",
-    "#6B3D4A",
-    "#3A4F3A",
-    "#B45309",
-    "#3D5A4C",
-    "#1E4A3A",
-    "#4A3A5A",
-    "#5A6B5A",
+    "#86958B",
+    "#A3311F",
+    "#6B5208",
+    "#8FBF7A",
+    "#A8480A",
+    "#5B8FB9",
+    "#553A73",
+    "#C9A227",
+    "#2F4A66",
+    "#17603A",
+    "#4F8A8B",
+    "#42574B",
+    "#9B7BB5",
+    "#A9B4AA",
 ]
 
 chartSequentialColors = [
-    "#EDE6D9",
-    "#E4E0C8",
-    "#C9D0B0",
-    "#A8B894",
-    "#7E9974",
-    "#5A7D5C",
-    "#3E6550",
-    "#2C5444",
-    "#1E4A3A",
-    "#16382C",
+    "#E3EEE5",
+    "#CFE0D4",
+    "#B7D3A8",
+    "#8FBF7A",
+    "#6BA35F",
+    "#4A8A52",
+    "#317447",
+    "#17603A",
+    "#10482B",
+    "#0C281D",
 ]
 
-dataframeBorderColor = "#DDD4C6"
-dataframeHeaderBackgroundColor = "#EDE6D9"
+dataframeBorderColor = "#CCD5CB"
+dataframeHeaderBackgroundColor = "#ECEEE9"
