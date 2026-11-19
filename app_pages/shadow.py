@@ -68,7 +68,7 @@ with ui.section("chart_shadow", "Spent vs. shadow value"):
         alt.Chart(timeline)
         .mark_line(interpolate="step-after")
         .encode(
-            x=alt.X("date:T", title=None),
+            x=alt.X("date:T", title=None, axis=alt.Axis(format="%b %-d", labelOverlap=True)),
             y=alt.Y("dollars:Q", title="Dollars"),
             color=alt.Color("series:N", title=None),
             tooltip=[alt.Tooltip("date:T", title="Date"), alt.Tooltip("series:N", title="Series"),
@@ -94,7 +94,7 @@ with ui.section("shadow_compare", "Same purchases, four portfolios"):
                 alt.Chart(lines)
                 .mark_line(interpolate="step-after")
                 .encode(
-                    x=alt.X("date:T", title=None),
+                    x=alt.X("date:T", title=None, axis=alt.Axis(format="%b %-d", labelOverlap=True)),
                     y=alt.Y("value:Q", title="Value ($)"),
                     color=alt.Color("name:N", title=None),
                     tooltip=[alt.Tooltip("date:T", title="Date"), alt.Tooltip("name:N", title="Portfolio"),
