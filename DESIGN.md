@@ -60,7 +60,7 @@ Light only, like the site. Text pairs all pass WCAG AA.
 
 Chart palette (site `--chart-*` plus its extras). Categorical, one fill per category: Transfers `#86958B`, Dining `#A3311F`, Coffee `#6B5208`, Groceries `#8FBF7A`, Gas `#A8480A`, Transport `#5B8FB9`, Subscriptions `#553A73`, Entertainment `#C9A227`, Travel `#2F4A66`, Shopping `#17603A`, Health `#4F8A8B`, Housing `#42574B`, Education `#9B7BB5`, Other `#A9B4AA`.
 
-Series: spent `#42574B` (baseline) vs. shadow value `#17603A` (hero); Roth contributions `#5B8FB9` under growth `#17603A`. Portfolios: VOO `#17603A`, 60/40 `#5B8FB9`, BND `#42574B`, QQQ `#A8480A`, SPY `#17251E`. Gold `#C9A227` and sage `#8FBF7A` are under 3:1 on white, so they are area fills only, never lines; QQQ uses burnt orange for that reason. Fan: outer `#CFE0D4`, inner `#8FBF7A`, median fairway, edged with `#3E7A52` (5.1:1). Histogram `#B7D3A8`.
+Series: spent `#5B8FB9` (site blue, the baseline) vs. shadow value `#17603A` (fairway, the hero); Roth contributions `#5B8FB9` under growth `#17603A`. Portfolios: VOO `#17603A`, 60/40 `#5B8FB9`, BND `#42574B`, QQQ `#A8480A`, SPY `#17251E`. Gold `#C9A227` and sage `#8FBF7A` are under 3:1 on white, so they are area fills only, never lines; QQQ uses burnt orange for that reason. Fan: outer `#CFE0D4`, inner `#8FBF7A`, median fairway, edged with `#3E7A52` (5.1:1). Histogram fill `#6BA35F` (about 3:1 on white), 1px `#3E7A52` stroke.
 
 Sequential (fairway ramp): `#E3EEE5` to `#0C281D`, 10 stops in `config.toml`.
 
@@ -88,7 +88,7 @@ Sequential (fairway ramp): `#E3EEE5` to `#0C281D`, 10 stops in `config.toml`.
 
 - **Captions are full opacity.** Streamlit fades `stCaptionContainer` to 60%, which drops muted text below AA; CSS resets it.
 - **Charts are transparent** on their white card (set in `ui.chart` and CSS), never a grey box.
-- **Legends wrap into columns** (2 per row, set on each color encoding because Streamlit's chart theme overrides legend config), so nothing runs off a phone.
+- **Legends wrap into columns** (2 per row on each color encoding, because Streamlit's chart theme overrides legend config), so nothing runs off a phone.
 - **Chart toolbar hidden on touch screens**, where it covered card titles and could not be hovered away.
 - **Money in tables uses the `dollar` format** (`$6,963.81`, `-$219.61`); shares use one decimal; money inputs that are whole dollars use `%.0f`.
 - **Proof table leads with Result** (`✓ Pass`), so a phone shows the verdict first; differences read `$0.00` / `-$1,779.75`, not scientific notation; the method for each check lives in an expander list.
@@ -158,7 +158,7 @@ This page holds the signature moment.
 2. **`shadow_controls`**: bordered card. Ticker (1/3) and category multiselect (2/3).
 3. **`shadow_kpis`**: four metrics: You spent, **In {ticker} it'd be worth** (signature: 40px Geist, fairway if gain / brick if loss), Annualized (XIRR), Priced as of. The second metric is the only oversized number in the product.
 4. Skip-count `st.info` only when purchases sit after the latest close.
-5. **`chart_shadow`**: step-after line, spent vs shadow value. Spent series uses `blue` `#2C4A6E`. Shadow series uses `orange` `#B45309`.
+5. **`chart_shadow`**: step-after line, spent vs shadow value. Spent series uses site blue `#5B8FB9`. Shadow series uses fairway `#17603A`.
 6. **`shadow_compare`**: full-width card under the signature chart. Title "Same purchases, four portfolios". 2 to 4 buy-and-hold lines on one plot (defaults: 100% VOO, 60/40 VOO/BND, 100% BND, 100% QQQ from `core.portfolios.PRESETS`). Color field `name` uses `ui.PORTFOLIO_COLORS`. This is a comparison, not a second signature: KPI values on this card stay at the 28px scale. Call `ui.chart`.
 7. Expander **`shadow_ledger`**: per-purchase table, collapsed.
 8. Disclaimer caption under the expander.
@@ -195,7 +195,7 @@ Class topic: market efficiency, behavioral finance. Needs loaded transactions. D
 1. Title: "Timing test". Course caption (Ch 11, 12). Then: if prices already reflect what is knowable, the dates you spent should look like luck.
 2. **`timing_controls`**: bordered card. Ticker (1/3) and category multiselect (2/3), same split as `shadow_controls`.
 3. **`timing_kpis`**: Your dates in {ticker}, Median random dates, Your percentile. Value is `37th` (a percentile, not rank 37 of 1,000). Label: "Your percentile, of 1,000 shuffles". Neutral color; luck is not a gain/loss.
-4. **`chart_timing_hist`**: histogram of the 1,000 shuffled end values (`#C9D0B0` bars, `#5A7D5C` 1px stroke). Pine rule at the actual value, muted dashed rule at the median shuffle. Call `ui.chart_histogram`.
+4. **`chart_timing_hist`**: histogram of the 1,000 shuffled end values (`#6BA35F` bars, `#3E7A52` 1px stroke). Fairway rule at the actual value, muted dashed rule at the median shuffle. Call `ui.chart_histogram`.
 5. **`timing_explainer`**: bordered card. 5th to 95th percentile is consistent with luck. Give the min/max of the 1,000 shuffles in the body (small steady purchases barely move). Lump-sum-on-day-one in the body, not as a fourth KPI.
 
 ### 7. Proof (`app_pages/proof.py`, new)
@@ -203,8 +203,8 @@ Class topic: market efficiency, behavioral finance. Needs loaded transactions. D
 Class topic: validation. Works with sample data; still `require_transactions` so every check has a CSV.
 
 1. Title: "Proof". Caption: key numbers are checked live against a second computation that does not use the app's own code; the workbook lets a grader redo the math in Excel with real formulas. The page lists what the live checks cover vs what the final audit recomputed by hand.
-2. **`proof_checks`**: bordered card, title "Live checks". Lead line: "{n} of {m} checks pass" on this data. Dataframe widget key `proof_table` (a container and a widget cannot share a key). Columns: Check, App, Independent, Difference, Result (Pass or Fail), How (header "How it's checked"). Tabular nums.
-3. **`proof_download`**: unbordered block. Primary pine download button, key `proof_xlsx`, label "Download the cross-check workbook". Caption: built in memory; sheets Roth (FV), Shadow (purchases, shares, value), Risk (SLOPE beta, volatility, T-bill, Sharpe).
+2. **`proof_checks`**: bordered card, title "Live checks". Lead line: "{n} of {m} checks pass" on this data. Dataframe widget key `proof_table` (a container and a widget cannot share a key). Columns in order: Result (`✓ Pass` / `✗ Fail`), Check, App, Independent, Difference (`$0.00` / `-$1,779.75`, never scientific notation). Method text lives in expander `proof_how` ("How each check is computed"), not in the table, so a phone can see the verdict first.
+3. **`proof_download`**: unbordered block. Primary fairway download button, key `proof_xlsx`, label "Download the cross-check workbook". Caption: built in memory; sheets Roth (FV), Shadow (purchases, shares, value), Risk (SLOPE beta, volatility, T-bill, Sharpe).
 4. **`proof_process`**: expander, collapsed, key `proof_process`. Title "How AI built this, and how we kept it honest". Drawn from HANDOFF (no transaction rows, no account numbers).
 
 ---
@@ -215,8 +215,8 @@ Signatures stay stable: `section(key, title=None, border=True)`, `kpi_row(key, i
 
 - `section`: keyed `st.container`. Bordered card by default (`upload_source` passes `border=False`). Geist 500 h3 when `title` is set.
 - `kpi_row`: keyed container, equal `st.columns`, each `st.metric(..., border=True)`. CSS sets Geist 500 28px values with -0.045em tracking. The shadow signature metric is wrapped as `.st-key-shadow_signature` (gain, fairway) or `.st-key-shadow_signature_down` (loss, brick), 40px / 2.5rem. Roth growth (third `roth_kpis` value) is green.
-- `chart`: Altair theme `spend_shadow` (also registered globally): legend bottom, no view stroke, axis `#6E675C`, grid `#E6DDD0`, view clip off so long category labels stay whole. Field `series`: domain Spent (cumulative) then Value in {ticker}, range `SPENT` / `SHADOW`. Field `part`: Contributions / Growth in `CONTRIBUTIONS` / `GROWTH`. Field `category`: pinned `CATEGORY_COLORS` (14 distinct fills); the scale domain is only categories present in the frame, so empty ones stay out of the legend. If `category` is on x or y and color is unset, `ui.chart` fills the bars and hides the legend (the axis already names them). Field `name` or `portfolio`: `PORTFOLIO_COLORS` (VOO orange, 60/40 blue, BND muted, QQQ pine, SPY violet). Named constants: `ui.SPENT`, `ui.SHADOW`, `ui.CONTRIBUTIONS`, `ui.GROWTH`, `ui.PORTFOLIO_COLORS`.
-- Extra helpers (Phase 7): `chart_fan(percentiles_df, key=...)`, `chart_histogram(values, markers=[...], key=...)`, `chart_risk_return(df, key=...)`, `chart_sml(line_df, points_df, key=...)`. Fan outer and histogram bars take a `#5A7D5C` stroke. Pages pass engine frames; they do not restyle these.
+- `chart`: Altair theme `spend_shadow` (also registered globally): legend bottom, no view stroke, axis `#42574B`, grid `#E3E6DF`, view clip off so long category labels stay whole, chart background transparent on the white card. Field `series`: domain Spent (cumulative) then Value in {ticker}, range `SPENT` (`#5B8FB9`) / `SHADOW` (`#17603A`). Field `part`: Contributions / Growth in `CONTRIBUTIONS` / `GROWTH`. Field `category`: pinned `CATEGORY_COLORS` (14 distinct fills); the scale domain is only categories present in the frame, so empty ones stay out of the legend. If `category` is on x or y and color is unset, `ui.chart` fills the bars and hides the legend (the axis already names them). Field `name` or `portfolio`: `PORTFOLIO_COLORS` (VOO fairway, 60/40 blue, BND muted, QQQ burnt orange, SPY ink). Named constants: `ui.SPENT`, `ui.SHADOW`, `ui.CONTRIBUTIONS`, `ui.GROWTH`, `ui.PORTFOLIO_COLORS`. Color encodings set a 2-column wrapping legend.
+- Extra helpers (Phase 7): `chart_fan(percentiles_df, key=...)`, `chart_histogram(values, markers=[...], key=...)`, `chart_risk_return(df, key=...)`, `chart_sml(line_df, points_df, key=...)`. Fan outer and histogram bars take a `#3E7A52` stroke. Pages pass engine frames; they do not restyle these.
 - Primary button: pine fill, white label, 4px radius. Secondary / "Use sample data" / "Clear data": surface fill, pine text, 1px border. Download (`proof_xlsx`) is primary. In-page `stPageLink` is 44px tall like buttons.
 - `st.caption` for helper copy. Course lines with `:material/school:` are pine 500 (`[aria-label="school icon"]`); other captions stay muted. `st.info` for the empty-upload pointer and skip/cap notices only.
 - Tables: header `surface-tint`, hairline borders, tabular nums.
@@ -229,7 +229,7 @@ Signatures stay stable: `section(key, title=None, border=True)`, `kpi_row(key, i
 
 `upload_source`, `column_mapper`, `loaded_summary`, `loaded_kpis`, `loaded_actions`, `spend_kpis`, `chart_by_category`, `table_by_category`, `chart_by_month`, `top_merchants`, `shadow_controls`, `shadow_kpis`, `chart_shadow`, `shadow_compare`, `roth_inputs`, `roth_kpis`, `chart_roth`, `roth_mc_controls`, `chart_roth_fan`, `roth_mc_kpis`, `risk_window`, `risk_kpis`, `chart_risk_return`, `chart_sml`, `risk_table`, `risk_explainer`, `timing_controls`, `timing_kpis`, `chart_timing_hist`, `timing_explainer`, `proof_checks`, `proof_download`, `proof_process`.
 
-Plus expanders `all_tx`, `shadow_ledger`, `roth_math`, tables `raw_preview`, `cat_table`, `top_table`, `tx_editor`, `ledger_table`, `roth_table`, `risk_stats`, `compare_table`, `proof_table`, download `proof_xlsx`, and signature wraps `shadow_signature` / `shadow_signature_down`. Radio `risk_window` is unkeyed chrome above the Risk KPIs. `proof_download` stays unbordered. Dataframe keys (`risk_stats`, `compare_table`, `proof_table`) sit inside cards: they do not get their own padding or hover lift. Course captions have no widget key: CSS targets `[data-testid="stCaption"]:has([aria-label="school icon"])`.
+Plus expanders `all_tx`, `shadow_ledger`, `roth_math`, `proof_how`, tables `raw_preview`, `cat_table`, `top_table`, `tx_editor`, `ledger_table`, `roth_table`, `risk_stats`, `compare_table`, `proof_table`, download `proof_xlsx`, and signature wraps `shadow_signature` / `shadow_signature_down`. Radio `risk_window` is unkeyed chrome above the Risk KPIs. `proof_download` stays unbordered. Dataframe keys (`risk_stats`, `compare_table`, `proof_table`) sit inside cards: they do not get their own padding or hover lift. Course captions have no widget key: CSS targets `[data-testid="stCaptionContainer"]:has([aria-label="school icon"])` (Streamlit 1.64 tags captions `stCaptionContainer`).
 
 ---
 
@@ -243,7 +243,7 @@ Plus expanders `all_tx`, `shadow_ledger`, `roth_math`, tables `raw_preview`, `ca
 
 ## Skip
 
-- Extra heroes, gradients, neon, glass, drop shadows at rest, emoji in nav.
+- Extra heroes, gradients, neon, glass, emoji in nav. Card rest shadow is the site's `0 8px 28px #132b1c0a` only.
 - A second typeface beyond Geist / Geist Mono.
 - Dark mode.
 - Copying transaction rows, account numbers, or statements into this spec, the Brain, or any file outside this folder.
@@ -258,11 +258,11 @@ Checked against the running app at 1280px and 390px (sample data, fictional).
 
 - [x] Exactly one signature moment: yes. Shadow "it'd be worth" is the only 40px number.
 - [x] Three layout alternatives compared: yes. Editorial ledger shipped; Night desk and Split studio parked.
-- [x] Type scale pinned: yes. Table in Type. h1 -0.02em, h2 -0.015em, h3 -0.01em, captions 13px.
-- [x] Motion in numbers: yes. 220ms card lift, 160ms press, cubic-bezier(0.22, 1, 0.36, 1), 2px.
+- [x] Type scale pinned: yes. Table in Type. Geist h1 -0.045em, h2 -0.04em, h3 -0.03em, captions 13px, course line 12.5px sentence case.
+- [x] Motion in numbers: yes. Page-enter 420ms / 8px, card lift 220ms / 2px, press 160ms scale 0.98, easing `cubic-bezier(0.2, 0.7, 0.2, 1)`.
 - [x] Transform and opacity only: yes. Button color snaps; transition lists are transform/opacity.
-- [x] Reduced-motion fallback: yes. Transitions off, transforms none, scroll-behavior auto. Includes secondary `:active`.
+- [x] Reduced-motion fallback: yes. Transitions off, transforms none, scroll-behavior auto, entrance animation off. Includes secondary `:active`.
 - [x] No 3D or video: yes. No cinematic fallback needed.
 - [x] Mobile-first wrap: yes. Columns wrap at 640px. 390px: full-width 44px buttons, title clears sticky header, no page-level sideways scroll. Top nav collapses to Streamlit's `>>` control.
-- [ ] Lighthouse 95 / CLS 0.00: no. Streamlit Cloud is not Lighthouse-clean. Contrast for body/primary passes AA. KPI labels on tint use `#5A544C`. Histogram and fan fills keep a `#5A7D5C` stroke. Orange/yellow fills are not used as body text.
+- [ ] Lighthouse 95 / CLS 0.00: no. Streamlit Cloud is not Lighthouse-clean. Contrast for body/primary/muted passes AA (muted on tint 6.7:1). Histogram fill `#6BA35F` with `#3E7A52` stroke. Orange/yellow fills are not used as body text.
 - [x] Specific decision: yes. Ashton's own site system (Geist, warm white, fairway), not a default dashboard.

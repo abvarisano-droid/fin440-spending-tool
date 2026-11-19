@@ -251,7 +251,7 @@ def chart(c: alt.Chart, key: str | None = None) -> None:
         c.properties(padding={"left": 12, "right": 8, "top": 8, "bottom": 8})
         # Legends wrap into columns so they never run off a phone screen.
         .configure_legend(orient="bottom", title=None, labelColor=TEXT, labelFont="Geist", labelFontSize=12,
-                          columns=3, columnPadding=14, rowPadding=6, labelLimit=150, symbolSize=70)
+                          columns=2, columnPadding=14, rowPadding=6, labelLimit=150, symbolSize=70)
         .configure_view(strokeWidth=0, clip=False)
         .configure_axis(
             labelColor=MUTED,
