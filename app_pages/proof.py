@@ -7,7 +7,8 @@ from core.state import SAMPLE_CSV, require_transactions, spending_only
 st.title("Proof")
 st.caption(
     "The key numbers are checked live against a second computation that doesn't use the app's own "
-    "code (the timing row instead confirms two of the app's engines agree), and the workbook below "
+    "code (two rows, timing and Monte Carlo, instead confirm that two of the app's engines agree), "
+    "and the workbook below "
     "lets you redo the math in Excel with real formulas."
 )
 tx = require_transactions()
