@@ -220,7 +220,8 @@ def tutorial(browser, video_dir):
     return path
 
 
-def to_mp4(src, dst, skip=0.3):
+def to_mp4(src, dst, skip=5.3):
+    # skip ~5 s of title card shown while the app loads, leaving about 3 s of it
     import imageio_ffmpeg
     ff = imageio_ffmpeg.get_ffmpeg_exe()
     os.makedirs(os.path.dirname(dst), exist_ok=True)
