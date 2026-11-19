@@ -45,11 +45,18 @@ spending figures do not.
   is a conservative mix with bonds or a bad decade.
 - **APR vs effective:** APR uses r/12. An effective annual rate uses (1+R)^(1/12) - 1, which is
   slightly lower per month.
-- **Redirected wants:** the sample's wants (dining, coffee, entertainment, shopping,
+- **Funded from your spending (the default with data):** the wants total $3,684.72 is the starting
+  balance, and the monthly box is pre-filled with a suggestion by tier: under $200/month of wants
+  suggests 50%, $200 to $500 suggests 35%, over $500 suggests 25%, rounded to $25 and capped at
+  $625. The sample's $614.12/month is the heavy tier: 25% = $153.53, so $150/month. 21 to 65 at
+  7%: $608,262. *Q: Why a smaller share for heavier spenders?* So the ask stays realistic: a
+  quarter of a big wants budget is still more dollars than half of a small one.
+- **Redirected wants table:** the sample's wants (dining, coffee, entertainment, shopping,
   subscriptions, travel) average $3,684.72 / 6 months = $614.12/month. All of it from 21 to 65
   at 7% grows to $2,164,990; 25% ($153.53) grows to $541,248; 50% to $1,082,495. $614.12 is under
   the $625/month cap, so the cap never binds. Proof checks the all-in figure against the annuity
-  formula.
+  formula. On the page ("My spending" mode) every row also starts from the $3,684.72, so all of
+  it shows $2,244,450.
 - **IRA cap:** $7,500/yr ($625/month), plus $1,100 from age 50. When the cap binds, "Show the
   math" splits the payments into segments, each grown to retirement.
 - **Monte Carlo:** 5,000 paths with random monthly returns that average 7%/yr.
@@ -61,12 +68,12 @@ spending figures do not.
   bootstrap view replays nominal fund months.
 
 ## Proof page
-- 7 checks on the sample. Each pairs an app number with a recompute that doesn't use the app's
+- 8 checks on the sample. Each pairs an app number with a recompute that doesn't use the app's
   own code for it: a raw CSV re-read, plain loops (VOO and 60/40), Excel's FV, the annuity formula
-  (default Roth and the redirected-wants Roth), and the Monte Carlo mean within 3 standard errors.
+  (default Roth and the redirected-wants Roth), PV plus annuity for the suggested plan, and the Monte Carlo mean within 3 standard errors.
   Each reports pass or fail with both numbers.
-- A real upload gets 6 checks. The raw file isn't kept, so the spending check runs on the sample only.
-- *Q: Is every number live-checked?* No, and the page says so. XIRR, BND/QQQ and the Monte Carlo
+- A real upload gets 7 checks. The raw file isn't kept, so the spending check runs on the sample only.
+- *Q: Is every number live-checked?* No, and the page says so. XIRR, BND/SCHD and the Monte Carlo
   percentiles were recomputed by hand in the final audit.
 - The Excel workbook uses live formulas. We recalculated it in Excel, and every difference is 0.
 - *Q: How do you know AI didn't hallucinate?*

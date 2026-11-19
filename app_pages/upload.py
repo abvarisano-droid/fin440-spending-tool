@@ -123,6 +123,7 @@ if tx is not None:
 TUTORIAL = Path(__file__).resolve().parent.parent / "assets" / "tutorial.mp4"
 if tx is None and TUTORIAL.exists():
     with ui.section("landing_preview", "How to use it, in about a minute"):
-        st.video(str(TUTORIAL), autoplay=True, muted=True, loop=True)
-        st.caption("Six steps on a fictional statement: upload a CSV and check the columns, then Spending, "
-                   "the Shadow portfolio, the Roth (with your wants spending redirected) and Proof.")
+        st.video(str(TUTORIAL), autoplay=True, muted=True)
+        st.caption(":material/volume_up: It starts muted, so turn on the sound in the player to hear the "
+                   "walkthrough. Six steps on a fictional statement: upload, check the columns, Spending, "
+                   "the Shadow portfolio, the Roth (funded from your spending) and Proof.")

@@ -18,12 +18,13 @@ spending really costing you as an investor?**
 
 Five pages:
 1. **Upload:** reads any bank or card CSV and auto-detects the date, merchant and amount columns.
-   Before anything is loaded it plays a one-minute tutorial: six captioned steps on a fictional statement.
+   Before anything is loaded it plays a narrated tutorial (AI voice-over with subtitles): six steps on a fictional statement.
 2. **Spending breakdown:** totals, categories, needs vs. wants.
 3. **Shadow portfolio:** what every purchase would be worth had it bought an index fund that day,
-   compared across four portfolios.
-4. **Roth calculator:** time value of money, fixed and with uncertain returns (Monte Carlo), and
-   what your own wants spending would grow to if you redirected it into a Roth.
+   compared across four portfolios, with one-click fund chips.
+4. **Roth calculator:** funded from your own spending. What you spent on wants becomes the
+   starting balance, and it suggests a monthly amount based on how much you spend. Time value of
+   money, fixed and with uncertain returns (Monte Carlo).
 5. **Proof:** live checks of the key numbers plus an Excel workbook with real formulas.
 
 ## 2. The problem it solves
@@ -39,8 +40,8 @@ Chapters refer to Bodie, Kane & Marcus, *Investments*, 13th edition, as covered 
 |---|---|---|
 | Spending breakdown | Gross purchases by category; discretionary (wants) share | Ch 1 (saving vs. consumption), Ch 12 (impulse spending, mental accounting) |
 | Shadow portfolio | Each purchase buys fractional shares at the first close on or after its date, using dividend-adjusted prices (dividends reinvested). Value today, gain, money-weighted return (XIRR) | Ch 2 (asset classes, stock and bond indexes), Ch 5 (holding-period returns, compounding) |
-| Shadow: compare | The same purchases split 100% VOO, 60/40 VOO/BND, 100% BND, 100% QQQ | Ch 7 (efficient diversification: the stock-bond mix) |
-| Roth calculator | FV of a monthly annuity with the 2026 IRA limit and age-50 catch-up; APR vs. effective rate; ordinary annuity vs. annuity due; 25%, 50% and all of your discretionary average redirected | Ch 5 (compounding, APR vs. EAR, real vs. nominal returns) |
+| Shadow: compare | The same purchases split 100% VOO, 60/40 VOO/BND, 100% BND, 100% SCHD | Ch 7 (efficient diversification: the stock-bond mix) |
+| Roth calculator | FV of a monthly annuity with the 2026 IRA limit and age-50 catch-up; APR vs. effective rate; ordinary annuity vs. annuity due; starting balance = your wants total (PV), suggested monthly by spending tier (PMT); 25%, 50% and all of your discretionary average redirected | Ch 5 (compounding, APR vs. EAR, real vs. nominal returns) |
 | Roth: uncertain returns | 5,000 simulated paths (normal returns, or replayed real fund months); percentile bands; odds of a target | Ch 5 (normal distribution, arithmetic vs. geometric averages: volatility drag) |
 
 One technical choice matters for correctness: every purchase buys at the first close on or after
@@ -87,27 +88,30 @@ The audits caught real errors before they shipped:
 - **Spending:** $6,963.81 over 6 months ($1,160.63/month). Wants are 53% ($3,684.72). Top
   categories: Shopping $2,052, Groceries $1,627, Dining $764.
 - **Shadow portfolio:** the same $6,963.81 in VOO would be worth about $6,749 today (-3.1%). The
-  60/40 mix lost less (-2.1%), BND least (-0.6%), and QQQ most (-8.0%). Over a short window,
-  diversification shows up as a smaller swing, not a bigger gain.
+  60/40 mix lost less, BND least (-0.6%), and the dividend fund SCHD gained (+3.7% on Nov 19).
+  Over a short window, which fund wins is mostly luck (health care XLV +10%, gold -15%), so the
+  Roth uses long-run averages.
 - **Roth:**
   - $200/month from 21 to 65 at 7% grows to $705,071 (Excel `FV(0.07/12, 528, -200)`).
-  - The sample's wants average $614.12/month. Redirecting all of it grows to $2,164,990; 25%
-    ($153.53/month) grows to about $541,248.
+  - Funded from the sample's spending: wants total $3,684.72 becomes the starting balance, and
+    $614.12/month of wants is the heavy tier, so it suggests 25%, rounded to $150/month. From 21 to
+    65 at 7% that grows to $608,262.48 (PV(1+r)^n + PMT((1+r)^n - 1)/r).
   - With uncertain returns (15% volatility), the median outcome is $517,725, the 5th percentile
     is $163,563, and only 34% of paths reach the $705k a simple calculator promises.
 
 ## 6. How we know it's valid
-1. **Hand-checked tests (94).** Expected values come from outside the code: Excel `FV`, hand
+1. **Hand-checked tests (103).** Expected values come from outside the code: Excel `FV`, hand
    formulas, brute-force loops, `numpy.polyfit`. For example, Roth $705,070.79 equals Excel's FV
    to the cent, and the 60/40 portfolio equals a purchase-by-purchase recompute to $0.000001.
 2. **Independent audits every phase,** plus a final three-checker audit (math, data leaks,
    design) by fresh agents that had not seen the code before.
-3. **A live Proof page.** It runs 7 checks on the sample (6 on an upload). Each pairs an app
+3. **A live Proof page.** It runs 8 checks on the sample (7 on an upload). Each pairs an app
    number with a recompute that doesn't use the app's own code for it:
    - the spending total vs. a raw re-read of the CSV;
    - the VOO and 60/40 portfolio values vs. plain loops;
    - the Roth balance vs. Excel's FV and the annuity formula;
    - the redirected-wants Roth balance vs. the annuity formula;
+   - the suggested plan (your spending as the start, plus the suggestion) vs. PV plus annuity;
    - the Monte Carlo mean within 3 standard errors of the closed form.
 
    The final math audit flagged a check that compared one engine with itself; we replaced it. The
