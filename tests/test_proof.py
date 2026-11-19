@@ -41,8 +41,8 @@ def test_raw_sample_total():
 
 def test_every_check_passes_on_synthetic_data():
     spend = _spend()
-    checks = proof.run_checks(spend, spend, _prices(1), bnd=_prices(3, vol=0.003), disc_monthly=150.0)
-    assert len(checks) == 6  # 7 on the sample, which adds the raw-CSV spending check
+    checks = proof.run_checks(spend, spend, _prices(1), bnd=_prices(3, vol=0.003), disc_monthly=150.0, disc_total=900.0)
+    assert len(checks) == 7  # 8 on the sample, which adds the raw-CSV spending check
     assert all(c.passed for c in checks), [(c.name, c.app, c.independent) for c in checks if not c.passed]
 
 
@@ -94,4 +94,13 @@ def test_redirect_check_uses_the_discretionary_average():
     c = [c for c in checks if c.name.startswith("Roth: redirected")][0]
     r = 0.07 / 12
     assert abs(c.independent - 614.12 * ((1 + r) ** 528 - 1) / r) < 1e-6
+    assert c.passed
+
+
+def test_suggested_plan_check_adds_start_and_suggestion():
+    spend = _spend()
+    checks = proof.run_checks(spend, spend, _prices(1), disc_monthly=614.12, disc_total=3684.72)
+    c = [c for c in checks if c.name.startswith("Roth: suggested")][0]
+    r = 0.07 / 12
+    assert abs(c.independent - (3684.72 * (1 + r) ** 528 + 150 * ((1 + r) ** 528 - 1) / r)) < 1e-6
     assert c.passed

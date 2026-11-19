@@ -2,8 +2,10 @@ import altair as alt
 import streamlit as st
 
 from core import montecarlo, tvm, ui
+from core.categorize import ALL_CATEGORIES, DISCRETIONARY
 from core.prices import clean_ticker, fetch_history
 from core.state import discretionary_monthly, get_transactions, spending_only
+from core.suggest import suggest_monthly
 
 st.title("Roth IRA calculator")
 st.caption(":material/school: FIN 440 link (Bodie, Kane & Marcus, 13e): Ch 5 (compounding, APR vs. EAR, real vs. nominal returns, arithmetic vs. geometric averages).")
@@ -14,29 +16,61 @@ st.caption(
 )
 
 tx = get_transactions()
-disc_monthly = None
-if tx is not None and not tx.empty:
-    disc_monthly = discretionary_monthly(spending_only(tx)) or None
+spend = spending_only(tx) if tx is not None and not tx.empty else None
+has_data = spend is not None and not spend.empty
+sugg = None
+wants_monthly = None
 
 with ui.section("roth_inputs"):
+    mode = "Enter my own"
+    if has_data:
+        mode = st.radio("Fund it from", ["My spending", "Enter my own"], horizontal=True, key="roth_mode",
+                        help="My spending: the money you spent becomes your starting balance, and we suggest "
+                             "a monthly amount from how much you spend. Enter my own: type any numbers.")
+    if mode == "My spending":
+        present = [c for c in ALL_CATEGORIES if c in set(spend["category"])]
+        cats = st.multiselect("Spending to redirect", present, default=[c for c in present if c in DISCRETIONARY],
+                              key="roth_cats", help="Wants are picked by default, like on the Shadow page.")
+        if not cats:
+            st.warning("Pick at least one category.")
+            st.stop()
+        months = max(spend["date"].dt.to_period("M").nunique(), 1)
+        picked_total = float(spend.loc[spend["category"].isin(cats), "amount"].sum())
+        wants_monthly = picked_total / months
+        sugg = suggest_monthly(wants_monthly)
+        start_default = round(min(picked_total, tvm.IRA_LIMIT_2026), 2)
+        # refill the two boxes whenever the categories change; edits stick otherwise
+        sig = (tuple(cats), round(picked_total, 2))
+        if st.session_state.get("_roth_sig") != sig:
+            st.session_state["_roth_sig"] = sig
+            st.session_state["roth_start_sp"] = start_default
+            st.session_state["roth_monthly_sp"] = sugg.monthly
+
     c1, c2, c3 = st.columns(3)
     with c1:
         current_age = st.number_input("Current age", 16, 80, 21, key="roth_age")
         retirement_age = st.number_input("Retirement age", 17, 90, 65, key="roth_retire")
-        starting = st.number_input("Current Roth balance ($)", 0.0, 10_000_000.0, 0.0, step=100.0, format="%.0f",
-                                   key="roth_start")
     with c2:
-        sources = ["Enter an amount"] + (["Redirect discretionary spending"] if disc_monthly else [])
-        source = st.radio("Monthly contribution", sources, key="roth_source")
-        if source == "Enter an amount":
+        if mode == "My spending":
+            starting = st.number_input("Starting balance ($)", 0.0, 10_000_000.0, step=100.0, format="%.2f",
+                                       key="roth_start_sp",
+                                       help="What you spent on these categories in the file, put in as "
+                                            "this year's contribution.")
+            monthly = st.number_input("Per month ($)", 0.0, 10_000.0, step=25.0, format="%.0f",
+                                      key="roth_monthly_sp")
+            tier_word = {"light": "light", "moderate": "moderate", "heavy": "on the heavy side"}[sugg.tier]
+            st.caption(
+                f":material/lightbulb: You spent \\${picked_total:,.2f} on these over {months} months "
+                f"(\\${wants_monthly:,.2f}/month, {tier_word}). We suggest putting in "
+                f"{sugg.share:.0%} of that: **\\${sugg.monthly:,.0f}/month**."
+                + (f" The starting balance is capped at this year's \\${tvm.IRA_LIMIT_2026:,.0f} IRA limit."
+                   if picked_total > tvm.IRA_LIMIT_2026 else "")
+            )
+        else:
+            starting = st.number_input("Current Roth balance ($)", 0.0, 10_000_000.0, 0.0, step=100.0,
+                                       format="%.0f", key="roth_start")
             monthly = st.number_input("Per month ($)", 0.0, 10_000.0, 200.0, step=25.0, format="%.0f",
                                       key="roth_monthly")
-        else:
-            pct = st.slider("Share of discretionary spending to redirect", 0, 100, 25, 5,
-                            format="%d%%", key="roth_pct")
-            monthly = disc_monthly * pct / 100
-            st.caption(f"Your discretionary average is \\${disc_monthly:,.2f}/month, so this redirects "
-                       f"**\\${monthly:,.2f}/month**.")
     with c3:
         rate_pct = st.slider("Annual return", 6.0, 10.0, 7.0, 0.25, format="%.2f%%", key="roth_rate",
                              help="A Roth earns whatever it holds. 7% is the common long-run real (after-inflation) "
@@ -78,27 +112,27 @@ if capped:
             f"so those years use the cap: \\${tvm.IRA_LIMIT_2026 / 12:,.2f}/month before {tvm.CATCHUP_AGE}, "
             f"\\${tvm.annual_limit(tvm.CATCHUP_AGE) / 12:,.2f}/month from {tvm.CATCHUP_AGE} (catch-up).")
 
-if disc_monthly:
+redirect_base = wants_monthly if mode == "My spending" else (discretionary_monthly(spend) if has_data else 0.0)
+if redirect_base:
     def _balance(pmt: float) -> float:
         return float(tvm.roth_projection(int(current_age), int(retirement_age), pmt, rate_pct / 100, starting,
                                          convention, due, enforce).iloc[-1]["balance"])
 
+    plan_label = ("Suggested plan" if sugg is not None and monthly == sugg.monthly else "Your plan above")
     rows = [{"Plan": label, f"Balance at {int(retirement_age)}": _balance(pmt), "Per month": pmt}
-            for label, pmt in ([("Your plan above", monthly)] if source == "Enter an amount" else [])
-            + [("25% of wants", disc_monthly * 0.25), ("50% of wants", disc_monthly * 0.5),
-               ("All your wants", disc_monthly)]]
+            for label, pmt in [(plan_label, monthly), ("25% of it", redirect_base * 0.25),
+                               ("50% of it", redirect_base * 0.5), ("All of it", redirect_base)]]
     all_in = rows[-1][f"Balance at {int(retirement_age)}"]
-    with ui.section("roth_redirect", "What your wants spending could become"):
-        st.markdown(f"Your data averages **\\${disc_monthly:,.2f}/month** of wants (dining, coffee, "
-                    f"entertainment, shopping, subscriptions, travel). Put all of it in a Roth from "
-                    f"{int(current_age)} to {int(retirement_age)} and it grows to **\\${all_in:,.0f}**.")
+    what = "the spending you picked" if mode == "My spending" else "wants (dining, coffee, entertainment, shopping, subscriptions, travel)"
+    with ui.section("roth_redirect", "What your spending could become"):
+        st.markdown(f"Your data averages **\\${redirect_base:,.2f}/month** of {what}. Put all of it in a "
+                    f"Roth from {int(current_age)} to {int(retirement_age)} and it grows to **\\${all_in:,.0f}**.")
         st.dataframe(
             rows, hide_index=True, key="redirect_table",
             column_config={"Per month": st.column_config.NumberColumn(format="dollar"),
                            f"Balance at {int(retirement_age)}": st.column_config.NumberColumn(format="dollar")},
         )
-        st.caption("Same age, return and settings as above. Pick \"Redirect discretionary spending\" in "
-                   "Monthly contribution to chart any share.")
+        st.caption("Same age, return, starting balance and settings as above.")
 
 chart_df = proj.assign(principal=proj["total_contributed"] + starting)[["age", "principal", "growth"]]
 chart_df = chart_df.melt("age", var_name="part", value_name="dollars")

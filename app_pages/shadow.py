@@ -20,8 +20,18 @@ st.caption(
 tx = spending_only(require_transactions())
 
 with ui.section("shadow_controls"):
+    QUICK = {"VOO": "S&P 500", "SCHD": "Dividend", "XLV": "Health care", "QQQ": "Nasdaq 100", "GLD": "Gold"}
+    if "shadow_ticker" not in st.session_state:
+        st.session_state["shadow_ticker"] = "VOO"
+
+    def _pick_fund():
+        if st.session_state.get("shadow_chip"):
+            st.session_state["shadow_ticker"] = st.session_state["shadow_chip"]
+
+    st.pills("Try a fund", list(QUICK), format_func=lambda t: f"{t} · {QUICK[t]}", key="shadow_chip",
+             on_change=_pick_fund)
     c1, c2 = st.columns([1, 2])
-    raw_ticker = c1.text_input("Fund ticker", value="VOO", max_chars=10, key="shadow_ticker",
+    raw_ticker = c1.text_input("Fund ticker", max_chars=10, key="shadow_ticker",
                                help="Any Yahoo Finance ticker, e.g. VOO, VTI, QQQ, SCHD.")
     present = [c for c in ALL_CATEGORIES if c in set(tx["category"])]
     cats = c2.multiselect("Categories to shadow", present, default=present, key="shadow_cats")
@@ -79,6 +89,9 @@ with ui.section("chart_shadow", "Spent vs. shadow value"):
 with ui.section("shadow_compare", "Same purchases, four portfolios"):
     st.caption("Each purchase is split across funds by fixed weights and held, no rebalancing. "
                "Diversification in practice: compare how far each line swings, not only where it ends.")
+    st.caption(":material/casino: Over a few months, which fund wins is mostly luck: a dividend fund can be up "
+               "while the S&P 500 is down, and the order flips in other windows. The Roth page uses "
+               "long-run averages for that reason.")
     picks = st.multiselect("Portfolios", list(PRESETS), default=list(PRESETS), max_selections=4,
                            key="compare_pick")
     if picks:

@@ -19,7 +19,7 @@ PRESETS: dict[str, dict[str, float]] = {
     "100% VOO": {"VOO": 1.0},
     "60/40 VOO/BND": {"VOO": 0.6, "BND": 0.4},
     "100% BND": {"BND": 1.0},
-    "100% QQQ": {"QQQ": 1.0},
+    "100% SCHD": {"SCHD": 1.0},
 }
 
 

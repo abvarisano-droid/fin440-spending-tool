@@ -19,7 +19,8 @@ try:
     with st.spinner("Getting prices and running checks..."):
         prices = fetch_many(["VOO", "BND"], spend["date"].min())
         checks = proof.run_checks(tx, spend, prices["VOO"], sample_path=SAMPLE_CSV if is_sample else None,
-                                  bnd=prices["BND"], disc_monthly=discretionary_monthly(spend))
+                                  bnd=prices["BND"], disc_monthly=discretionary_monthly(spend),
+                                  disc_total=float(spend.loc[spend["discretionary"], "amount"].sum()))
 except (RuntimeError, ValueError) as exc:
     st.error(str(exc))
     st.stop()
@@ -38,7 +39,7 @@ with ui.section("proof_checks", "Live checks"):
     st.caption(
         ("" if is_sample else "The spending-total check runs on the sample only, because your raw file "
          "isn't kept. ")
-        + "Not live-checked here, but recomputed by hand in the final audit: XIRR, the BND and QQQ "
+        + "Not live-checked here, but recomputed by hand in the final audit: XIRR, the BND and SCHD "
         "portfolios and the Monte Carlo percentiles."
     )
 

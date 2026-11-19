@@ -18,6 +18,7 @@ import pandas as pd
 from core import montecarlo, tvm
 from core.portfolios import build_portfolio
 from core.shadow import build_shadow
+from core.suggest import suggest_monthly
 
 # Roth defaults and Excel's own answer: =FV(0.07/12, 528, -200) in Excel 365 = 705,070.79
 ROTH_DEFAULTS = dict(current_age=21, retirement_age=65, monthly=200.0, rate=0.07)
@@ -78,7 +79,8 @@ def fv_by_loop(monthly: float, rate_apr: float, months: int) -> float:
 # ---------- the live checks ----------
 
 def run_checks(tx_all: pd.DataFrame, spend: pd.DataFrame, voo: pd.Series, sample_path=None,
-               bnd: pd.Series | None = None, disc_monthly: float | None = None) -> list[Check]:
+               bnd: pd.Series | None = None, disc_monthly: float | None = None,
+               disc_total: float | None = None) -> list[Check]:
     """tx_all = every normalized row (transfers included); spend = spending only. The raw-CSV
     spending check runs only for the sample (an upload's raw file isn't kept); the 60/40 check
     runs when BND prices are given; the redirected-spending Roth check runs when the data has
@@ -128,6 +130,17 @@ def run_checks(tx_all: pd.DataFrame, spend: pd.DataFrame, voo: pd.Series, sample
                             f"Your discretionary average (${disc_monthly:,.2f}/month) put into the Roth from 21 "
                             f"to 65 at 7% APR, closed form typed out here. Uncapped, so it matches the Roth "
                             f"page only while that amount is under the IRA limit (${tvm.IRA_LIMIT_2026 / 12:,.2f}/month)."))
+
+    if disc_monthly and disc_total:
+        sg = suggest_monthly(disc_monthly)
+        pv = min(disc_total, tvm.IRA_LIMIT_2026)
+        app_sugg = float(tvm.roth_projection(d["current_age"], d["retirement_age"], sg.monthly, d["rate"], pv,
+                                             enforce_limit=False).iloc[-1]["balance"])
+        checks.append(Check("Roth: suggested plan (your spending as the start, plus the suggestion) vs the formula",
+                            app_sugg, pv * (1 + r) ** n + sg.monthly * ((1 + r) ** n - 1) / r, 0.005,
+                            f"Start ${pv:,.2f} (your discretionary total) plus the suggested ${sg.monthly:,.0f}/month "
+                            f"({sg.share:.0%} of ${disc_monthly:,.2f}, {sg.tier} tier), 21 to 65 at 7% APR: "
+                            f"PV(1+r)^n + PMT((1+r)^n - 1)/r, typed out here."))
 
     mc = montecarlo.simulate_roth(d["current_age"], d["retirement_age"], d["monthly"], method="normal",
                                   annual_mean=d["rate"], annual_vol=0.15, n_sims=5000, seed=0,
