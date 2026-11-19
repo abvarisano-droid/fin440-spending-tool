@@ -31,35 +31,11 @@ spending figures do not.
   window. Diversification lowers the swing; it doesn't promise more return.
 - *Verify:* the Proof page's brute-force loop, and the Shadow sheet of the workbook.
 
-## Risk & CAPM
-- **Volatility** = sample std of daily returns x sqrt(252).
-- **Sharpe** = (average daily return - daily T-bill rate) / std x sqrt(252): excess return per
-  unit of total risk.
-- **Max drawdown** = the worst fall from a previous high.
-- **Beta** = the slope of the portfolio's excess returns on SPY's excess returns (in Excel,
-  `SLOPE`). Beta 1 moves with the market; BND is about 0.1.
-- **Jensen's alpha** = the regression intercept x 252. Positive means it beat what its beta asked for.
-- **CAPM:** E[R] = rf + beta (E[Rm] - rf). The **SML** plots that line. Dots above it earned
-  positive alpha.
-- **T-bill:** Yahoo's ^IRX is a bank discount yield. Price = 1 - d x 91/360; holding-period return
-  = 1/price - 1; effective annual = (1 + HPR)^(365/91) - 1. So 4.145% discount = 4.32% effective.
-- **Unit value:** risk is measured on value per unit (like a fund's NAV), so new purchases don't
-  look like returns.
-- *Q: Why does the line slope down on purchase dates?* Over those 6 months SPY returned less than
-  T-bills. That is a negative realized risk premium. CAPM is about expected returns, so use the
-  5-year view.
-- *Q: Why two alphas?* "Above SML" uses compounded returns; Jensen's alpha is an arithmetic
-  regression intercept. They are close but not identical.
-
-## Timing test
-- Each of 1,000 shuffles moves every purchase to a random trading day between the first and last
-  real buy, then values it the same way as the shadow portfolio.
-- **Percentile** = share of shuffles the real dates beat. 37th means "ordinary luck". 5th to 95th
-  is the luck band. The two-sided p-value is 0.74.
-- **Lump sum** (all money on day one) beats spreading purchases out in a rising market. That is
-  drift, not skill.
-- *Q: What does this prove?* Purchase dates carry no information about future prices, which is
-  what weak-form efficiency predicts.
+## Removed pages (Nov 19)
+- The Risk & CAPM page and the Timing test were removed to keep the app focused on spending, the
+  shadow portfolio and the Roth. Their engines and tests are still in the repo.
+- *Q: Why no CAPM?* Be ready to say it was built, checked and then cut for focus; the 60/40 vs
+  100% VOO compare on the Shadow page still shows diversification (Ch 7).
 
 ## Roth calculator
 - **FV = PMT x ((1+r)^n - 1)/r** with r = 7%/12 and n = 528 months gives $705,070.79. That is
@@ -69,6 +45,11 @@ spending figures do not.
   is a conservative mix with bonds or a bad decade.
 - **APR vs effective:** APR uses r/12. An effective annual rate uses (1+R)^(1/12) - 1, which is
   slightly lower per month.
+- **Redirected wants:** the sample's wants (dining, coffee, entertainment, shopping,
+  subscriptions, travel) average $3,684.72 / 6 months = $614.12/month. All of it from 21 to 65
+  at 7% grows to $2,164,990; 25% ($153.53) grows to $541,248; 50% to $1,082,495. $614.12 is under
+  the $625/month cap, so the cap never binds. Proof checks the all-in figure against the annuity
+  formula.
 - **IRA cap:** $7,500/yr ($625/month), plus $1,100 from age 50. When the cap binds, "Show the
   math" splits the payments into segments, each grown to retirement.
 - **Monte Carlo:** 5,000 paths with random monthly returns that average 7%/yr.
@@ -80,14 +61,13 @@ spending figures do not.
   bootstrap view replays nominal fund months.
 
 ## Proof page
-- 10 checks on the sample. Each pairs an app number with a recompute that doesn't use the app's
-  own code for it: a raw CSV re-read, plain loops (VOO and 60/40), numpy (beta, volatility,
-  Sharpe), Excel's FV and the annuity formula, and the Monte Carlo mean within 3 standard errors.
+- 7 checks on the sample. Each pairs an app number with a recompute that doesn't use the app's
+  own code for it: a raw CSV re-read, plain loops (VOO and 60/40), Excel's FV, the annuity formula
+  (default Roth and the redirected-wants Roth), and the Monte Carlo mean within 3 standard errors.
   Each reports pass or fail with both numbers.
-- A real upload gets 9 checks. The raw file isn't kept, so the spending check runs on the sample only.
-- *Q: Is every number live-checked?* No, and the page says so. XIRR, drawdown, alpha, CAPM
-  expected, BND/QQQ, the timing percentile and the Monte Carlo percentiles were recomputed by hand
-  in the final audit.
+- A real upload gets 6 checks. The raw file isn't kept, so the spending check runs on the sample only.
+- *Q: Is every number live-checked?* No, and the page says so. XIRR, BND/QQQ and the Monte Carlo
+  percentiles were recomputed by hand in the final audit.
 - The Excel workbook uses live formulas. We recalculated it in Excel, and every difference is 0.
 - *Q: How do you know AI didn't hallucinate?*
   - Every output was recomputed outside the code.
@@ -133,6 +113,8 @@ spending figures do not.
 - *What's left:* the presentation deck, and practice explaining each number.
 
 ## Chapter map (cite only covered chapters: 1, 2, 3, 5, 6, 7, 9, 11, 12)
+Since the Nov 19 cut, the app itself shows Ch 1, 2, 5, 7 and 12. Ch 6, 9 and 11 were the Risk &
+CAPM and Timing pages; mention them only as "built, then removed".
 - **Ch 2:** T-bills (bank discount yield), stock and bond indexes, asset classes.
 - **Ch 5:** holding-period return, compounding, APR vs EAR, real vs nominal, standard deviation,
   Sharpe ratio, arithmetic vs geometric averages (volatility drag), the normal distribution.

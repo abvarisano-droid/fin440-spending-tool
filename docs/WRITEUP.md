@@ -16,21 +16,21 @@ Spend Shadow is a web app that turns a bank or card statement into an investment
 CSV export (or use the fictional sample) and it answers one question several ways: **what is your
 spending really costing you as an investor?**
 
-Seven pages:
+Five pages:
 1. **Upload:** reads any bank or card CSV and auto-detects the date, merchant and amount columns.
+   Before anything is loaded it plays a 45-second preview of the app on the fictional sample.
 2. **Spending breakdown:** totals, categories, needs vs. wants.
 3. **Shadow portfolio:** what every purchase would be worth had it bought an index fund that day,
    compared across four portfolios.
-4. **Risk & CAPM:** volatility, Sharpe, drawdown, beta, alpha and the security market line.
-5. **Timing test:** a market-efficiency experiment on your own purchase dates.
-6. **Roth calculator:** time value of money, fixed and with uncertain returns (Monte Carlo).
-7. **Proof:** live checks of every engine plus an Excel workbook with real formulas.
+4. **Roth calculator:** time value of money, fixed and with uncertain returns (Monte Carlo), and
+   what your own wants spending would grow to if you redirected it into a Roth.
+5. **Proof:** live checks of the key numbers plus an Excel workbook with real formulas.
 
 ## 2. The problem it solves
 People hear "invest instead of spending" as abstract advice. Spend Shadow makes it concrete and
 personal: the purchases are yours, the dates are yours, and the prices are real. It also avoids
-the usual "latte calculator" trap of assuming a smooth 7%. It shows risk, a range of outcomes,
-and whether the market paid you for the risk you would have taken.
+the usual "latte calculator" trap of assuming a smooth 7%. It shows a range of outcomes, and it
+turns your actual wants spending into a retirement number.
 
 ## 3. How it works (and the class topic behind each part)
 Chapters refer to Bodie, Kane & Marcus, *Investments*, 13th edition, as covered in FIN 440.
@@ -40,17 +40,12 @@ Chapters refer to Bodie, Kane & Marcus, *Investments*, 13th edition, as covered 
 | Spending breakdown | Gross purchases by category; discretionary (wants) share | Ch 1 (saving vs. consumption), Ch 12 (impulse spending, mental accounting) |
 | Shadow portfolio | Each purchase buys fractional shares at the first close on or after its date, using dividend-adjusted prices (dividends reinvested). Value today, gain, money-weighted return (XIRR) | Ch 2 (asset classes, stock and bond indexes), Ch 5 (holding-period returns, compounding) |
 | Shadow: compare | The same purchases split 100% VOO, 60/40 VOO/BND, 100% BND, 100% QQQ | Ch 7 (efficient diversification: the stock-bond mix) |
-| Risk & CAPM | Volatility, Sharpe ratio, max drawdown, beta and alpha against SPY; the security market line, with the 13-week T-bill as the risk-free rate (bank discount yield converted to an effective annual rate) | Ch 2 (T-bill discount yield), Ch 5 (standard deviation, Sharpe ratio), Ch 6 (risk-free vs. risky assets), Ch 7 (systematic vs. diversifiable risk), Ch 9 (CAPM, beta, alpha, SML) |
-| Timing test | Moves every purchase to a random trading day 1,000 times and ranks your real dates | Ch 11 (efficient market hypothesis, weak form), Ch 12 (overconfidence in timing) |
-| Roth calculator | FV of a monthly annuity with the 2026 IRA limit and age-50 catch-up; APR vs. effective rate; ordinary annuity vs. annuity due | Ch 5 (compounding, APR vs. EAR, real vs. nominal returns) |
+| Roth calculator | FV of a monthly annuity with the 2026 IRA limit and age-50 catch-up; APR vs. effective rate; ordinary annuity vs. annuity due; 25%, 50% and all of your discretionary average redirected | Ch 5 (compounding, APR vs. EAR, real vs. nominal returns) |
 | Roth: uncertain returns | 5,000 simulated paths (normal returns, or replayed real fund months); percentile bands; odds of a target | Ch 5 (normal distribution, arithmetic vs. geometric averages: volatility drag) |
 
-Two technical choices matter for correctness:
-- **Time-weighted unit value.** A portfolio that keeps receiving new purchases has a balance that
-  jumps whenever money goes in, and those jumps are not returns. Risk is therefore measured on a
-  unit value, the way a mutual fund computes NAV, so only investment performance counts.
-- **Two risk windows.** Your purchase dates (real, but often only months of data) or five years
-  of fund history (statistically steadier).
+One technical choice matters for correctness: every purchase buys at the first close on or after
+its date, using dividend-adjusted prices, so the shadow value is what that exact purchase stream
+would hold today, and the money-weighted return (XIRR) accounts for when each dollar went in.
 
 
 ## What changed from the original plan
@@ -59,8 +54,11 @@ Two technical choices matter for correctness:
   or card, needs no credentials, and keeps the data in the browser session. Another person can
   still run it on their own real data, which was the goal.
 - **The scope grew from "spending and a Roth calculator" into an investments lab.** We added
-  risk, CAPM and the SML, a diversification comparison, a market-efficiency test, Monte Carlo
-  uncertainty and a Proof page. Each addition ties back to a course chapter.
+  a diversification comparison, Monte Carlo uncertainty and a Proof page. Each addition ties back
+  to a course chapter.
+- **We built, then removed, a Risk & CAPM page and a market-timing test (Nov 19)** to keep the
+  app focused on spending, the shadow portfolio and the Roth. The engines and their tests are
+  still in the repository.
 - **The Roth default is ages 21 to 65.** It is editable, so 60 is one click away.
 
 ## 4. How AI was used
@@ -91,53 +89,39 @@ The audits caught real errors before they shipped:
 - **Shadow portfolio:** the same $6,963.81 in VOO would be worth about $6,749 today (-3.1%). The
   60/40 mix lost less (-2.1%), BND least (-0.6%), and QQQ most (-8.0%). Over a short window,
   diversification shows up as a smaller swing, not a bigger gain.
-- **Risk & CAPM, last 5 years:**
-  - VOO: 17.1% volatility, beta 0.99, Sharpe 0.44, worst drawdown -24.5%.
-  - 60/40: volatility falls to 11.0% and beta to 0.62.
-  - QQQ: beta 1.28, but a negative alpha (-0.5%/yr). It took more market risk and was paid
-    slightly less than CAPM required.
-  - Over the 6-month purchase window, SPY returned less than T-bills, so the security market line
-    sloped downward. The page explains this as a negative realized market risk premium, which can
-    happen over short windows even though the expected premium is positive.
-- **Timing test:** the real purchase dates beat 37% of 1,000 random ones (p = 0.74). That is what
-  luck looks like, consistent with market efficiency. Every random set landed between about
-  $6,712 and $6,791, so for small, steady purchases timing barely matters. Investing everything
-  on day one would have produced about $7,095. That is the drift of a rising market, not skill.
 - **Roth:**
   - $200/month from 21 to 65 at 7% grows to $705,071 (Excel `FV(0.07/12, 528, -200)`).
-  - Redirecting 25% of the sample's wants ($153.53/month) grows to about $541,000.
+  - The sample's wants average $614.12/month. Redirecting all of it grows to $2,164,990; 25%
+    ($153.53/month) grows to about $541,248.
   - With uncertain returns (15% volatility), the median outcome is $517,725, the 5th percentile
     is $163,563, and only 34% of paths reach the $705k a simple calculator promises.
 
 ## 6. How we know it's valid
-1. **Hand-checked tests (90).** Expected values come from outside the code: Excel `FV`, hand
+1. **Hand-checked tests (94).** Expected values come from outside the code: Excel `FV`, hand
    formulas, brute-force loops, `numpy.polyfit`. For example, Roth $705,070.79 equals Excel's FV
    to the cent, and the 60/40 portfolio equals a purchase-by-purchase recompute to $0.000001.
 2. **Independent audits every phase,** plus a final three-checker audit (math, data leaks,
    design) by fresh agents that had not seen the code before.
-3. **A live Proof page.** It runs 10 checks on your own data. Each pairs an app number with a
-   recompute that doesn't use the app's own code for it:
+3. **A live Proof page.** It runs 7 checks on the sample (6 on an upload). Each pairs an app
+   number with a recompute that doesn't use the app's own code for it:
    - the spending total vs. a raw re-read of the CSV;
    - the VOO and 60/40 portfolio values vs. plain loops;
-   - the timing test vs. the shadow value;
-   - beta vs. numpy covariance/variance;
-   - volatility and Sharpe vs. hand formulas;
    - the Roth balance vs. Excel's FV and the annuity formula;
+   - the redirected-wants Roth balance vs. the annuity formula;
    - the Monte Carlo mean within 3 standard errors of the closed form.
 
    The final math audit flagged a check that compared one engine with itself; we replaced it. The
    page also says plainly which numbers are verified by the audit rather than live.
-4. **An Excel workbook with live formulas** (`FV`, shares and value per purchase, `SLOPE`,
-   `STDEV.S`, the T-bill conversion, Sharpe). We recalculated it in Excel itself: every
-   difference cell is 0, to about 16 decimal places.
-5. **Built-in sanity anchors on screen.** SPY sits exactly on its own security market line. The
-   Monte Carlo average lands next to the fixed-return formula, and the page shows both numbers.
+4. **An Excel workbook with live formulas** (`FV`, shares and value per purchase). We
+   recalculated it in Excel itself: every difference cell is 0.
+5. **A built-in sanity anchor on screen.** The Monte Carlo average lands next to the
+   fixed-return formula, and the page shows both numbers.
 
 ## 7. Why it matters
 - **For a person:** it turns "spend less" into a number with a risk range attached, using their
   own data.
-- **For the class:** it applies CAPM, the SML, diversification, market efficiency and TVM to real
-  prices and shows where the theory holds and where a short window breaks it.
+- **For the class:** it applies index investing, holding-period and money-weighted returns,
+  stock-bond diversification and TVM under uncertainty to real prices and real spending.
 - **For an employer:** it shows tested, audited and documented financial software, with privacy
   by design and a documented process for using AI safely: verify every output, separate building
   from auditing, keep an audit trail.
