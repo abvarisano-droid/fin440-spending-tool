@@ -1,3 +1,9 @@
+---
+title: "Spend Shadow group prep"
+type: project-doc
+updated: 2026-11-19
+---
+
 # Group prep: explain every number
 
 Each member should be able to answer every block below without the app open. Load the sample
