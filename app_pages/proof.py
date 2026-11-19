@@ -7,7 +7,8 @@ from core.state import SAMPLE_CSV, require_transactions, spending_only
 st.title("Proof")
 st.caption(
     "The key numbers are checked live against a second computation that doesn't use the app's own "
-    "code, and the workbook below lets you redo the math in Excel with real formulas."
+    "code (the timing row instead confirms two of the app's engines agree), and the workbook below "
+    "lets you redo the math in Excel with real formulas."
 )
 tx = require_transactions()
 spend = spending_only(tx)
@@ -29,7 +30,7 @@ with ui.section("proof_checks", "Live checks"):
     st.markdown(f"**{passed} of {len(checks)} checks pass** on your data and today's prices.")
     st.dataframe(proof.checks_frame(checks), hide_index=True, key="proof_table",
                  column_config={"Result": st.column_config.TextColumn("Result", width="small"),
-                                "Check": st.column_config.TextColumn("Check", width="medium")})
+                                "Check": st.column_config.TextColumn("Check", width="large")})
     with st.expander("How each check is computed", key="proof_how"):
         st.markdown(proof.how_list(checks))
     st.caption(

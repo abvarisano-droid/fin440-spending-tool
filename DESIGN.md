@@ -6,7 +6,7 @@ SITE: Spend Shadow (FIN 440)
 ONE SIGNATURE MOMENT: On Shadow portfolio, the second KPI ("In {ticker} it'd be worth") is the only oversized number in the app. Everything else stays at the type scale below.
 WEBSITE MAP: top nav (Upload, Spending breakdown, Shadow portfolio, Risk & CAPM, Timing test, Roth calculator, Proof). No sidebar. Wide layout. Seven labels scroll sideways on a phone; Streamlit's `>>` control is the overflow.
 
-Chosen direction (v2, 2026-11-18): **the Ashton Capes site system**, taken from `ashton-capes-site/assets/styles.css` (editorial layer) and `assets/tokens.css`, so the class project matches Ashton's portfolio site. Warm white, deep forest, Geist throughout, pill buttons, rounded white cards with soft shadows, small uppercase labels. v1 (the Fraunces "editorial ledger" below) is retired; its layouts, keys and rules stay.
+Chosen direction (v3, 2026-11-18): **Liquid Glass v8, light, matched to the live Ashton Capes site** (`assets/glass.css`, `v8.css`, `kronos.css` on ashtoncapesvarisano.space; spec in second-brain `Resources/design/liquid-glass-v8.md`, Ashton: one look for every product). Cool paper with three faint static glows, frosted white glass cards, a floating glass header pill, display serif for titles and big numbers, Geist for body, one cyan accent with dark ink, teal text links. v2 (warm white and fairway) and v1 (Fraunces ledger) are retired; their layouts, keys and rules stay.
 
 ## Layout alternatives (picked A)
 
@@ -20,23 +20,21 @@ Chosen direction (v2, 2026-11-18): **the Ashton Capes site system**, taken from 
 
 ## Type
 
-One family, like the site: Geist for everything, Geist Mono for code.
+Two families, like the site: display serif (`ui-serif, Georgia`, no font download) for titles and big numbers, Geist for everything else.
 
 | Role | Family | Weight | Size | Tracking | Line height |
 |---|---|---|---|---|---|
-| Display / `st.title` (h1) | Geist | 600 | 44px (32px phone) | -0.045em | 1.14 |
-| Page section / `st.header` (h2) | Geist | 600 | 30px | -0.04em | 1.2 |
-| Card title / `st.subheader` (h3) | Geist | 500 | 22px | -0.03em | 1.25 |
+| Display / `st.title` (h1) | serif | 400 | 44px (32px phone) | -0.025em | 1.08 |
+| Page section / `st.header` (h2) | serif | 400 | 30px | -0.02em | 1.2 |
+| Card title / `st.subheader` (h3) | serif | 400 | 22px | -0.02em | 1.25 |
 | Body | Geist | 400 | 16px | 0 | 1.5 |
 | Caption / help | Geist | 400 | 13px | 0 | 1.45 |
 | Label (KPI labels) | Geist | 600 | 11px, uppercase | 0.13em | 1.3 |
-| Course line (`:material/school:` caption) | Geist | 500 | 12.5px, sentence case, fairway | 0 | 1.5 |
-| KPI value | Geist | 500 | 28px (40px on the shadow signature only) | -0.045em | 1.1 |
+| Course line (`:material/school:` caption) | Geist | 500 | 12.5px, sentence case, teal | 0 | 1.5 |
+| KPI value | serif | 400 | 32px (27px phone; 44px / 36px on the shadow signature) | -0.01em | 1.1 |
 | Code / tickers | Geist Mono | 400 | 13px | 0 | 1.45 |
 
-Google Fonts (loaded by `config.toml`): `Geist` 400/500/600, `Geist Mono` 400/500.
-
-Sentence case on titles, headings, buttons and widget labels; the uppercase label style is only for KPI labels (a full sentence in caps is hard to read, so the course line stays sentence case). Material Symbols for icons. Money and percents use tabular figures.
+Sentence case on titles, headings, buttons and widget labels; the uppercase label style is only for KPI labels. Material Symbols for icons. Money and percents use tabular figures.
 
 ---
 
@@ -46,23 +44,22 @@ Light only, like the site. Text pairs all pass WCAG AA.
 
 | Token | Hex | Use | Contrast |
 |---|---|---|---|
-| `bg` (site `--paper`) | `#F5F5F2` | App background | |
-| `surface` | `#FFFFFF` | Cards, widgets | |
-| `tint` (site `--mist`) | `#ECEEE9` | KPI wells, table headers | |
-| `text` (site `--ink`) | `#17251E` | Body, headings, KPI values | 14.6:1 on bg |
-| `muted` (site `--ink-muted`) | `#42574B` | Captions, labels | 7.1:1 on bg, 6.7:1 on tint |
-| `accent` (site `--fairway`) | `#17603A` | Primary buttons, links, course line, gains, focus | 6.9:1 on bg; white on it 7.6:1 |
-| `accent-hover` | `#10482B` | Primary hover | |
-| `accent-soft` | `#E3EEE5` | Light fairway wash | |
-| `forest` / `lime` | `#0C281D` / `#C8F4AA` | Site CTA pair (reserved) | 12.7:1 |
-| `border` (site `--line`) | `#CCD5CB` | Card and widget hairlines | |
-| `red` (site `--neg`) | `#A3311F` | Losses, errors, the signature on a loss | 6.0:1 on tint |
+| `bg` (site `--paper`) | `#F0F6FA` + glows `#CFF8F5` / `#CDEEDD` / `#D4E4FA` | App background (static radial fields) | |
+| glass card | white 86% to 62% gradient, 1px white edge, inset top highlight | Cards, header pill | |
+| KPI tile | white 62%, white edge, radius 18 | KPI wells | |
+| `text` (site `--ink`) | `#1A1D1B` | Body, headings, KPI values | 16:1 on bg |
+| `muted` (site `--ink-muted`) | `#4F5752` | Captions, labels | 7.0:1 on bg |
+| `accent` text (site `--fairway`) | `#0B7A75` | Links, course line, gains, focus, sliders | 5.0:1 on white |
+| `cyan` (site `--hi`) + ink | `#34E0D6` / `#0A1420` | Primary buttons (the one accent fill) | 9.1:1 |
+| ghost edge | `#C4C9C3` (hover `#8F958F`) | Secondary buttons, uploader, expanders | |
+| `border` (site `--line`) | `#DCDFD8` | Widget hairlines | |
+| `red` (site `--neg`) | `#A3311F` | Losses, errors, the signature on a loss | 6.4:1 on white |
 
-Chart palette (site `--chart-*` plus its extras). Categorical, one fill per category: Transfers `#86958B`, Dining `#A3311F`, Coffee `#6B5208`, Groceries `#8FBF7A`, Gas `#A8480A`, Transport `#5B8FB9`, Subscriptions `#553A73`, Entertainment `#C9A227`, Travel `#2F4A66`, Shopping `#17603A`, Health `#4F8A8B`, Housing `#42574B`, Education `#9B7BB5`, Other `#A9B4AA`.
+Chart palette (site glass `--chart-*` plus extras). Categorical: Transfers `#8F958F`, Dining `#A3311F`, Coffee `#6B5208`, Groceries `#4F7A3A`, Gas `#B0603A`, Transport `#3F6F9E`, Subscriptions `#553A73`, Entertainment `#C9A227`, Travel `#2F4A66`, Shopping `#0B7A75`, Health `#34B8B0`, Housing `#4F5752`, Education `#9B7BB5`, Other `#B4BAB5`.
 
-Series: spent `#5B8FB9` (site blue, the baseline) vs. shadow value `#17603A` (fairway, the hero); Roth contributions `#5B8FB9` under growth `#17603A`. Portfolios: VOO `#17603A`, 60/40 `#5B8FB9`, BND `#42574B`, QQQ `#A8480A`, SPY `#17251E`. Gold `#C9A227` and sage `#8FBF7A` are under 3:1 on white, so they are area fills only, never lines; QQQ uses burnt orange for that reason. Fan: outer `#CFE0D4`, inner `#8FBF7A`, median fairway, edged with `#3E7A52` (5.1:1). Histogram fill `#6BA35F` (about 3:1 on white), 1px `#3E7A52` stroke.
+Series: spent `#B0603A` (copper, the baseline) vs. shadow value `#0B7A75` (teal, the hero); Roth contributions `#3F6F9E` under growth `#0B7A75`. Portfolios: VOO `#0B7A75`, 60/40 `#3F6F9E`, BND `#4F5752`, QQQ `#B0603A`, SPY `#1A1D1B`. Fan: outer `#C4F6F3`, inner `#6FD9D1`, median and edge teal `#0B7A75`. Histogram `#2FA59E`. Chart cards carry the Kronos frame: a 2px cyan rule along the top.
 
-Sequential (fairway ramp): `#E3EEE5` to `#0C281D`, 10 stops in `config.toml`.
+Sequential (teal ramp): `#EAFBFA` to `#19373F`, 10 stops in `config.toml`.
 
 ---
 

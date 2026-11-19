@@ -1,17 +1,21 @@
 [browser]
 gatherUsageStats = false
 
-# Theme: Ashton Capes site system (ashton-capes-site/assets/styles.css, editorial layer).
+# Viewers get a clean toolbar: no developer menu items.
+[client]
+toolbarMode = "minimal"
+
+# Theme: Ashton Capes site, Liquid Glass v8 light (live site assets/glass.css + v8.css + kronos.css).
 [theme]
 base = "light"
-primaryColor = "#17603A"
-backgroundColor = "#F5F5F2"
+primaryColor = "#0B7A75"
+backgroundColor = "#F0F6FA"
 secondaryBackgroundColor = "#FFFFFF"
-textColor = "#17251E"
-linkColor = "#17603A"
-borderColor = "#CCD5CB"
-codeTextColor = "#17251E"
-codeBackgroundColor = "#ECEEE9"
+textColor = "#1A1D1B"
+linkColor = "#0B7A75"
+borderColor = "#DCDFD8"
+codeTextColor = "#1A1D1B"
+codeBackgroundColor = "#EEF0EC"
 showWidgetBorder = true
 showSidebarBorder = false
 baseRadius = "14px"
@@ -23,66 +27,66 @@ baseFontWeight = 400
 codeFontSize = "13px"
 codeFontWeight = 400
 headingFontSizes = ["44px", "30px", "22px", "18px", "16px", "14px"]
-headingFontWeights = [600, 600, 500, 500, 500, 500]
+headingFontWeights = [400, 400, 400, 500, 500, 500]
 
 font = "Geist:https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap"
-headingFont = "Geist:https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap"
+headingFont = "serif"
 codeFont = "'Geist Mono':https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&display=swap"
 
 redColor = "#A3311F"
 orangeColor = "#A8480A"
 yellowColor = "#6B5208"
-greenColor = "#17603A"
+greenColor = "#0B7A75"
 blueColor = "#2F4A66"
 violetColor = "#553A73"
-grayColor = "#42574B"
+grayColor = "#4F5752"
 
 redBackgroundColor = "#F6E4E0"
 orangeBackgroundColor = "#F8E8DA"
 yellowBackgroundColor = "#FBF1D3"
-greenBackgroundColor = "#E3EEE5"
+greenBackgroundColor = "#DEFAF8"
 blueBackgroundColor = "#E8EDF3"
 violetBackgroundColor = "#F1EBF6"
-grayBackgroundColor = "#ECEEE9"
+grayBackgroundColor = "#EEF0EC"
 
 redTextColor = "#A3311F"
 orangeTextColor = "#8A3B08"
 yellowTextColor = "#6B5208"
-greenTextColor = "#10482B"
+greenTextColor = "#19373F"
 blueTextColor = "#2F4A66"
 violetTextColor = "#553A73"
-grayTextColor = "#42574B"
+grayTextColor = "#4F5752"
 
 # Same order as core/ui.CATEGORICAL (one per spending category).
 chartCategoricalColors = [
-    "#86958B",
+    "#8F958F",
     "#A3311F",
     "#6B5208",
-    "#8FBF7A",
-    "#A8480A",
-    "#5B8FB9",
+    "#4F7A3A",
+    "#B0603A",
+    "#3F6F9E",
     "#553A73",
     "#C9A227",
     "#2F4A66",
-    "#17603A",
-    "#4F8A8B",
-    "#42574B",
+    "#0B7A75",
+    "#34B8B0",
+    "#4F5752",
     "#9B7BB5",
-    "#A9B4AA",
+    "#B4BAB5",
 ]
 
 chartSequentialColors = [
-    "#E3EEE5",
-    "#CFE0D4",
-    "#B7D3A8",
-    "#8FBF7A",
-    "#6BA35F",
-    "#4A8A52",
-    "#317447",
-    "#17603A",
-    "#10482B",
-    "#0C281D",
+    "#EAFBFA",
+    "#C4F6F3",
+    "#9DEDE7",
+    "#6FD9D1",
+    "#47C3BB",
+    "#2FA59E",
+    "#178C86",
+    "#0B7A75",
+    "#19575A",
+    "#19373F",
 ]
 
-dataframeBorderColor = "#CCD5CB"
-dataframeHeaderBackgroundColor = "#ECEEE9"
+dataframeBorderColor = "#DCDFD8"
+dataframeHeaderBackgroundColor = "#EEF3F5"

@@ -1,27 +1,28 @@
 /* Spend Shadow. Owned by the designer. Tokens live in DESIGN.md.
-   Look: the Ashton Capes site system (warm white, deep forest, Geist, pill buttons). */
+   Look: the Ashton Capes site, Liquid Glass v8 light (cool paper, frosted white glass,
+   serif titles and big numbers, one cyan accent). Glass layer at the end of this file. */
 
 :root {
-  --ss-bg: #f5f5f2;
+  --ss-bg: #f0f6fa;
   --ss-surface: #ffffff;
-  --ss-tint: #eceee9;
-  --ss-text: #17251e;
-  --ss-muted: #42574b;
-  --ss-muted-on-tint: #42574b;
-  --ss-accent: #17603a;
-  --ss-accent-hover: #10482b;
-  --ss-accent-soft: #e3eee5;
-  --ss-forest: #0c281d;
-  --ss-lime: #c8f4aa;
-  --ss-border: #ccd5cb;
-  --ss-green: #17603a;
+  --ss-tint: rgba(240, 246, 250, 0.72);
+  --ss-text: #1a1d1b;
+  --ss-muted: #4f5752;
+  --ss-muted-on-tint: #4f5752;
+  --ss-accent: #0b7a75;
+  --ss-accent-hover: #19373f;
+  --ss-accent-soft: #defaf8;
+  --ss-forest: #0a1420;
+  --ss-lime: #34e0d6;
+  --ss-border: #dcdfd8;
+  --ss-green: #0b7a75;
   --ss-red: #a3311f;
-  --ss-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ss-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   --ss-radius: 22px;
   --ss-radius-control: 14px;
   --ss-radius-pill: 999px;
-  --ss-shadow: 0 8px 28px #132b1c0a;
-  --ss-shadow-lift: 0 20px 50px #10271c14;
+  --ss-shadow: 0 1px 2px rgba(26, 29, 27, 0.05), 0 24px 48px -20px rgba(40, 46, 42, 0.28);
+  --ss-shadow-lift: 0 2px 4px rgba(26, 29, 27, 0.05), 0 30px 60px -20px rgba(40, 46, 42, 0.34);
 }
 
 html {
@@ -40,7 +41,7 @@ html {
 }
 
 [data-testid="stHeader"] {
-  background: #f5f5f2db;
+  background: rgba(240, 246, 250, 0.8);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border-bottom: 1px solid var(--ss-border);
@@ -215,7 +216,7 @@ h3 {
 [data-testid="stFileUploaderDropzone"] {
   min-height: 44px;
   touch-action: manipulation;
-  -webkit-tap-highlight-color: rgba(23, 96, 58, 0.14);
+  -webkit-tap-highlight-color: rgba(11, 122, 117, 0.14);
 }
 
 [data-testid="stMain"] [data-testid="stPageLink-NavLink"] {
@@ -514,7 +515,7 @@ h3 {
   opacity: 1 !important;
 }
 
-/* Course line: sentence case, small and fairway (a full sentence in caps is hard to read). */
+/* Course line: sentence case, small and teal (a full sentence in caps is hard to read). */
 [data-testid="stCaptionContainer"]:has([aria-label="school icon"]),
 [data-testid="stCaptionContainer"]:has([aria-label="school icon"]) p {
   text-transform: none;
@@ -582,7 +583,7 @@ h3 {
 [data-baseweb="select"] > div:focus-within,
 [data-baseweb="textarea"]:focus-within {
   border-color: var(--ss-accent) !important;
-  box-shadow: 0 0 0 3px #17603a33;
+  box-shadow: 0 0 0 3px rgba(11, 122, 117, 0.28);
 }
 
 /* Buttons: focus halo, and a press that every pointer can feel. */
@@ -590,7 +591,7 @@ h3 {
 .stDownloadButton button:focus-visible,
 [data-testid="stMain"] [data-testid="stPageLink-NavLink"]:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px #17603a40;
+  box-shadow: 0 0 0 3px rgba(11, 122, 117, 0.35);
 }
 
 .stButton button:active,
@@ -651,17 +652,17 @@ h3 {
 [data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] > *:nth-child(5) { animation-delay: 120ms; }
 [data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] > *:nth-child(n+6) { animation-delay: 150ms; }
 
-/* Text selection in the site's lime. */
+/* Text selection in the site's cyan. */
 ::selection {
-  background: #c8f4aa;
-  color: #10271c;
+  background: rgba(52, 224, 214, 0.45);
+  color: #0a1420;
 }
 
 /* Quiet scrollbars on desktop. */
 @media (hover: hover) and (pointer: fine) {
   * {
     scrollbar-width: thin;
-    scrollbar-color: #ccd5cb transparent;
+    scrollbar-color: #c4c9c3 transparent;
   }
 
   [class*="_kpis"] [data-testid="stMetric"]:hover {
@@ -731,4 +732,330 @@ h3 {
   .stDownloadButton button:active {
     transform: none;
   }
+}
+
+/* =====================================================================
+   Liquid Glass layer (v8, light), matched to the live Ashton Capes site
+   (assets/glass.css, v8.css, kronos.css). Visual only: no copy, keys or layout order change.
+   Paper #f0f6fa with three faint static glows, frosted white glass cards, serif titles and
+   big numbers, one cyan accent (#34e0d6 with #0a1420 ink, 9.1:1), teal text #0b7a75 (5.0:1).
+   Real blur only on desktop; phones get a near-opaque fill that reads the same.
+   ===================================================================== */
+
+:root {
+  --lg-serif: ui-serif, Georgia, "Times New Roman", serif;
+  --lg-cyan: #34e0d6;
+  --lg-cyan-ink: #0a1420;
+  --lg-fill: linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.62));
+  --lg-edge: rgba(255, 255, 255, 0.9);
+  --lg-hi: inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 -1px 0 rgba(26, 29, 27, 0.05);
+  --lg-ghost-edge: #c4c9c3;
+  --lg-ghost-edge-hover: #8f958f;
+}
+
+/* The lit room: faint cyan, mint and sky fields so the glass has light behind it. Static. */
+.stApp {
+  background:
+    radial-gradient(42% 38% at 96% 30%, rgba(207, 248, 245, 0.55), transparent 70%),
+    radial-gradient(40% 40% at 0% 70%, rgba(205, 238, 221, 0.5), transparent 70%),
+    radial-gradient(38% 34% at 70% 100%, rgba(212, 228, 250, 0.55), transparent 70%),
+    var(--ss-bg);
+}
+
+[data-testid="stMain"],
+[data-testid="stAppViewContainer"] {
+  background: transparent;
+}
+
+/* Header: the site's floating glass pill. */
+[data-testid="stHeader"] {
+  top: 10px;
+  left: 12px;
+  right: 12px;
+  width: auto;
+  border-radius: 999px;
+  border: 1px solid var(--lg-edge);
+  border-bottom: 1px solid var(--lg-edge);
+  background: rgba(255, 255, 255, 0.66);
+  box-shadow: var(--lg-hi), 0 1px 1px rgba(26, 29, 27, 0.04), 0 12px 40px -12px rgba(40, 46, 42, 0.2);
+  backdrop-filter: saturate(1.6) blur(20px);
+  -webkit-backdrop-filter: saturate(1.6) blur(20px);
+}
+
+[data-testid="stTopNavLink"]:hover {
+  background: rgba(26, 29, 27, 0.06);
+}
+
+/* Titles and section heads: display serif at 400, as on the site. */
+h1, h2, h3,
+h1 *, h2 *, h3 * {
+  font-family: var(--lg-serif) !important;
+}
+
+h1 {
+  font-weight: 400 !important;
+  letter-spacing: -0.025em;
+  line-height: 1.08;
+}
+
+h2, h3 {
+  font-weight: 400 !important;
+  letter-spacing: -0.02em;
+}
+
+/* Glass cards. */
+.st-key-column_mapper,
+.st-key-loaded_summary,
+.st-key-table_by_category,
+.st-key-top_merchants,
+.st-key-shadow_controls,
+.st-key-shadow_compare,
+.st-key-roth_inputs,
+.st-key-roth_mc_controls,
+.st-key-risk_explainer,
+.st-key-timing_explainer,
+.st-key-timing_controls,
+.st-key-proof_checks,
+.st-key-risk_table,
+[class*="st-key-chart_"] {
+  position: relative;
+  isolation: isolate;
+  background: var(--lg-fill);
+  border: 1px solid var(--lg-edge) !important;
+  box-shadow: var(--lg-hi), var(--ss-shadow);
+}
+
+/* Specular sheen on hover (opacity only), fine pointers. */
+.st-key-column_mapper::after,
+.st-key-loaded_summary::after,
+.st-key-table_by_category::after,
+.st-key-top_merchants::after,
+.st-key-shadow_controls::after,
+.st-key-shadow_compare::after,
+.st-key-roth_inputs::after,
+.st-key-roth_mc_controls::after,
+.st-key-risk_explainer::after,
+.st-key-timing_explainer::after,
+.st-key-timing_controls::after,
+.st-key-proof_checks::after,
+.st-key-risk_table::after,
+[class*="st-key-chart_"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 2;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.3), transparent 42%);
+  opacity: 0;
+  transition: opacity 160ms var(--ss-ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .st-key-column_mapper:hover::after,
+  .st-key-loaded_summary:hover::after,
+  .st-key-table_by_category:hover::after,
+  .st-key-top_merchants:hover::after,
+  .st-key-shadow_controls:hover::after,
+  .st-key-shadow_compare:hover::after,
+  .st-key-roth_inputs:hover::after,
+  .st-key-roth_mc_controls:hover::after,
+  .st-key-risk_explainer:hover::after,
+  .st-key-timing_explainer:hover::after,
+  .st-key-timing_controls:hover::after,
+  .st-key-proof_checks:hover::after,
+  .st-key-risk_table:hover::after,
+  [class*="st-key-chart_"]:hover::after {
+    opacity: 1;
+  }
+
+  [class*="st-key-chart_"]:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--lg-hi), var(--ss-shadow-lift);
+  }
+}
+
+/* Chart cards: the Kronos frame, a thin cyan rule along the top. */
+[class*="st-key-chart_"]::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 22px;
+  right: 22px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--lg-cyan) 30%, var(--lg-cyan) 70%, transparent);
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+/* KPI tiles: lighter glass, serif numbers. */
+[class*="_kpis"] [data-testid="stMetric"] {
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid var(--lg-edge) !important;
+  border-radius: 18px;
+  box-shadow: var(--lg-hi), 0 1px 2px rgba(26, 29, 27, 0.05), 0 12px 30px -18px rgba(40, 46, 42, 0.3);
+}
+
+[class*="_kpis"] [data-testid="stMetricValue"],
+[class*="_kpis"] [data-testid="stMetricValue"] * {
+  font-family: var(--lg-serif) !important;
+  font-weight: 400 !important;
+  letter-spacing: -0.01em !important;
+  font-variant-numeric: tabular-nums;
+}
+
+[class*="_kpis"] [data-testid="stMetricValue"] {
+  font-size: 2rem !important;
+  line-height: 1.1;
+}
+
+.st-key-shadow_signature [data-testid="stMetricValue"],
+.st-key-shadow_signature_down [data-testid="stMetricValue"] {
+  font-size: 2.75rem !important;
+}
+
+/* Primary actions: the site's one cyan pill with dark ink. */
+.stButton button[kind="primary"],
+.stDownloadButton button[kind="primary"],
+[data-testid="stBaseButton-primary"] {
+  background: var(--lg-cyan);
+  border-color: var(--lg-cyan);
+  color: var(--lg-cyan-ink);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), 0 6px 18px -8px rgba(11, 122, 117, 0.6);
+  transition: transform 200ms var(--ss-ease), box-shadow 200ms var(--ss-ease);
+}
+
+.stButton button[kind="primary"] *,
+.stDownloadButton button[kind="primary"] *,
+[data-testid="stBaseButton-primary"] * {
+  color: var(--lg-cyan-ink);
+}
+
+/* Secondary actions and in-page links: frosted ghost pills. */
+.st-key-use_sample button,
+.st-key-clear_btn button,
+[data-testid="stBaseButton-secondary"],
+[data-testid="stMain"] [data-testid="stPageLink-NavLink"] {
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid var(--lg-ghost-edge);
+  border-radius: var(--ss-radius-pill);
+  color: var(--ss-text);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 1px 2px rgba(26, 29, 27, 0.06);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .stButton button[kind="primary"]:hover,
+  .stDownloadButton button[kind="primary"]:hover,
+  [data-testid="stBaseButton-primary"]:hover {
+    background: var(--lg-cyan);
+    border-color: var(--lg-cyan);
+    color: var(--lg-cyan-ink);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 10px 24px -10px rgba(11, 122, 117, 0.65);
+    transform: translateY(-2px);
+  }
+
+  .st-key-use_sample button:hover,
+  .st-key-clear_btn button:hover,
+  [data-testid="stBaseButton-secondary"]:hover,
+  [data-testid="stMain"] [data-testid="stPageLink-NavLink"]:hover {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: var(--lg-ghost-edge-hover);
+    color: var(--ss-text);
+  }
+}
+
+/* Fields, uploader, expanders: frosted, quiet edge. */
+[data-baseweb="input"],
+[data-baseweb="select"] > div,
+[data-baseweb="textarea"] {
+  background: rgba(255, 255, 255, 0.72);
+}
+
+[data-testid="stFileUploaderDropzone"],
+[data-testid="stExpander"] details {
+  background: rgba(255, 255, 255, 0.62);
+  border-color: var(--lg-ghost-edge);
+}
+
+[data-testid="stExpander"] details {
+  border-radius: var(--ss-radius-control);
+}
+
+/* Phones and touch screens: no live blur (it repaints on every scroll frame). */
+@media (hover: none), (max-width: 900px) {
+  [data-testid="stHeader"] {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+@media (max-width: 640px) {
+  [data-testid="stHeader"] {
+    top: 8px;
+    left: 8px;
+    right: 8px;
+  }
+
+  [class*="_kpis"] [data-testid="stMetricValue"] {
+    font-size: 1.7rem !important;
+  }
+
+  .st-key-shadow_signature [data-testid="stMetricValue"],
+  .st-key-shadow_signature_down [data-testid="stMetricValue"] {
+    font-size: 2.25rem !important;
+  }
+
+  [class*="st-key-chart_"]::before {
+    left: 18px;
+    right: 18px;
+  }
+}
+
+/* Accessibility fallbacks. */
+@media (prefers-reduced-motion: reduce) {
+  [class*="st-key-"]::after {
+    transition: none !important;
+  }
+
+  [class*="st-key-chart_"]:hover,
+  .stButton button[kind="primary"]:hover,
+  [data-testid="stBaseButton-primary"]:hover {
+    transform: none !important;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  [data-testid="stHeader"],
+  [class*="st-key-chart_"],
+  .st-key-proof_checks,
+  .st-key-risk_table,
+  [class*="_kpis"] [data-testid="stMetric"] {
+    background: #ffffff;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  [data-testid="stHeader"],
+  [class*="st-key-chart_"],
+  .st-key-proof_checks,
+  .st-key-risk_table,
+  [class*="_kpis"] [data-testid="stMetric"] {
+    border-color: #8f958f !important;
+  }
+}
+
+/* Clean header for viewers: hide the hosting toolbar actions (GitHub, fork, star, edit). */
+[data-testid="stToolbarActions"],
+[data-testid="stToolbarActionButton"],
+[data-testid="stAppDeployButton"] {
+  display: none !important;
+}
+
+/* Loaded actions: the page link and Clear data share one baseline. */
+.st-key-loaded_actions {
+  align-items: center;
 }

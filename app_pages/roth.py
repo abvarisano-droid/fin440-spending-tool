@@ -31,7 +31,8 @@ with ui.section("roth_inputs"):
         sources = ["Enter an amount"] + (["Redirect discretionary spending"] if disc_monthly else [])
         source = st.radio("Monthly contribution", sources, key="roth_source")
         if source == "Enter an amount":
-            monthly = st.number_input("Per month ($)", 0.0, 10_000.0, 200.0, step=25.0, key="roth_monthly")
+            monthly = st.number_input("Per month ($)", 0.0, 10_000.0, 200.0, step=25.0, format="%.0f",
+                                      key="roth_monthly")
         else:
             pct = st.slider("Share of discretionary spending to redirect", 0, 100, 25, 5,
                             format="%d%%", key="roth_pct")
@@ -39,8 +40,10 @@ with ui.section("roth_inputs"):
             st.caption(f"Your discretionary average is \\${disc_monthly:,.2f}/month, so this redirects "
                        f"**\\${monthly:,.2f}/month**.")
     with c3:
-        rate_pct = st.slider("Annual return", 0.0, 12.0, 7.0, 0.25, format="%.2f%%", key="roth_rate",
-                             help="7% is a common long-run real return assumption for US stocks.")
+        rate_pct = st.slider("Annual return", 6.0, 10.0, 7.0, 0.25, format="%.2f%%", key="roth_rate",
+                             help="A Roth earns whatever it holds. 7% is the common long-run real (after-inflation) "
+                                  "return for an S&P 500 fund, about 10% before inflation. Use 6% "
+                                  "for a conservative mix with bonds or a bad decade.")
         convention = st.radio(
             "Rate convention", ["apr", "effective"], key="roth_conv",
             format_func={"apr": "APR, monthly compounding (r/12)",

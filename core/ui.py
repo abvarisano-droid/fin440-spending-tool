@@ -17,49 +17,49 @@ import pandas as pd
 from core.categorize import ALL_CATEGORIES
 from core.portfolios import PRESETS
 
-# Tokens from DESIGN.md (Ashton Capes site system). Pages may pass these into Altair color scales.
-TEXT = "#17251E"
-MUTED = "#42574B"
-BORDER = "#CCD5CB"
-GRID = "#E3E6DF"
-SPENT = "#5B8FB9"  # cumulative spending: the baseline, in site blue (clearly apart from fairway)
-SHADOW = "#17603A"  # fund value: the hero series, in fairway
-CONTRIBUTIONS = "#5B8FB9"
-GROWTH = "#17603A"
+# Tokens from DESIGN.md (Ashton Capes site, Liquid Glass v8 light). Pages may pass these into Altair color scales.
+TEXT = "#1A1D1B"
+MUTED = "#4F5752"
+BORDER = "#DCDFD8"
+GRID = "#E4E8E6"
+SPENT = "#B0603A"  # cumulative spending: the baseline, in site chart copper (clearly apart from teal)
+SHADOW = "#0B7A75"  # fund value: the hero series, in site teal
+CONTRIBUTIONS = "#3F6F9E"
+GROWTH = "#0B7A75"
 # 14 fills, one per ALL_CATEGORIES entry (13 rules + Other), from the site chart palette.
 # Chart fills, not body text.
 CATEGORICAL = [
-    "#86958B",  # Transfers & Payments
+    "#8F958F",  # Transfers & Payments
     "#A3311F",  # Dining
     "#6B5208",  # Coffee
-    "#8FBF7A",  # Groceries
-    "#A8480A",  # Gas
-    "#5B8FB9",  # Transport
+    "#4F7A3A",  # Groceries
+    "#B0603A",  # Gas
+    "#3F6F9E",  # Transport
     "#553A73",  # Subscriptions
     "#C9A227",  # Entertainment
     "#2F4A66",  # Travel
-    "#17603A",  # Shopping
-    "#4F8A8B",  # Health
-    "#42574B",  # Housing & Utilities
+    "#0B7A75",  # Shopping
+    "#34B8B0",  # Health
+    "#4F5752",  # Housing & Utilities
     "#9B7BB5",  # Education
-    "#A9B4AA",  # Other
+    "#B4BAB5",  # Other
 ]
 CATEGORY_COLORS = dict(zip(ALL_CATEGORIES, CATEGORICAL))
-ACCENT = "#17603A"
-FAN_OUTER = "#CFE0D4"
-FAN_INNER = "#8FBF7A"
-HIST_FILL = "#6BA35F"  # solid bars, about 3:1 on white
+ACCENT = "#0B7A75"
+FAN_OUTER = "#C4F6F3"
+FAN_INNER = "#6FD9D1"
+HIST_FILL = "#2FA59E"  # solid bars, about 3:1 on white
 # 3:1 non-text stroke on white/paper (the light fills alone are too faint).
-BAND_STROKE = "#3E7A52"
+BAND_STROKE = "#0B7A75"
 PORTFOLIO_ORDER = list(PRESETS.keys()) + ["SPY (market)", "SPY"]
 # Lines need 3:1 on white, so QQQ uses burnt orange, not the site gold.
 PORTFOLIO_COLORS = {
-    "100% VOO": "#17603A",
-    "60/40 VOO/BND": "#5B8FB9",
-    "100% BND": "#42574B",
-    "100% QQQ": "#A8480A",
-    "SPY (market)": "#17251E",
-    "SPY": "#17251E",
+    "100% VOO": "#0B7A75",
+    "60/40 VOO/BND": "#3F6F9E",
+    "100% BND": "#4F5752",
+    "100% QQQ": "#B0603A",
+    "SPY (market)": "#1A1D1B",
+    "SPY": "#1A1D1B",
 }
 
 
