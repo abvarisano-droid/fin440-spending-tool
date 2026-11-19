@@ -65,9 +65,9 @@ ui.kpi_row("risk_kpis", [
     dict(label="Beta vs SPY", value=f"{head['beta']:.2f}",
          help=f"Slope of excess returns on SPY's excess returns. R squared {head['r_squared']:.2f}, "
               f"{int(head['n'])} days."),
-    dict(label="Alpha (Jensen's, yearly)", value=f"{alpha:+.2%}",
+    dict(label="Alpha (yearly)", value=f"{alpha:+.2%}",
          delta=f"{'-' if alpha < 0 else '+'}{abs(alpha):.2%} vs CAPM",
-         help="Regression intercept on excess returns x 252. Positive = beat what its beta asked for."),
+         help="Jensen's alpha: the regression intercept on excess returns x 252. Positive = beat what its beta asked for."),
 ])
 st.caption(
     f"For 100% VOO. Risk-free: 13-week T-bill at {rf['discount_yield']:.3%} discount yield = "

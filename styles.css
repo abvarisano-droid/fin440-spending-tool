@@ -503,3 +503,232 @@ h3 {
   font-size: 11px;
   font-weight: 600;
 }
+
+/* =====================================================================
+   Experience layer (customer-experience pass). Fixes from a phone + desktop walkthrough,
+   then motion that makes the app feel continuous instead of jumpy.
+   ===================================================================== */
+
+/* Streamlit fades captions to 60% opacity, which drops them below AA contrast. */
+[data-testid="stCaptionContainer"] {
+  opacity: 1 !important;
+}
+
+/* Course line: sentence case, small and fairway (a full sentence in caps is hard to read). */
+[data-testid="stCaptionContainer"]:has([aria-label="school icon"]),
+[data-testid="stCaptionContainer"]:has([aria-label="school icon"]) p {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+/* Charts sit directly on the white card, no grey box. */
+[data-testid="stVegaLiteChart"],
+.vega-embed {
+  background: transparent !important;
+}
+
+/* Chart toolbar: on touch screens it covers card titles and can't be hovered away. */
+@media (hover: none), (pointer: coarse) {
+  [data-testid="stElementToolbar"] {
+    display: none !important;
+  }
+}
+
+/* KPI wells side by side share one height, whether or not a well has a delta line.
+   Desktop only: on a phone the wells stack, and stretching them would only add empty space. */
+@media (min-width: 641px) {
+  [class*="_kpis"] [data-testid="stHorizontalBlock"] {
+    align-items: stretch;
+  }
+
+  [class*="_kpis"] [data-testid="stColumn"] div:has([data-testid="stMetric"]),
+  [class*="_kpis"] [data-testid="stMetric"] {
+    height: 100%;
+  }
+}
+
+[class*="_kpis"] [data-testid="stMetric"] {
+  box-sizing: border-box;
+  transition: transform 300ms var(--ss-ease), box-shadow 300ms var(--ss-ease);
+}
+
+/* Tables: rounded, contained; wide tables scroll inside their own frame. */
+[data-testid="stDataFrame"] {
+  border-radius: var(--ss-radius-control);
+  overflow: hidden;
+}
+
+/* In-page links (See spending breakdown, Go to Upload) read as ghost pill buttons. */
+[data-testid="stMain"] [data-testid="stPageLink-NavLink"] {
+  border: 1px solid var(--ss-border);
+  border-radius: var(--ss-radius-pill);
+  background: var(--ss-surface);
+  padding: 0 18px;
+  font-weight: 500;
+  transition: border-color 250ms var(--ss-ease), transform 250ms var(--ss-ease), background 250ms var(--ss-ease);
+}
+
+/* Inputs: the site's soft focus halo instead of a hard outline jump. */
+[data-baseweb="input"],
+[data-baseweb="select"] > div,
+[data-baseweb="textarea"] {
+  transition: border-color 200ms var(--ss-ease), box-shadow 200ms var(--ss-ease);
+}
+
+[data-baseweb="input"]:focus-within,
+[data-baseweb="select"] > div:focus-within,
+[data-baseweb="textarea"]:focus-within {
+  border-color: var(--ss-accent) !important;
+  box-shadow: 0 0 0 3px #17603a33;
+}
+
+/* Buttons: focus halo, and a press that every pointer can feel. */
+.stButton button:focus-visible,
+.stDownloadButton button:focus-visible,
+[data-testid="stMain"] [data-testid="stPageLink-NavLink"]:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px #17603a40;
+}
+
+.stButton button:active,
+.stDownloadButton button:active,
+[data-testid="stMain"] [data-testid="stPageLink-NavLink"]:active {
+  transform: scale(0.98);
+}
+
+/* Top nav: smooth hover. */
+[data-testid="stTopNavLink"] {
+  border-radius: var(--ss-radius-pill);
+  transition: background 200ms var(--ss-ease), color 200ms var(--ss-ease);
+}
+
+[data-testid="stTopNavLink"]:hover {
+  background: var(--ss-accent-soft);
+}
+
+/* Expanders: smooth hover, rounded like the cards' controls. */
+[data-testid="stExpander"] details summary {
+  transition: color 200ms var(--ss-ease);
+}
+
+[data-testid="stExpander"] details summary:hover {
+  color: var(--ss-accent);
+}
+
+/* While a page reruns, Streamlit dims stale elements abruptly. Fade instead, and less. */
+[data-testid="stElementContainer"],
+[data-testid="stLayoutWrapper"] {
+  transition: opacity 250ms var(--ss-ease);
+}
+
+[data-stale="true"] {
+  opacity: 0.6 !important;
+}
+
+/* Page enter: content rises in gently on navigation (not on every widget change,
+   because Streamlit keeps existing elements mounted between reruns). */
+@keyframes ss-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+[data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] > * {
+  animation: ss-rise 420ms var(--ss-ease) both;
+}
+
+[data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] > *:nth-child(2) { animation-delay: 30ms; }
+[data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] > *:nth-child(3) { animation-delay: 60ms; }
+[data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] > *:nth-child(4) { animation-delay: 90ms; }
+[data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] > *:nth-child(5) { animation-delay: 120ms; }
+[data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] > *:nth-child(n+6) { animation-delay: 150ms; }
+
+/* Text selection in the site's lime. */
+::selection {
+  background: #c8f4aa;
+  color: #10271c;
+}
+
+/* Quiet scrollbars on desktop. */
+@media (hover: hover) and (pointer: fine) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #ccd5cb transparent;
+  }
+
+  [class*="_kpis"] [data-testid="stMetric"]:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--ss-shadow);
+  }
+
+  [data-testid="stMain"] [data-testid="stPageLink-NavLink"]:hover {
+    border-color: var(--ss-accent);
+    background: var(--ss-surface);
+    transform: translateY(-2px);
+  }
+}
+
+/* Phone: compact wells, stacked full-width actions. */
+@media (max-width: 640px) {
+  .st-key-loaded_actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .st-key-loaded_actions > *,
+  .st-key-loaded_actions [data-testid="stPageLink"],
+  .st-key-loaded_actions [data-testid="stPageLink-NavLink"] {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  [data-testid="stMain"] [data-testid="stPageLink-NavLink"] {
+    justify-content: center;
+  }
+
+  .st-key-column_mapper,
+  .st-key-loaded_summary,
+  [class*="st-key-chart_"],
+  .st-key-shadow_controls,
+  .st-key-shadow_compare,
+  .st-key-roth_inputs,
+  .st-key-roth_mc_controls,
+  .st-key-risk_explainer,
+  .st-key-timing_explainer,
+  .st-key-timing_controls,
+  .st-key-proof_checks,
+  .st-key-risk_table,
+  .st-key-table_by_category,
+  .st-key-top_merchants {
+    padding: 16px;
+    border-radius: 18px !important;
+  }
+}
+
+/* Reduced motion: no entrances, lifts or presses. */
+@media (prefers-reduced-motion: reduce) {
+  [data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] > * {
+    animation: none !important;
+  }
+
+  [class*="_kpis"] [data-testid="stMetric"],
+  [data-testid="stMain"] [data-testid="stPageLink-NavLink"],
+  [data-testid="stElementContainer"],
+  [data-testid="stLayoutWrapper"] {
+    transition: none !important;
+    transform: none !important;
+  }
+
+  .stButton button:active,
+  .stDownloadButton button:active {
+    transform: none;
+  }
+}

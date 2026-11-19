@@ -53,12 +53,12 @@ with c1, ui.section("chart_by_category", "By category"):
     )
 with c2, ui.section("table_by_category", "Totals"):
     st.dataframe(
-        by_cat,
+        by_cat.assign(share=by_cat["share"] * 100),  # display only: one decimal everywhere
         hide_index=True,
         column_config={
             "category": "Category",
-            "amount": st.column_config.NumberColumn("Spent", format="$%.2f"),
-            "share": st.column_config.ProgressColumn("Share", format="percent", min_value=0, max_value=1),
+            "amount": st.column_config.NumberColumn("Spent", format="dollar"),
+            "share": st.column_config.NumberColumn("Share", format="%.1f%%"),
         },
         key="cat_table",
     )
@@ -95,7 +95,7 @@ with ui.section("top_merchants", "Top 10 merchants"):
         hide_index=True,
         column_config={
             "description": "Merchant",
-            "spent": st.column_config.NumberColumn("Spent", format="$%.2f"),
+            "spent": st.column_config.NumberColumn("Spent", format="dollar"),
             "visits": "Visits",
             "category": "Category",
         },
@@ -109,7 +109,7 @@ with st.expander("All transactions (edit categories here)", key="all_tx"):
         disabled=["date", "description", "amount"],
         column_config={
             "date": st.column_config.DateColumn("Date"),
-            "amount": st.column_config.NumberColumn("Amount", format="$%.2f"),
+            "amount": st.column_config.NumberColumn("Amount", format="dollar"),
             "category": st.column_config.SelectboxColumn("Category", options=ALL_CATEGORIES, required=True),
         },
         key="tx_editor",

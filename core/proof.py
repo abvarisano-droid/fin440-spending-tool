@@ -153,17 +153,36 @@ def run_checks(tx_all: pd.DataFrame, spend: pd.DataFrame, voo: pd.Series, spy: p
     return checks
 
 
+def _fmt_value(v: float, unit: str) -> str:
+    if unit == "$":
+        return f"${v:,.2f}"
+    if unit == "%":
+        return f"{v:.4%}"
+    return f"{v:.6f}"
+
+
+def _fmt_diff(d: float, unit: str) -> str:
+    """Differences a person can read: dollars to the cent, otherwise 6 decimals; a pure
+    floating-point speck (well under the display precision) shows as an exact zero."""
+    if unit == "$":
+        return "$0.00" if abs(d) < 0.005 else f"{'-' if d < 0 else '+'}${abs(d):,.2f}"
+    if unit == "%":
+        return "0" if abs(d) < 5e-9 else f"{d * 100:+.4f} pts"
+    return "0" if abs(d) < 5e-7 else f"{d:+.6f}"
+
+
 def checks_frame(checks: list[Check]) -> pd.DataFrame:
-    def fmt(v, unit):
-        if unit == "$":
-            return f"${v:,.2f}"
-        if unit == "%":
-            return f"{v:.6%}"
-        return f"{v:.6f}"
+    """The table on the Proof page. The method for each check is listed separately (how_list)."""
     return pd.DataFrame([{
-        "Check": c.name, "App": fmt(c.app, c.unit), "Independent": fmt(c.independent, c.unit),
-        "Difference": f"{c.diff:+.2e}", "Result": "Pass" if c.passed else "Fail", "How": c.how,
+        "Result": "✓ Pass" if c.passed else "✗ Fail", "Check": c.name,
+        "App": _fmt_value(c.app, c.unit), "Independent": _fmt_value(c.independent, c.unit),
+        "Difference": _fmt_diff(c.diff, c.unit),
     } for c in checks])
+
+
+def how_list(checks: list[Check]) -> str:
+    """Markdown list: how each check is computed. Dollar signs escaped for Streamlit markdown."""
+    return "\n".join(f"{i}. **{c.name}.** {c.how.replace('$', chr(92) + '$')}" for i, c in enumerate(checks, 1))
 
 
 # ---------- Excel workbook with live formulas ----------

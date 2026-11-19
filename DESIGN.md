@@ -29,13 +29,14 @@ One family, like the site: Geist for everything, Geist Mono for code.
 | Card title / `st.subheader` (h3) | Geist | 500 | 22px | -0.03em | 1.25 |
 | Body | Geist | 400 | 16px | 0 | 1.5 |
 | Caption / help | Geist | 400 | 13px | 0 | 1.45 |
-| Label (KPI labels, course line) | Geist | 600 | 11px, uppercase | 0.13em | 1.3 |
+| Label (KPI labels) | Geist | 600 | 11px, uppercase | 0.13em | 1.3 |
+| Course line (`:material/school:` caption) | Geist | 500 | 12.5px, sentence case, fairway | 0 | 1.5 |
 | KPI value | Geist | 500 | 28px (40px on the shadow signature only) | -0.045em | 1.1 |
 | Code / tickers | Geist Mono | 400 | 13px | 0 | 1.45 |
 
 Google Fonts (loaded by `config.toml`): `Geist` 400/500/600, `Geist Mono` 400/500.
 
-Sentence case on titles, headings, buttons and widget labels; the uppercase label style is only for KPI labels and the course line. Material Symbols for icons. Money and percents use tabular figures.
+Sentence case on titles, headings, buttons and widget labels; the uppercase label style is only for KPI labels (a full sentence in caps is hard to read, so the course line stays sentence case). Material Symbols for icons. Money and percents use tabular figures.
 
 ---
 
@@ -80,6 +81,20 @@ Sequential (fairway ramp): `#E3EEE5` to `#0C281D`, 10 stops in `config.toml`.
 - Shadows (site): cards rest at `0 8px 28px #132b1c0a`; hover lifts to `0 20px 50px #10271c14` on fine pointers only
 - Header/nav: frosted like the site nav (`#f5f5f2db`, 24px backdrop blur), 1px bottom hairline `#CCD5CB`; horizontal scroll on a phone if the nav labels overflow
 - Phone (max 640px): side padding 16px plus `env(safe-area-inset-*)`, h1 28px, KPI values 24px, signature 32px, buttons, download buttons, and in-page `stPageLink` 44px min-height and full width, file dropzone at least 88px tall
+
+---
+
+## Experience rules (customer-experience pass, verified at 1280px and 390px)
+
+- **Captions are full opacity.** Streamlit fades `stCaptionContainer` to 60%, which drops muted text below AA; CSS resets it.
+- **Charts are transparent** on their white card (set in `ui.chart` and CSS), never a grey box.
+- **Legends wrap into columns** (2 per row, set on each color encoding because Streamlit's chart theme overrides legend config), so nothing runs off a phone.
+- **Chart toolbar hidden on touch screens**, where it covered card titles and could not be hovered away.
+- **Money in tables uses the `dollar` format** (`$6,963.81`, `-$219.61`); shares use one decimal; money inputs that are whole dollars use `%.0f`.
+- **Proof table leads with Result** (`✓ Pass`), so a phone shows the verdict first; differences read `$0.00` / `-$1,779.75`, not scientific notation; the method for each check lives in an expander list.
+- **KPI wells share one height per row on desktop**; on a phone they stack at natural height.
+- **In-page links are ghost pills**; on a phone the Upload actions stack full width.
+- **Motion:** content rises in (8px, 420ms, light stagger) only on navigation, because Streamlit keeps elements mounted between reruns (verified: no flicker when a setting changes); stale elements fade to 0.6 instead of snapping; inputs get the site's soft focus halo; cards, wells, pills and buttons lift 2-3px on fine-pointer hover; every button presses to 0.98. All of it is off under `prefers-reduced-motion`.
 
 ---
 

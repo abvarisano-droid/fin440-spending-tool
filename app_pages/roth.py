@@ -25,7 +25,7 @@ with ui.section("roth_inputs"):
     with c1:
         current_age = st.number_input("Current age", 16, 80, 21, key="roth_age")
         retirement_age = st.number_input("Retirement age", 17, 90, 65, key="roth_retire")
-        starting = st.number_input("Current Roth balance ($)", 0.0, 10_000_000.0, 0.0, step=100.0,
+        starting = st.number_input("Current Roth balance ($)", 0.0, 10_000_000.0, 0.0, step=100.0, format="%.0f",
                                    key="roth_start")
     with c2:
         sources = ["Enter an amount"] + (["Redirect discretionary spending"] if disc_monthly else [])
@@ -123,7 +123,7 @@ with ui.section("roth_mc_controls", "With uncertain returns"):
     else:
         mc_raw = m2.text_input("Fund for history", value="VOO", max_chars=10, key="mc_ticker")
     target = m3.number_input("Target balance ($)", 0.0, 100_000_000.0,
-                             float(round(final["balance"], -3)), step=10_000.0, key="mc_target",
+                             float(round(final["balance"], -3)), step=10_000.0, format="%.0f", key="mc_target",
                              help="Defaults to the fixed-return balance above.")
     n_sims = m4.selectbox("Simulations", [1000, 5000, 10000], index=1, key="mc_sims")
 
@@ -197,10 +197,10 @@ with st.expander("Show the math", key="roth_math"):
         hide_index=True,
         column_config={
             "age": "Age",
-            "contributed_this_year": st.column_config.NumberColumn("Added that year", format="$%.0f"),
-            "total_contributed": st.column_config.NumberColumn("Total added", format="$%.0f"),
-            "balance": st.column_config.NumberColumn("Balance", format="$%.0f"),
-            "growth": st.column_config.NumberColumn("Growth", format="$%.0f"),
+            "contributed_this_year": st.column_config.NumberColumn("Added that year", format="dollar"),
+            "total_contributed": st.column_config.NumberColumn("Total added", format="dollar"),
+            "balance": st.column_config.NumberColumn("Balance", format="dollar"),
+            "growth": st.column_config.NumberColumn("Growth", format="dollar"),
         },
         key="roth_table",
     )

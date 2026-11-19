@@ -28,7 +28,10 @@ passed = sum(c.passed for c in checks)
 with ui.section("proof_checks", "Live checks"):
     st.markdown(f"**{passed} of {len(checks)} checks pass** on your data and today's prices.")
     st.dataframe(proof.checks_frame(checks), hide_index=True, key="proof_table",
-                 column_config={"How": st.column_config.TextColumn("How it's checked", width="large")})
+                 column_config={"Result": st.column_config.TextColumn("Result", width="small"),
+                                "Check": st.column_config.TextColumn("Check", width="medium")})
+    with st.expander("How each check is computed", key="proof_how"):
+        st.markdown(proof.how_list(checks))
     st.caption(
         ("" if is_sample else "The spending-total check runs on the sample only, because your raw file "
          "isn't kept. ")

@@ -22,7 +22,7 @@ TEXT = "#17251E"
 MUTED = "#42574B"
 BORDER = "#CCD5CB"
 GRID = "#E3E6DF"
-SPENT = "#42574B"  # cumulative spending: the baseline, in muted ink
+SPENT = "#5B8FB9"  # cumulative spending: the baseline, in site blue (clearly apart from fairway)
 SHADOW = "#17603A"  # fund value: the hero series, in fairway
 CONTRIBUTIONS = "#5B8FB9"
 GROWTH = "#17603A"
@@ -48,7 +48,7 @@ CATEGORY_COLORS = dict(zip(ALL_CATEGORIES, CATEGORICAL))
 ACCENT = "#17603A"
 FAN_OUTER = "#CFE0D4"
 FAN_INNER = "#8FBF7A"
-HIST_FILL = "#B7D3A8"
+HIST_FILL = "#6BA35F"  # solid bars, about 3:1 on white
 # 3:1 non-text stroke on white/paper (the light fills alone are too faint).
 BAND_STROKE = "#3E7A52"
 PORTFOLIO_ORDER = list(PRESETS.keys()) + ["SPY (market)", "SPY"]
@@ -150,6 +150,13 @@ def _portfolio_scale(names: list[str]) -> alt.Scale:
     return alt.Scale(domain=domain, range=range_)
 
 
+def _legend(columns: int) -> alt.Legend:
+    """Legends wrap into fixed columns so they never run off a phone screen. Set on the encoding,
+    because Streamlit's chart theme overrides legend settings given only in the config."""
+    return alt.Legend(title=None, orient="bottom", columns=columns, columnPadding=14, rowPadding=6,
+                      labelLimit=150, symbolSize=70, labelFontSize=12)
+
+
 def _apply_named_series_colors(c: alt.Chart) -> alt.Chart:
     """Map shadow/roth/category series to DESIGN.md colors."""
     field = _color_field(c)
@@ -169,6 +176,7 @@ def _apply_named_series_colors(c: alt.Chart) -> alt.Chart:
                 title=None,
                 sort=[spent, other],
                 scale=alt.Scale(domain=[spent, other], range=[SPENT, SHADOW]),
+                legend=_legend(2),
             )
         )
     if field == "part":
@@ -181,6 +189,7 @@ def _apply_named_series_colors(c: alt.Chart) -> alt.Chart:
                     domain=["Contributions", "Growth"],
                     range=[CONTRIBUTIONS, GROWTH],
                 ),
+                legend=_legend(2),
             )
         )
     if field == "category":
@@ -192,7 +201,7 @@ def _apply_named_series_colors(c: alt.Chart) -> alt.Chart:
         if auto_category:
             color_kwargs["legend"] = None
         else:
-            color_kwargs["title"] = "Category"
+            color_kwargs["legend"] = _legend(2)
         return c.encode(color=alt.Color("category:N", **color_kwargs))
     if field in {"name", "portfolio"}:
         names = _field_values(c, field) or list(PORTFOLIO_ORDER)
@@ -201,6 +210,7 @@ def _apply_named_series_colors(c: alt.Chart) -> alt.Chart:
                 f"{field}:N",
                 title=None,
                 scale=_portfolio_scale(names),
+                legend=_legend(2),
             )
         )
     return c
@@ -239,7 +249,9 @@ def chart(c: alt.Chart, key: str | None = None) -> None:
     c = _apply_named_series_colors(c)
     c = (
         c.properties(padding={"left": 12, "right": 8, "top": 8, "bottom": 8})
-        .configure_legend(orient="bottom", title=None, labelColor=TEXT, labelFont="Geist")
+        # Legends wrap into columns so they never run off a phone screen.
+        .configure_legend(orient="bottom", title=None, labelColor=TEXT, labelFont="Geist", labelFontSize=12,
+                          columns=3, columnPadding=14, rowPadding=6, labelLimit=150, symbolSize=70)
         .configure_view(strokeWidth=0, clip=False)
         .configure_axis(
             labelColor=MUTED,
@@ -256,6 +268,7 @@ def chart(c: alt.Chart, key: str | None = None) -> None:
         .configure_range(category=CATEGORICAL)
         .configure_line(strokeWidth=2.5)
         .configure_area(opacity=0.9)
+        .configure(background="transparent")
     )
     st.altair_chart(c, width="stretch", key=key)
 
@@ -320,7 +333,7 @@ def chart_histogram(
     df = pd.DataFrame({"value": list(values)})
     layers: list[alt.Chart] = [
         alt.Chart(df)
-        .mark_bar(color=HIST_FILL, stroke=BAND_STROKE, strokeWidth=1)
+        .mark_bar(color=HIST_FILL, binSpacing=1, cornerRadiusTopLeft=2, cornerRadiusTopRight=2)
         .encode(
             x=alt.X(
                 "value:Q",
@@ -353,11 +366,11 @@ def chart_risk_return(df: pd.DataFrame, *, key: str | None = None) -> None:
     names = list(dict.fromkeys(str(v) for v in df["name"].tolist()))
     c = (
         alt.Chart(df)
-        .mark_circle(size=90)
+        .mark_circle(size=110, opacity=1, stroke='#ffffff', strokeWidth=1.5)
         .encode(
             x=alt.X("ann_vol:Q", title="Annualized volatility", axis=alt.Axis(format="%")),
             y=alt.Y("ann_return:Q", title="Annualized return", axis=alt.Axis(format="%")),
-            color=alt.Color("name:N", title=None, scale=_portfolio_scale(names)),
+            color=alt.Color("name:N", title=None, scale=_portfolio_scale(names), legend=_legend(2)),
             tooltip=[
                 alt.Tooltip("name:N", title="Portfolio"),
                 alt.Tooltip("ann_vol:Q", title="Vol", format=".1%"),
@@ -381,11 +394,11 @@ def chart_sml(line_df: pd.DataFrame, points_df: pd.DataFrame, *, key: str | None
     )
     points = (
         alt.Chart(points_df)
-        .mark_circle(size=90)
+        .mark_circle(size=110, opacity=1, stroke='#ffffff', strokeWidth=1.5)
         .encode(
             x=alt.X("beta:Q", title="Beta"),
             y=alt.Y("ann_return:Q", title="Annual return", axis=alt.Axis(format="%")),
-            color=alt.Color("name:N", title=None, scale=_portfolio_scale(names)),
+            color=alt.Color("name:N", title=None, scale=_portfolio_scale(names), legend=_legend(2)),
             tooltip=[
                 alt.Tooltip("name:N", title="Portfolio"),
                 alt.Tooltip("beta:Q", title="Beta", format=".2f"),
