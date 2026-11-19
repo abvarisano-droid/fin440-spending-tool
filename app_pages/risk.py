@@ -66,9 +66,8 @@ ui.kpi_row("risk_kpis", [
          help=f"Slope of excess returns on SPY's excess returns. R squared {head['r_squared']:.2f}, "
               f"{int(head['n'])} days."),
     dict(label="Alpha (yearly)", value=f"{alpha:+.2%}",
-         delta=f"{'-' if head['sml_gap'] < 0 else '+'}{abs(head['sml_gap']):.2%} above the SML",
          help="Jensen's alpha: the regression intercept on excess returns x 252. Positive = beat what its beta asked for. "
-              "The delta is the other alpha: the dot's distance above the SML, from compounded returns."),
+              "The table's Above SML column is the other alpha, from compounded returns."),
 ])
 st.caption(
     f"For 100% VOO. Risk-free: 13-week T-bill at {rf['discount_yield']:.3%} discount yield = "
@@ -121,7 +120,7 @@ with ui.section("risk_explainer", "How to read this"):
     st.latex(r"E[R_i] = r_f + \beta_i\,(E[R_m] - r_f)")
     st.markdown(
         f"Here $r_f$ = {rf_annual:.2%} (T-bill) and $E[R_m]$ = {mkt_ann:.2%} (SPY's realized annual "
-        "return over the same days). The line on the right is that equation: the **security market "
+        "return over the same days). The second chart draws that equation as the **security market "
         "line**. A dot above it earned more than its beta asked for over this window; below, less. "
         "SPY sits exactly on the line (beta 1, alpha 0), which is a built-in check.\n\n"
         + (f"**Why the line slopes down here:** over this window SPY returned {mkt_ann:.2%}, less "
