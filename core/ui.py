@@ -182,7 +182,8 @@ def _apply_named_series_colors(c: alt.Chart) -> alt.Chart:
             )
         )
     if field == "category":
-        domain = list(CATEGORY_COLORS.keys())
+        seen = set(_field_values(c, "category"))
+        domain = [k for k in CATEGORY_COLORS if k in seen] or list(CATEGORY_COLORS.keys())
         color_kwargs: dict = {
             "scale": alt.Scale(domain=domain, range=[CATEGORY_COLORS[k] for k in domain]),
         }
