@@ -6,7 +6,9 @@ updated: 2026-11-19
 
 # Group prep: explain every number
 
-Each member should be able to answer every block below without the app open. Load the sample
+Group: Ashton (project lead), Taylor and Jonathan. Ashton presents the whole deck on Nov 30.
+Taylor and Jonathan should still be able to answer every block below without the app open, since
+questions can go to anyone. Load the sample
 (Upload, then "Use sample data") and follow along. Market figures change daily; the sample's
 spending figures do not.
 
