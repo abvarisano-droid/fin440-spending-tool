@@ -4,12 +4,14 @@ from core import proof, ui
 from core.prices import fetch_many
 from core.state import SAMPLE_CSV, discretionary_monthly, require_transactions, spending_only
 
-st.title("Proof")
-st.caption(
-    "The key numbers are checked live against a second computation that doesn't use the app's own "
-    "code (the Monte Carlo row instead confirms that two of the app's engines agree), "
-    "and the workbook below "
-    "lets you redo the math in Excel with real formulas."
+ui.page_header(
+    "Proof",
+    lede=(
+        "The key numbers are checked live against a second computation that doesn't use the app's own "
+        "code (the Monte Carlo row instead confirms that two of the app's engines agree), "
+        "and the workbook below "
+        "lets you redo the math in Excel with real formulas."
+    ),
 )
 tx = require_transactions()
 spend = spending_only(tx)
@@ -27,7 +29,8 @@ except (RuntimeError, ValueError) as exc:
 
 passed = sum(c.passed for c in checks)
 with ui.section("proof_checks", "Live checks"):
-    st.markdown(f"**{passed} of {len(checks)} checks pass** on your data and today's prices.")
+    ok = passed == len(checks)
+    st.markdown(f":{'green' if ok else 'red'}-badge[:material/{'check_circle' if ok else 'error'}: {'All clear' if ok else 'Check failed'}] **{passed} of {len(checks)} checks pass** on your data and today's prices.")
     st.dataframe(proof.checks_frame(checks), hide_index=True, key="proof_table",
                  column_order=["Result", "App", "Check", "Difference", "Independent"],
                  column_config={"Result": st.column_config.TextColumn("Result", width="small"),

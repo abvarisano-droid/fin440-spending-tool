@@ -7,12 +7,14 @@ from core.prices import clean_ticker, fetch_history
 from core.state import discretionary_monthly, get_transactions, spending_only
 from core.suggest import suggest_monthly
 
-st.title("Roth IRA calculator")
-st.caption(":material/school: FIN 440 link (Bodie, Kane & Marcus, 13e): Ch 5 (compounding, APR vs. EAR, real vs. nominal returns, arithmetic vs. geometric averages).")
-st.caption(
-    "Monthly contributions grow tax-free. Use a real (after-inflation) return to read every "
-    "number in today's dollars. Roth eligibility has income limits, which this calculator "
-    "doesn't check."
+ui.page_header(
+    "Roth IRA calculator",
+    course="FIN 440 link (Bodie, Kane & Marcus, 13e): Ch 5 (compounding, APR vs. EAR, real vs. nominal returns, arithmetic vs. geometric averages).",
+    lede=(
+        "Monthly contributions grow tax-free. Use a real (after-inflation) return to read every "
+        "number in today's dollars. Roth eligibility has income limits, which this calculator "
+        "doesn't check."
+    ),
 )
 
 tx = get_transactions()

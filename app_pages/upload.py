@@ -6,16 +6,19 @@ from core import ingest, ui
 from core.categorize import categorize
 from core.state import SAMPLE_CSV, clear_transactions, get_transactions, set_transactions, spending_only
 
-st.title("Upload your transactions")
-st.caption(
-    "Export a CSV from your bank or card. Your transactions stay in this browser session only: "
-    "they're never saved to disk or sent anywhere. Only purchases count as spending; refunds, "
-    "deposits and other money coming in are left out, not subtracted."
+ui.page_header(
+    "Upload your transactions",
+    lede=(
+        "Export a CSV from your bank or card. Your transactions stay in this browser session only: "
+        "they're never saved to disk or sent anywhere. Only purchases count as spending; refunds, "
+        "deposits and other money coming in are left out, not subtracted."
+    ),
 )
 
 with ui.section("upload_source", border=False):
     uploaded = st.file_uploader("Bank or card CSV", type=["csv"], key="csv_file")
-    use_sample = st.button("Use sample data", icon=":material/science:", key="use_sample")
+    use_sample = st.button("Use sample data", icon=":material/science:", key="use_sample",
+                           type="primary" if uploaded is None else "secondary")
 
 if use_sample:
     # known format, so skip the mapper and load in one click

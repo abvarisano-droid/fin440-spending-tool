@@ -5,9 +5,11 @@ from core import ui
 from core.categorize import ALL_CATEGORIES, DISCRETIONARY
 from core.state import require_transactions, set_transactions, spending_only
 
-st.title("Spending breakdown")
-st.caption(":material/school: FIN 440 link (Bodie, Kane & Marcus, 13e): Ch 1 (saving vs. consumption), Ch 12 (behavioral finance: impulse spending, mental accounting).")
-st.caption("Totals include only purchases unless you turn on transfers.")
+ui.page_header(
+    "Spending breakdown",
+    course="FIN 440 link (Bodie, Kane & Marcus, 13e): Ch 1 (saving vs. consumption), Ch 12 (behavioral finance: impulse spending, mental accounting).",
+    lede="Totals include only purchases unless you turn on transfers.",
+)
 tx = require_transactions()
 
 include_transfers = st.toggle(

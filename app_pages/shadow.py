@@ -9,13 +9,15 @@ from core.prices import clean_ticker, fetch_adjusted_close, fetch_many
 from core.shadow import build_shadow
 from core.state import require_transactions, spending_only
 
-st.title("Shadow portfolio")
-st.caption(":material/school: FIN 440 link (Bodie, Kane & Marcus, 13e): Ch 2 (asset classes, stock and bond indexes), Ch 5 (holding-period returns, compounding), Ch 7 (stock-bond diversification).")
-st.caption(
-    "What if every purchase had bought an index fund instead? Each dollar buys fractional "
-    "shares at the close of the first trading day on or after the purchase. Prices are "
-    "dividend-adjusted, so dividends count as reinvested. No fees or taxes. Only the ticker and "
-    "your earliest purchase date go to Yahoo Finance."
+ui.page_header(
+    "Shadow portfolio",
+    course="FIN 440 link (Bodie, Kane & Marcus, 13e): Ch 2 (asset classes, stock and bond indexes), Ch 5 (holding-period returns, compounding), Ch 7 (stock-bond diversification).",
+    lede=(
+        "What if every purchase had bought an index fund instead? Each dollar buys fractional "
+        "shares at the close of the first trading day on or after the purchase. Prices are "
+        "dividend-adjusted, so dividends count as reinvested. No fees or taxes. Only the ticker and "
+        "your earliest purchase date go to Yahoo Finance."
+    ),
 )
 tx = spending_only(require_transactions())
 
@@ -87,11 +89,6 @@ with ui.section("chart_shadow", "Spent vs. shadow value"):
     )
 
 with ui.section("shadow_compare", "Same purchases, four portfolios"):
-    st.caption("Each purchase is split across funds by fixed weights and held, no rebalancing. "
-               "Diversification in practice: compare how far each line swings, not only where it ends.")
-    st.caption(":material/casino: Over a few months, which fund wins is mostly luck: a dividend fund can be up "
-               "while the S&P 500 is down, and the order flips in other windows. The Roth page uses "
-               "long-run averages for that reason.")
     picks = st.multiselect("Portfolios", list(PRESETS), default=list(PRESETS), max_selections=4,
                            key="compare_pick")
     if picks:
@@ -133,6 +130,11 @@ with ui.section("shadow_compare", "Same purchases, four portfolios"):
             )
             with st.container(key="swipe_hint_compare"):
                 st.caption(":material/swipe: Swipe the table sideways for more columns.")
+    st.caption("Each purchase is split across funds by fixed weights and held, no rebalancing. "
+               "Diversification in practice: compare how far each line swings, not only where it ends.")
+    st.caption(":material/casino: Over a few months, which fund wins is mostly luck: a dividend fund can be up "
+               "while the S&P 500 is down, and the order flips in other windows. The Roth page uses "
+               "long-run averages for that reason.")
 
 ledger = res.ledger.assign(value_now=res.ledger["shares"] * prices.iloc[-1])
 ledger["gain"] = ledger["value_now"] - ledger["amount"]
