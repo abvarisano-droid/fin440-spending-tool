@@ -78,3 +78,25 @@ Append only, newest at the bottom. One entry per finished phase or cross-boundar
 - **Tests:** 105 pass.
 - **Auditor should check:** that the round trip keeps $3,684.72 and $150; that all categories gives a $3,900 start and $300/month.
 - 2026-11-19 claude (covering design), final-audit fix round, designer items: (1) off-state controls now meet 3:1: unchecked toggle track `#7A817B` with a white knob, unchecked radio ring 2px `#7A817B`, unchecked checkbox edge the same (3.87:1 on the card, 3.67:1 on paper, knob 4.0:1; was `#DCDFD8`, 1.31:1); (2) every multiselect wraps all chips at every width (no one-line faded strip on Shadow, no max height or inner scroll on Roth); (3) desktop header pill is white 93% with plain `blur(24px)` (was 68% with `saturate(1.6)`), plus a paper strip in the gap above the pill, so the cyan sample button no longer glows through; (4) Spending "By category" and "Totals" are top-aligned and hug their content (no stretched empty glass); (5) DESIGN.md: "Use sample data" is primary until a file is chosen, landing video is the ~1:40 voiced tutorial titled "How to use it, in under two minutes", no loop, 45-second wording gone, new `control off` token. Files: `styles.css`, `DESIGN.md`. Auditor: check toggles and radios on Roth and Spending at 390, the Shadow and Roth multiselects at 390, the header over the Upload page on desktop scroll. 105 tests pass.
+
+## 2026-11-19 night, builder (claude): final audit (phase 5) and fix round
+- **Final audit:** four fresh checkers ran in parallel.
+  - Math by hand: SHIP. The app matches hand recomputes to the cent.
+  - Data leaks and rules: SHIP. Minor notes: one earlier HANDOFF entry was edited in place (0926a47), plus two commit-prefix labels; recorded here rather than rewritten.
+  - Live-site QA at 1440 and 390: SHIP plus 2 FIX items.
+  - Deck vs app: FIX (draft notes, old charts, the slide 9 credit).
+- **Builder fixes (e55c372):**
+  - A real built-in-sample flag (`SAMPLE_FLAG`) instead of matching the file name.
+  - The tutorial hides once a file is picked (it was a black, paused box).
+  - Rounded-suggestion wording.
+  - Card title "How to use it, in under two minutes".
+  - Docs counts; GROUP_PREP check-ins marked as history.
+  - `*.mp3` and `narration/` ignored.
+- **Designer fixes (1ddb69c):** off-state toggle and radio contrast 3.87:1, chip multiselects wrap on phone, opaque header pill, Spending cards top-aligned, DESIGN.md synced.
+- **Tutorial:** re-recorded with the "under two minutes" intro and the new controls.
+- **Deck:** new native "How it works" workflow diagram (slide 4); slide 6 retitled; captions 15pt; slide 8 Q&A note.
+- **Waiting on Ashton:**
+  - the slide 9 Designer credit
+  - the professor name on slide 1
+  - chart images for slides 5, 6 and 8
+  - re-pricing on Nov 29

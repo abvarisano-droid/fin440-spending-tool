@@ -79,7 +79,7 @@ INIT_CARD = """document.addEventListener('DOMContentLoaded', () => {
     + 'background:radial-gradient(1200px 600px at 50% 40%,#FFFFFF 0%,#EAF4F8 55%,#DCEBF2 100%)';
   d.innerHTML = '<h1 style="font:400 64px/1.05 Georgia,serif;margin:0">Spend Shadow</h1>'
     + '<i style="width:64px;height:3px;background:#0A716C;border-radius:3px"></i>'
-    + '<p style="font:400 24px/1.4 Segoe UI,Arial,sans-serif;color:#4F5752;margin:0">How to use it, in about a minute</p>';
+    + '<p style="font:400 24px/1.4 Segoe UI,Arial,sans-serif;color:#4F5752;margin:0">How to use it, in under two minutes</p>';
   document.body.appendChild(d); });"""
 
 

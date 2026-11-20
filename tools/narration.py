@@ -13,7 +13,7 @@ VOICE = "en-US-AndrewMultilingualNeural"
 RATE = "-4%"
 
 LINES = {
-    "intro": "Hi! This is Spend Shadow. Give me about a minute, and I'll show you how it works.",
+    "intro": "Hi! This is Spend Shadow. Give me under two minutes, and I'll show you how it works.",
     "upload": "Start by downloading a CSV of your transactions from your bank or card website. "
               "Then drop it right here.",
     "columns": "Spend Shadow finds the date, merchant and amount columns for you. "
