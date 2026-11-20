@@ -5,7 +5,7 @@ gatherUsageStats = false
 [client]
 toolbarMode = "minimal"
 
-# Theme: Ashton Capes site, Liquid Glass v8 light (live site assets/glass.css + v8.css + kronos.css).
+# Theme: design v4, Ashton Capes site Liquid Glass v8 light (live site assets/glass.css + v8.css + kronos.css).
 [theme]
 base = "light"
 primaryColor = "#0A716C"
@@ -45,7 +45,7 @@ redBackgroundColor = "#F6E4E0"
 orangeBackgroundColor = "#F8E8DA"
 yellowBackgroundColor = "#FBF1D3"
 greenBackgroundColor = "#DEFAF8"
-blueBackgroundColor = "#E8EDF3"
+blueBackgroundColor = "#E3F3F4"
 violetBackgroundColor = "#F1EBF6"
 grayBackgroundColor = "#EEF0EC"
 
@@ -53,7 +53,7 @@ redTextColor = "#A3311F"
 orangeTextColor = "#8A3B08"
 yellowTextColor = "#6B5208"
 greenTextColor = "#19373F"
-blueTextColor = "#2F4A66"
+blueTextColor = "#16404A"
 violetTextColor = "#553A73"
 grayTextColor = "#4F5752"
 
@@ -88,5 +88,5 @@ chartSequentialColors = [
     "#19373F",
 ]
 
-dataframeBorderColor = "#DCDFD8"
-dataframeHeaderBackgroundColor = "#EEF3F5"
+dataframeBorderColor = "#E6EBE8"
+dataframeHeaderBackgroundColor = "#F4F8FA"

@@ -1,511 +1,420 @@
-/* Spend Shadow. Owned by the designer. Tokens live in DESIGN.md.
-   Look: the Ashton Capes site, Liquid Glass v8 light (cool paper, frosted white glass,
-   serif titles and big numbers, one cyan accent). Glass layer at the end of this file. */
+/* Spend Shadow, design v4 (2026-11-19). Owned by the designer. Tokens and rules live in DESIGN.md.
+   Look: Liquid Glass v8, light, as the Ashton Capes site ships it: cool paper lit by three
+   static glows, frosted white glass, display serif for titles and big numbers, Geist for the
+   rest, one cyan accent with dark ink, teal for text. v4 adds a branded header, a page intro
+   with a course chip, a dark hero tile for the one signature number, segmented and pill
+   controls, and quieter tables and charts.
+   Rules for this file: it is injected through st.html, so it must never contain a less-than
+   sign followed by a letter. Motion uses transform and opacity only. */
 
+/* ---------------------------------------------------------------- 1. Tokens */
 :root {
-  --ss-bg: #f0f6fa;
-  --ss-surface: #ffffff;
-  --ss-tint: rgba(240, 246, 250, 0.72);
-  --ss-text: #1a1d1b;
+  --ss-paper: #f0f6fa;
+  --ss-ink: #1a1d1b;
   --ss-muted: #4f5752;
-  --ss-muted-on-tint: #4f5752;
-  --ss-accent: #0a716c;
-  --ss-accent-hover: #19373f;
-  --ss-accent-soft: #defaf8;
-  --ss-forest: #0a1420;
-  --ss-lime: #34e0d6;
-  --ss-border: #dcdfd8;
-  --ss-green: #0a716c;
+  --ss-teal: #0a716c;
+  --ss-teal-deep: #19373f;
   --ss-red: #a3311f;
+  --ss-cyan: #34e0d6;
+  --ss-cyan-ink: #0a1420;
+  --ss-hairline: #dcdfd8;
+  --ss-ghost-edge: #c4c9c3;
+  --ss-field-edge: #8f958f;
+  --ss-field-edge-hover: #4f5752;
+
+  --ss-serif: ui-serif, "New York", Georgia, "Times New Roman", serif;
+  --ss-sans: Geist, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --ss-glass: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.66));
+  --ss-glass-tile: linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.58));
+  --ss-edge: rgba(255, 255, 255, 0.92);
+  --ss-hi: inset 0 1px 0 rgba(255, 255, 255, 0.96), inset 0 -1px 0 rgba(26, 29, 27, 0.04);
+  --ss-depth-1: 0 1px 2px rgba(26, 29, 27, 0.05), 0 10px 24px -16px rgba(40, 46, 42, 0.28);
+  --ss-depth-2: 0 1px 2px rgba(26, 29, 27, 0.05), 0 28px 56px -28px rgba(40, 46, 42, 0.36);
+  --ss-depth-3: 0 2px 4px rgba(26, 29, 27, 0.05), 0 36px 70px -28px rgba(40, 46, 42, 0.44);
+
+  --ss-hero: radial-gradient(120% 90% at 100% 0%, rgba(52, 224, 214, 0.18), transparent 58%),
+             linear-gradient(160deg, #0f2e33 0%, #0a1420 100%);
+  --ss-gain-on-dark: #7ff0e8;
+  --ss-loss-on-dark: #ffb4a6;
+
+  --ss-r-card: 24px;
+  --ss-r-tile: 18px;
+  --ss-r-field: 14px;
+  --ss-r-pill: 999px;
+
   --ss-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
-  --ss-radius: 22px;
-  --ss-radius-control: 14px;
-  --ss-radius-pill: 999px;
-  --ss-shadow: 0 1px 2px rgba(26, 29, 27, 0.05), 0 24px 48px -20px rgba(40, 46, 42, 0.28);
-  --ss-shadow-lift: 0 2px 4px rgba(26, 29, 27, 0.05), 0 30px 60px -20px rgba(40, 46, 42, 0.34);
+  --ss-focus: 0 0 0 3px rgba(10, 113, 108, 0.32);
 }
 
+/* ---------------------------------------------------------------- 2. Room and page frame */
 html {
   scroll-behavior: smooth;
 }
 
 .stApp {
   overflow-x: hidden;
-  background: var(--ss-bg);
+  background:
+    radial-gradient(46% 40% at 98% 18%, rgba(207, 248, 245, 0.7), transparent 70%),
+    radial-gradient(42% 42% at 0% 72%, rgba(205, 238, 221, 0.6), transparent 70%),
+    radial-gradient(40% 36% at 68% 104%, rgba(212, 228, 250, 0.7), transparent 70%),
+    var(--ss-paper);
+  color: var(--ss-ink);
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Chrome */
-.stAppDeployButton,
-[data-testid="stDecoration"] {
-  display: none;
-}
-
-[data-testid="stHeader"] {
-  background: rgba(240, 246, 250, 0.8);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border-bottom: 1px solid var(--ss-border);
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-x: contain;
+[data-testid="stMain"],
+[data-testid="stAppViewContainer"] {
+  background: transparent;
 }
 
 [data-testid="stMainBlockContainer"] {
-  max-width: 1200px;
-  padding-top: 5.5rem;
-  padding-bottom: 3rem;
-  padding-left: max(1.5rem, env(safe-area-inset-left));
-  padding-right: max(1.5rem, env(safe-area-inset-right));
+  max-width: 1180px;
+  padding-top: 6.75rem;
+  padding-bottom: 4rem;
+  padding-left: max(2rem, env(safe-area-inset-left));
+  padding-right: max(2rem, env(safe-area-inset-right));
+}
+
+/* Section rhythm: 20px between top-level blocks, 12px inside cards. */
+[data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] {
+  gap: 1.25rem;
+}
+
+/* ---------------------------------------------------------------- 3. Header: floating glass pill with the wordmark */
+.stAppDeployButton,
+[data-testid="stDecoration"],
+[data-testid="stToolbarActions"],
+[data-testid="stToolbarActionButton"],
+[data-testid="stAppDeployButton"] {
+  display: none !important;
+}
+
+[data-testid="stHeader"] {
+  top: 12px;
+  left: 16px;
+  right: 16px;
+  width: auto;
+  height: 60px;
+  border-radius: var(--ss-r-pill);
+  border: 1px solid var(--ss-edge);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: var(--ss-hi), 0 1px 1px rgba(26, 29, 27, 0.04), 0 16px 40px -18px rgba(40, 46, 42, 0.32);
+}
+
+/* Wordmark, right side of the pill: a cyan dot and the product name in the display serif. */
+[data-testid="stHeader"]::after {
+  content: "Spend Shadow";
+  position: absolute;
+  right: 26px;
+  top: 50%;
+  transform: translateY(-50%);
+  padding-left: 18px;
+  font-family: var(--ss-serif);
+  font-size: 20px;
+  letter-spacing: -0.02em;
+  color: var(--ss-ink);
+  white-space: nowrap;
+  pointer-events: none;
+  background: radial-gradient(circle at 5px 50%, var(--ss-cyan) 0 4.5px, transparent 5px);
+}
+
+/* Nav links: muted text, the current page is a raised white pill. */
+[data-testid="stTopNavLink"] {
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: var(--ss-r-pill);
+  transition: background-color 160ms var(--ss-ease), box-shadow 160ms var(--ss-ease);
+}
+
+[data-testid="stTopNavLink"] p,
+[data-testid="stTopNavLink"] [data-testid="stIconMaterial"],
+[data-testid="stTopNavLink"] span[color] {
+  color: var(--ss-muted) !important;
+  font-weight: 500;
+  font-size: 14.5px;
+}
+
+[data-testid="stTopNavLink"][aria-current="page"] {
+  background: #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(26, 29, 27, 0.08), 0 4px 12px -6px rgba(40, 46, 42, 0.3);
+}
+
+[data-testid="stTopNavLink"][aria-current="page"] p,
+[data-testid="stTopNavLink"][aria-current="page"] [data-testid="stIconMaterial"],
+[data-testid="stTopNavLink"][aria-current="page"] span[color] {
+  color: var(--ss-ink) !important;
+  font-weight: 600;
+}
+
+[data-testid="stTopNavLink"][aria-current="page"] [data-testid="stIconMaterial"] {
+  color: var(--ss-teal) !important;
+}
+
+/* Phone nav: the collapsed-menu button reads as a ghost pill labeled Menu (also its accessible name). */
+[data-testid="stHeader"] [data-testid="stExpandSidebarButton"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 16px 0 10px;
+  border: 1px solid var(--ss-ghost-edge);
+  border-radius: var(--ss-r-pill);
+  background: #ffffff;
+  color: var(--ss-ink);
+  touch-action: manipulation;
+}
+
+[data-testid="stHeader"] [data-testid="stExpandSidebarButton"] [data-testid="stIconMaterial"],
+[data-testid="stHeader"] [data-testid="stExpandSidebarButton"] span {
+  color: var(--ss-ink) !important;
+}
+
+[data-testid="stHeader"] [data-testid="stExpandSidebarButton"]::after {
+  content: "Menu";
+  font-family: var(--ss-sans);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--ss-ink);
+}
+
+/* Real blur only on a desktop with a fine pointer. */
+@media (min-width: 901px) and (hover: hover) and (pointer: fine) {
+  [data-testid="stHeader"] {
+    background: rgba(255, 255, 255, 0.68);
+    backdrop-filter: saturate(1.6) blur(20px);
+    -webkit-backdrop-filter: saturate(1.6) blur(20px);
+  }
+
+  [data-testid="stTopNavLink"]:not([aria-current="page"]):hover {
+    background: rgba(26, 29, 27, 0.05);
+  }
+}
+
+/* ---------------------------------------------------------------- 4. Type */
+h1, h2, h3,
+h1 *, h2 *, h3 * {
+  font-family: var(--ss-serif) !important;
+  color: var(--ss-ink);
 }
 
 h1, h2, h3 {
   overflow-wrap: anywhere;
+  font-weight: 400 !important;
 }
 
 h1 {
-  font-weight: 600 !important;
-  letter-spacing: -0.045em;
-  line-height: 1.14;
+  font-size: 3.25rem !important;
+  line-height: 1.04 !important;
+  letter-spacing: -0.03em;
+  padding-bottom: 0.15rem !important;
 }
 
 h2 {
-  font-weight: 600 !important;
-  letter-spacing: -0.04em;
+  font-size: 1.875rem !important;
+  line-height: 1.15 !important;
+  letter-spacing: -0.02em;
 }
 
 h3 {
-  font-weight: 500 !important;
-  letter-spacing: -0.03em;
+  font-size: 1.375rem !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.015em;
+  padding-bottom: 0.25rem !important;
+}
+
+/* Hide Streamlit's heading anchor links: they flicker in on hover and add noise. */
+[data-testid="stHeaderActionElements"] {
+  display: none !important;
+}
+
+/* Captions: full opacity (Streamlit fades them to 60%, below AA), comfortable measure. */
+[data-testid="stCaptionContainer"] {
+  opacity: 1 !important;
+  max-width: 76ch;
 }
 
 [data-testid="stCaptionContainer"],
 [data-testid="stCaptionContainer"] p {
   color: var(--ss-muted);
-  font-size: 13px;
+  font-size: 14px;
+  line-height: 1.55;
 }
 
-/* Lab-page course line. Streamlit renders :material/school: as this aria-label. */
-[data-testid="stCaptionContainer"]:has([aria-label="school icon"]),
+/* The page lede: the plain caption right under a title reads a size up. */
+[data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] > [data-testid="stElementContainer"]:has([data-testid="stCaptionContainer"]):not(:has([aria-label="school icon"])) [data-testid="stCaptionContainer"] p {
+  font-size: 15.5px;
+  line-height: 1.6;
+}
+
+/* Course line (:material/school:): a glass chip in teal. */
+[data-testid="stCaptionContainer"]:has([aria-label="school icon"]) {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  padding: 6px 14px 6px 10px;
+  border-radius: var(--ss-r-pill);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(10, 113, 108, 0.22);
+  box-shadow: var(--ss-hi);
+}
+
 [data-testid="stCaptionContainer"]:has([aria-label="school icon"]) p {
-  color: var(--ss-accent);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
+  margin: 0;
+  color: var(--ss-teal);
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.45;
+  text-transform: none;
+  letter-spacing: 0;
   overflow-wrap: anywhere;
 }
 
-[data-testid="stCaptionContainer"]:has([aria-label="school icon"]) [aria-label="school icon"] {
-  color: var(--ss-accent);
-  margin-right: 0.2em;
+[data-testid="stCaptionContainer"] [aria-label="school icon"] {
+  color: var(--ss-teal);
+  margin-right: 0.25em;
 }
 
-/* Tabular money */
+/* Page intro block (ui.page_header): title, course chip, lede. */
+.st-key-page_head {
+  gap: 0.85rem;
+  padding-bottom: 0.5rem;
+}
+
+.st-key-page_head [data-testid="stCaptionContainer"]:not(:has([aria-label="school icon"])) p {
+  font-size: 15.5px;
+  line-height: 1.6;
+}
+
+/* Body copy and numbers. */
+[data-testid="stMarkdownContainer"] p {
+  line-height: 1.55;
+}
+
 [data-testid="stMetricValue"],
-[data-testid="stDataFrame"] {
+[data-testid="stDataFrame"],
+[data-testid="stMarkdownContainer"] strong {
   font-variant-numeric: tabular-nums;
 }
 
-[data-testid="stMetricValue"] {
-  overflow-wrap: anywhere;
+::selection {
+  background: rgba(52, 224, 214, 0.45);
+  color: var(--ss-cyan-ink);
 }
 
-.st-key-loaded_actions {
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-/* Cards (upload_source and proof_download stay unbordered). 16px Streamlit + 4px. */
+/* ---------------------------------------------------------------- 5. Glass cards */
 .st-key-column_mapper,
 .st-key-loaded_summary,
-.st-key-chart_by_category,
 .st-key-table_by_category,
-.st-key-chart_by_month,
 .st-key-top_merchants,
 .st-key-shadow_controls,
-.st-key-chart_shadow,
 .st-key-shadow_compare,
 .st-key-roth_inputs,
-.st-key-chart_roth,
 .st-key-roth_mc_controls,
-.st-key-chart_roth_fan,
-.st-key-proof_checks,
 .st-key-roth_redirect,
-.st-key-landing_preview {
-  background: var(--ss-surface);
-  border-color: var(--ss-border) !important;
-  border-radius: var(--ss-radius) !important;
-  box-shadow: var(--ss-shadow);
-  padding: 20px;
+.st-key-proof_checks,
+.st-key-landing_preview,
+[class*="st-key-chart_"] {
+  position: relative;
+  isolation: isolate;
+  gap: 0.75rem;
+  padding: 24px 26px !important;
+  background: var(--ss-glass) !important;
+  border: 1px solid var(--ss-edge) !important;
+  border-radius: var(--ss-r-card) !important;
+  box-shadow: var(--ss-hi), var(--ss-depth-2);
   transition: transform 300ms var(--ss-ease), box-shadow 300ms var(--ss-ease);
 }
 
-/* Extra left pad so long y-axis labels (Housing & Utilities) stay inside the card. */
-.st-key-chart_by_category {
-  padding-left: 32px;
+/* Specular sheen on hover. It sits behind the content (z-index -1 inside the isolated card),
+   so it never washes out text. Opacity only. */
+.st-key-column_mapper::after,
+.st-key-loaded_summary::after,
+.st-key-table_by_category::after,
+.st-key-top_merchants::after,
+.st-key-shadow_controls::after,
+.st-key-shadow_compare::after,
+.st-key-roth_inputs::after,
+.st-key-roth_mc_controls::after,
+.st-key-roth_redirect::after,
+.st-key-proof_checks::after,
+.st-key-landing_preview::after,
+[class*="st-key-chart_"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(125deg, rgba(255, 255, 255, 0.55), transparent 45%);
+  opacity: 0;
+  transition: opacity 160ms var(--ss-ease);
 }
 
-/* KPI type. Wells come from st.metric(border=True) plus a tint fill. */
-.st-key-spend_kpis [data-testid="stMetric"],
-.st-key-shadow_kpis [data-testid="stMetric"],
-.st-key-roth_kpis [data-testid="stMetric"],
-.st-key-roth_mc_kpis [data-testid="stMetric"],
-.st-key-loaded_kpis [data-testid="stMetric"] {
-  background: var(--ss-tint);
-  border-radius: var(--ss-radius-control);
+/* Chart cards: the Kronos frame, a thin cyan rule along the top edge. */
+[class*="st-key-chart_"]::before,
+.st-key-shadow_compare::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 28px;
+  right: 28px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--ss-cyan) 25%, var(--ss-cyan) 75%, transparent);
+  pointer-events: none;
 }
 
-.st-key-spend_kpis [data-testid="stMetricLabel"],
-.st-key-shadow_kpis [data-testid="stMetricLabel"],
-.st-key-roth_kpis [data-testid="stMetricLabel"],
-.st-key-roth_mc_kpis [data-testid="stMetricLabel"],
-.st-key-loaded_kpis [data-testid="stMetricLabel"] {
-  color: var(--ss-muted-on-tint);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
+/* Card titles: serif, and a little air before the content. */
+[class*="st-key-"] h3 {
+  margin-bottom: 0.1rem;
 }
 
-.st-key-spend_kpis [data-testid="stMetricValue"],
-.st-key-shadow_kpis [data-testid="stMetricValue"],
-.st-key-roth_kpis [data-testid="stMetricValue"],
-.st-key-roth_mc_kpis [data-testid="stMetricValue"],
-.st-key-loaded_kpis [data-testid="stMetricValue"] {
-  font-family: Geist, ui-sans-serif, system-ui, sans-serif;
-  font-weight: 500;
-  font-size: 1.75rem;
-  letter-spacing: -0.045em;
-  color: var(--ss-text);
+/* Tables inside cards do not get their own padding or lift. */
+.st-key-redirect_table,
+.st-key-compare_table,
+.st-key-proof_table {
+  padding: 0 !important;
+  transform: none !important;
 }
 
-/* Signature moment: oversized shadow value. Teal on a gain, red on a loss. */
-.st-key-shadow_signature [data-testid="stMetricValue"],
-.st-key-shadow_signature_down [data-testid="stMetricValue"] {
-  font-size: 2.5rem;
-}
-
-.st-key-shadow_signature [data-testid="stMetricValue"] {
-  color: var(--ss-accent);
-}
-
-.st-key-shadow_signature_down [data-testid="stMetricValue"] {
-  color: var(--ss-red);
-}
-
-/* Roth growth reads as the earned amount. */
-.st-key-roth_kpis [data-testid="stHorizontalBlock"] > div:nth-child(3) [data-testid="stMetricValue"] {
-  color: var(--ss-green);
-}
-
-.stButton button,
-.stDownloadButton button,
-[data-testid="stDownloadButton"] button,
-[data-testid="stMain"] [data-testid="stPageLink-NavLink"],
-[data-testid="stFileUploaderDropzone"] {
-  min-height: 44px;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: rgba(10, 113, 108, 0.14);
-}
-
-[data-testid="stMain"] [data-testid="stPageLink-NavLink"] {
-  display: inline-flex;
-  align-items: center;
-}
-
-/* Secondary actions: sample data and Clear data. Site ghost pill. Load and download are the cyan primary pill. */
-.st-key-use_sample button,
-.st-key-clear_btn button {
-  color: var(--ss-text);
-  border-color: var(--ss-border);
-  background: var(--ss-surface);
-  border-radius: var(--ss-radius-pill);
-  font-weight: 500;
-  transition: transform 300ms var(--ss-ease), border-color 300ms var(--ss-ease);
-}
-
-/* Primary buttons */
-.stButton button[kind="primary"],
-[data-testid="stBaseButton-primary"] {
-  background: var(--ss-accent);
-  border-color: var(--ss-accent);
-  color: #ffffff;
-  border-radius: var(--ss-radius-pill);
-  font-weight: 500;
-  transition: transform 300ms var(--ss-ease), background 300ms var(--ss-ease);
-}
-
-/* File uploader, expanders, quiet alerts */
-[data-testid="stFileUploaderDropzone"],
-[data-testid="stExpander"] {
-  background: var(--ss-surface);
-  border-color: var(--ss-border);
-  border-radius: var(--ss-radius-control);
-}
-
-[data-testid="stAlert"] {
-  border-radius: var(--ss-radius-control);
-}
-
-[data-testid="stDataFrameGlideDataEditor"],
-[data-testid="stDataFrame"],
-.vega-embed,
-[data-testid="stArrowVegaLiteChart"] {
-  max-width: 100%;
-}
-
-[data-testid="stDataFrame"] {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* fit-x charts already match the column. overflow:auto on .vega-embed clips y-axis labels. */
-.st-key-chart_by_category [data-testid="stVegaLiteChart"],
-.st-key-chart_by_month [data-testid="stVegaLiteChart"],
-.st-key-chart_shadow [data-testid="stVegaLiteChart"],
-.st-key-chart_roth [data-testid="stVegaLiteChart"],
-.st-key-chart_roth_fan [data-testid="stVegaLiteChart"],
-.st-key-shadow_compare [data-testid="stVegaLiteChart"],
-.st-key-chart_by_category [data-testid="stVegaLiteChart"] svg,
-.st-key-chart_by_month [data-testid="stVegaLiteChart"] svg,
-.st-key-chart_shadow [data-testid="stVegaLiteChart"] svg,
-.st-key-chart_roth [data-testid="stVegaLiteChart"] svg,
-.st-key-chart_roth_fan [data-testid="stVegaLiteChart"] svg,
-.st-key-shadow_compare [data-testid="stVegaLiteChart"] svg {
-  overflow: visible !important;
-}
-
-/* Fine pointer only: card lift. Phones skip this so hover does not stick. */
-@media (hover: hover) and (pointer: fine) {
-  .st-key-column_mapper:hover,
-  .st-key-loaded_summary:hover,
-  .st-key-chart_by_category:hover,
-  .st-key-table_by_category:hover,
-  .st-key-chart_by_month:hover,
-  .st-key-top_merchants:hover,
-  .st-key-shadow_controls:hover,
-  .st-key-chart_shadow:hover,
-  .st-key-shadow_compare:hover,
-  .st-key-roth_inputs:hover,
-  .st-key-chart_roth:hover,
-  .st-key-roth_mc_controls:hover,
-  .st-key-chart_roth_fan:hover,
-  .st-key-proof_checks:hover,
-  .st-key-roth_redirect:hover,
-  .st-key-landing_preview:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--ss-shadow-lift);
+/* Spending: the chart and the totals cards share one height on desktop. */
+@media (min-width: 641px) {
+  [data-testid="stHorizontalBlock"]:has(.st-key-chart_by_category) {
+    align-items: stretch;
   }
 
-  .st-key-use_sample button:hover,
-  .st-key-clear_btn button:hover {
-    border-color: var(--ss-accent);
-    color: var(--ss-text);
-    transform: translateY(-2px);
-  }
-
-  .stButton button[kind="primary"]:hover,
-  [data-testid="stBaseButton-primary"]:hover,
-  .stDownloadButton button[kind="primary"]:hover {
-    background: var(--ss-accent-hover);
-    border-color: var(--ss-accent-hover);
-    color: #ffffff;
-    transform: translateY(-2px);
-  }
-}
-
-/* Touch press: short opacity + scale, transform/opacity only. */
-@media (hover: none), (pointer: coarse) {
-  .stButton button:active,
-  .stDownloadButton button:active,
-  [data-testid="stBaseButton-primary"]:active,
-  [data-testid="stBaseButton-secondary"]:active,
-  [data-testid="stMain"] [data-testid="stPageLink-NavLink"]:active,
-  .st-key-use_sample button:active,
-  .st-key-clear_btn button:active {
-    transform: scale(0.98);
-    opacity: 0.88;
-  }
-}
-
-/* Focus */
-:focus-visible {
-  outline: 2px solid var(--ss-accent);
-  outline-offset: 2px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-
-  .st-key-column_mapper,
-  .st-key-loaded_summary,
+  [data-testid="stColumn"]:has(.st-key-chart_by_category) > [data-testid="stVerticalBlock"],
+  [data-testid="stColumn"]:has(.st-key-table_by_category) > [data-testid="stVerticalBlock"],
+  [data-testid="stColumn"]:has(.st-key-chart_by_category) [data-testid="stLayoutWrapper"],
+  [data-testid="stColumn"]:has(.st-key-table_by_category) [data-testid="stLayoutWrapper"],
   .st-key-chart_by_category,
-  .st-key-table_by_category,
-  .st-key-chart_by_month,
-  .st-key-top_merchants,
-  .st-key-shadow_controls,
-  .st-key-chart_shadow,
-  .st-key-shadow_compare,
-  .st-key-roth_inputs,
-  .st-key-chart_roth,
-  .st-key-roth_mc_controls,
-  .st-key-chart_roth_fan,
-  .st-key-proof_checks,
-  .st-key-roth_redirect,
-  .st-key-landing_preview,
-  .stButton button[kind="primary"],
-  .stDownloadButton button,
-  [data-testid="stBaseButton-primary"],
-  [data-testid="stBaseButton-secondary"],
-  [data-testid="stMain"] [data-testid="stPageLink-NavLink"],
-  .st-key-use_sample button,
-  .st-key-clear_btn button {
-    transition: none;
-  }
-
-  .st-key-column_mapper:hover,
-  .st-key-loaded_summary:hover,
-  .st-key-chart_by_category:hover,
-  .st-key-table_by_category:hover,
-  .st-key-chart_by_month:hover,
-  .st-key-top_merchants:hover,
-  .st-key-shadow_controls:hover,
-  .st-key-chart_shadow:hover,
-  .st-key-shadow_compare:hover,
-  .st-key-roth_inputs:hover,
-  .st-key-chart_roth:hover,
-  .st-key-roth_mc_controls:hover,
-  .st-key-chart_roth_fan:hover,
-  .st-key-proof_checks:hover,
-  .st-key-roth_redirect:hover,
-  .st-key-landing_preview:hover,
-  .stButton button:active,
-  .stDownloadButton button:active,
-  [data-testid="stBaseButton-primary"]:active,
-  [data-testid="stBaseButton-secondary"]:active,
-  [data-testid="stMain"] [data-testid="stPageLink-NavLink"]:active,
-  .st-key-use_sample button:active,
-  .st-key-clear_btn button:active {
-    transform: none;
+  .st-key-table_by_category {
+    height: 100%;
   }
 }
 
-/* Phone: Streamlit columns already wrap at 640px. Tighten type, padding, tap targets. */
-@media (max-width: 640px) {
-  [data-testid="stMainBlockContainer"] {
-    padding-top: 5rem;
-    padding-bottom: max(2.5rem, env(safe-area-inset-bottom));
-    padding-left: max(1rem, env(safe-area-inset-left));
-    padding-right: max(1rem, env(safe-area-inset-right));
-  }
-
-  h1 {
-    font-size: 2rem !important;
-    line-height: 1.2 !important;
-  }
-
-  h2 {
-    font-size: 1.35rem !important;
-  }
-
-  h3 {
-    font-size: 1.15rem !important;
-  }
-
-  .st-key-spend_kpis [data-testid="stMetricValue"],
-  .st-key-shadow_kpis [data-testid="stMetricValue"],
-  .st-key-roth_kpis [data-testid="stMetricValue"],
-  .st-key-roth_mc_kpis [data-testid="stMetricValue"],
-  .st-key-loaded_kpis [data-testid="stMetricValue"] {
-    font-size: 1.5rem;
-  }
-
-  .st-key-shadow_signature [data-testid="stMetricValue"],
-  .st-key-shadow_signature_down [data-testid="stMetricValue"] {
-    font-size: 2rem;
-  }
-
-  [data-testid="stMain"] .stButton,
-  [data-testid="stMain"] .stButton button,
-  [data-testid="stMain"] .stDownloadButton,
-  [data-testid="stMain"] .stDownloadButton button,
-  [data-testid="stMain"] button[data-testid="stBaseButton-primary"],
-  [data-testid="stMain"] button[data-testid="stBaseButton-secondary"],
-  [data-testid="stMain"] .stPageLink,
-  [data-testid="stMain"] [data-testid="stPageLink-NavLink"],
-  [data-testid="stMain"] .st-key-use_sample,
-  [data-testid="stMain"] .st-key-clear_btn {
-    width: 100% !important;
-  }
-
-  [data-testid="stFileUploaderDropzone"] {
-    min-height: 88px;
-  }
+/* ---------------------------------------------------------------- 6. KPI tiles and the hero */
+[class*="_kpis"] [data-testid="stHorizontalBlock"] {
+  gap: 14px;
 }
 
-/* Reduced motion also stills the site-style button lifts. */
-@media (prefers-reduced-motion: reduce) {
-  .st-key-use_sample button:hover,
-  .st-key-clear_btn button:hover,
-  .stButton button[kind="primary"]:hover,
-  [data-testid="stBaseButton-primary"]:hover,
-  .stDownloadButton button[kind="primary"]:hover {
-    transform: none;
-  }
+[class*="_kpis"] [data-testid="stMetric"] {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start !important;
+  min-height: 112px;
+  padding: 18px 20px 16px !important;
+  background: var(--ss-glass-tile) !important;
+  border: 1px solid var(--ss-edge) !important;
+  border-radius: var(--ss-r-tile) !important;
+  box-shadow: var(--ss-hi), var(--ss-depth-1);
+  transition: transform 300ms var(--ss-ease), box-shadow 300ms var(--ss-ease);
 }
 
-/* Streamlit sets size and weight on the label's inner paragraph, so the label style must reach it. */
-[data-testid="stMetricLabel"] p,
-[data-testid="stMetricLabel"] [data-testid="stMarkdownContainer"] {
-  font-size: 11px !important;
-  font-weight: 600 !important;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-  color: var(--ss-muted-on-tint);
-}
-
-[data-testid="stCaptionContainer"]:has([aria-label="school icon"]) p {
-  font-size: 11px;
-  font-weight: 600;
-}
-
-/* =====================================================================
-   Experience layer (customer-experience pass). Fixes from a phone + desktop walkthrough,
-   then motion that makes the app feel continuous instead of jumpy.
-   ===================================================================== */
-
-/* Streamlit fades captions to 60% opacity, which drops them below AA contrast. */
-[data-testid="stCaptionContainer"] {
-  opacity: 1 !important;
-}
-
-/* Course line: sentence case, small and teal (a full sentence in caps is hard to read). */
-[data-testid="stCaptionContainer"]:has([aria-label="school icon"]),
-[data-testid="stCaptionContainer"]:has([aria-label="school icon"]) p {
-  text-transform: none;
-  letter-spacing: 0;
-  font-size: 12.5px;
-  font-weight: 500;
-  line-height: 1.5;
-}
-
-/* Charts sit directly on the white card, no grey box. */
-[data-testid="stVegaLiteChart"],
-.vega-embed {
-  background: transparent !important;
-}
-
-/* Chart toolbar: on touch screens it covers card titles and can't be hovered away. */
-@media (hover: none), (pointer: coarse) {
-  [data-testid="stElementToolbar"] {
-    display: none !important;
-  }
-}
-
-/* KPI wells side by side share one height, whether or not a well has a delta line.
-   Desktop only: on a phone the wells stack, and stretching them would only add empty space. */
+/* KPI tiles in a row share one height on desktop. */
 @media (min-width: 641px) {
   [class*="_kpis"] [data-testid="stHorizontalBlock"] {
     align-items: stretch;
@@ -517,75 +426,513 @@ h3 {
   }
 }
 
-[class*="_kpis"] [data-testid="stMetric"] {
-  box-sizing: border-box;
-  transition: transform 300ms var(--ss-ease), box-shadow 300ms var(--ss-ease);
+[data-testid="stMetricLabel"] p,
+[data-testid="stMetricLabel"] [data-testid="stMarkdownContainer"] {
+  font-family: var(--ss-sans);
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.13em;
+  line-height: 1.3;
+  text-transform: uppercase;
+  color: var(--ss-muted);
 }
 
-/* Tables: rounded, contained; wide tables scroll inside their own frame. */
-[data-testid="stDataFrame"] {
-  border-radius: var(--ss-radius-control);
-  overflow: hidden;
+[class*="_kpis"] [data-testid="stMetricValue"] {
+  margin-top: 6px;
+  font-size: 2.125rem !important;
+  line-height: 1.08;
+  color: var(--ss-ink);
+  overflow-wrap: anywhere;
 }
 
-/* In-page links (See spending breakdown, Go to Upload) read as ghost pill buttons. */
-[data-testid="stMain"] [data-testid="stPageLink-NavLink"] {
-  border: 1px solid var(--ss-border);
-  border-radius: var(--ss-radius-pill);
-  background: var(--ss-surface);
-  padding: 0 18px;
+[class*="_kpis"] [data-testid="stMetricValue"],
+[class*="_kpis"] [data-testid="stMetricValue"] * {
+  font-family: var(--ss-serif) !important;
+  font-weight: 400 !important;
+  letter-spacing: -0.015em !important;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+[class*="_kpis"] [data-testid="stMetricDelta"] {
+  margin-top: 8px;
+  border-radius: var(--ss-r-pill);
+  font-size: 12.5px;
   font-weight: 500;
-  transition: border-color 250ms var(--ss-ease), transform 250ms var(--ss-ease), background 250ms var(--ss-ease);
 }
 
-/* Inputs: the site's soft focus halo instead of a hard outline jump. */
+/* Roth growth reads as the earned amount. */
+.st-key-roth_kpis [data-testid="stColumn"]:nth-child(3) [data-testid="stMetricValue"] {
+  color: var(--ss-teal);
+}
+
+/* The one signature moment: the shadow value as a dark hero tile (v8 hero widget). */
+.st-key-shadow_signature [data-testid="stMetric"],
+.st-key-shadow_signature_down [data-testid="stMetric"] {
+  background: var(--ss-hero) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 2px 4px rgba(10, 20, 32, 0.12), 0 30px 60px -26px rgba(10, 20, 32, 0.6);
+}
+
+.st-key-shadow_signature [data-testid="stMetricLabel"] p,
+.st-key-shadow_signature_down [data-testid="stMetricLabel"] p,
+.st-key-shadow_signature [data-testid="stMetricLabel"] [data-testid="stMarkdownContainer"],
+.st-key-shadow_signature_down [data-testid="stMetricLabel"] [data-testid="stMarkdownContainer"] {
+  color: rgba(255, 255, 255, 0.78) !important;
+}
+
+.st-key-shadow_signature [data-testid="stMetricValue"],
+.st-key-shadow_signature_down [data-testid="stMetricValue"] {
+  font-size: 2.875rem !important;
+  line-height: 1.02;
+}
+
+.st-key-shadow_signature [data-testid="stMetricValue"],
+.st-key-shadow_signature [data-testid="stMetricValue"] * {
+  color: var(--ss-gain-on-dark) !important;
+}
+
+.st-key-shadow_signature_down [data-testid="stMetricValue"],
+.st-key-shadow_signature_down [data-testid="stMetricValue"] * {
+  color: var(--ss-loss-on-dark) !important;
+}
+
+.st-key-shadow_signature [data-testid="stMetricDelta"],
+.st-key-shadow_signature_down [data-testid="stMetricDelta"] {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.st-key-shadow_signature [data-testid="stMetricDelta"],
+.st-key-shadow_signature [data-testid="stMetricDelta"] * {
+  color: var(--ss-gain-on-dark) !important;
+}
+
+.st-key-shadow_signature_down [data-testid="stMetricDelta"],
+.st-key-shadow_signature_down [data-testid="stMetricDelta"] * {
+  color: var(--ss-loss-on-dark) !important;
+}
+
+.st-key-shadow_signature [data-testid="stTooltipIcon"] svg,
+.st-key-shadow_signature_down [data-testid="stTooltipIcon"] svg {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+/* The hero column takes a larger share of the row on desktop. */
+@media (min-width: 641px) {
+  .st-key-shadow_kpis [data-testid="stColumn"] {
+    flex: 1 1 0 !important;
+    width: auto !important;
+    min-width: 0 !important;
+  }
+
+  .st-key-shadow_kpis [data-testid="stColumn"]:has(.st-key-shadow_signature),
+  .st-key-shadow_kpis [data-testid="stColumn"]:has(.st-key-shadow_signature_down) {
+    flex-grow: 1.5 !important;
+  }
+}
+
+/* ---------------------------------------------------------------- 7. Buttons, links, pills */
+.stButton button,
+.stDownloadButton button,
+[data-testid="stDownloadButton"] button,
+[data-testid="stMain"] [data-testid="stPageLink-NavLink"] {
+  min-height: 44px;
+  padding: 0 22px;
+  border-radius: var(--ss-r-pill);
+  font-weight: 500;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(10, 113, 108, 0.14);
+  transition: transform 200ms var(--ss-ease), box-shadow 200ms var(--ss-ease), background-color 200ms var(--ss-ease), border-color 200ms var(--ss-ease);
+}
+
+/* Primary: the one cyan pill with dark ink. */
+.stButton button[kind="primary"],
+.stDownloadButton button[kind="primary"],
+[data-testid="stBaseButton-primary"] {
+  background: var(--ss-cyan) !important;
+  border: 1px solid var(--ss-cyan) !important;
+  color: var(--ss-cyan-ink) !important;
+  font-weight: 600;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), 0 8px 20px -10px rgba(10, 113, 108, 0.7);
+}
+
+.stButton button[kind="primary"] *,
+.stDownloadButton button[kind="primary"] *,
+[data-testid="stBaseButton-primary"] * {
+  color: var(--ss-cyan-ink) !important;
+}
+
+/* Secondary and in-page links: frosted ghost pills. */
+[data-testid="stBaseButton-secondary"],
+.st-key-use_sample button,
+.st-key-clear_btn button,
+[data-testid="stMain"] [data-testid="stPageLink-NavLink"] {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.78) !important;
+  border: 1px solid var(--ss-ghost-edge) !important;
+  color: var(--ss-ink) !important;
+  box-shadow: inset 0 1px 0 #ffffff, 0 1px 2px rgba(26, 29, 27, 0.06);
+}
+
+[data-testid="stMain"] [data-testid="stPageLink-NavLink"] p,
+[data-testid="stMain"] [data-testid="stPageLink-NavLink"] span {
+  color: var(--ss-ink) !important;
+  font-weight: 500;
+}
+
+.st-key-loaded_actions {
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+/* st.pills (Try a fund): glass pills; the picked one fills cyan. */
+button[data-variant="pills"] {
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: var(--ss-r-pill) !important;
+  border: 1px solid var(--ss-ghost-edge) !important;
+  background: rgba(255, 255, 255, 0.78) !important;
+  color: var(--ss-ink) !important;
+  box-shadow: inset 0 1px 0 #ffffff;
+  touch-action: manipulation;
+  transition: transform 160ms var(--ss-ease), background-color 160ms var(--ss-ease), border-color 160ms var(--ss-ease);
+}
+
+button[data-variant="pills"] p {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ss-ink) !important;
+}
+
+button[data-variant="pills"][aria-checked="true"] {
+  background: var(--ss-cyan) !important;
+  border-color: var(--ss-cyan) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), 0 6px 16px -10px rgba(10, 113, 108, 0.7);
+}
+
+button[data-variant="pills"][aria-checked="true"] p {
+  color: var(--ss-cyan-ink) !important;
+  font-weight: 600;
+}
+
+/* Fine pointer only: hover feedback. Phones skip it so hover does not stick. */
+@media (hover: hover) and (pointer: fine) {
+  .stButton button[kind="primary"]:hover,
+  .stDownloadButton button[kind="primary"]:hover,
+  [data-testid="stBaseButton-primary"]:hover {
+    transform: translateY(-2px);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 14px 28px -12px rgba(10, 113, 108, 0.75);
+  }
+
+  [data-testid="stBaseButton-secondary"]:hover,
+  .st-key-use_sample button:hover,
+  .st-key-clear_btn button:hover,
+  [data-testid="stMain"] [data-testid="stPageLink-NavLink"]:hover,
+  button[data-variant="pills"]:not([aria-checked="true"]):hover {
+    background: #ffffff !important;
+    border-color: var(--ss-field-edge) !important;
+  }
+
+  .st-key-column_mapper:hover,
+  .st-key-loaded_summary:hover,
+  .st-key-table_by_category:hover,
+  .st-key-top_merchants:hover,
+  .st-key-shadow_controls:hover,
+  .st-key-shadow_compare:hover,
+  .st-key-roth_inputs:hover,
+  .st-key-roth_mc_controls:hover,
+  .st-key-roth_redirect:hover,
+  .st-key-proof_checks:hover,
+  .st-key-landing_preview:hover,
+  [class*="st-key-chart_"]:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--ss-hi), var(--ss-depth-3);
+  }
+
+  .st-key-column_mapper:hover::after,
+  .st-key-loaded_summary:hover::after,
+  .st-key-table_by_category:hover::after,
+  .st-key-top_merchants:hover::after,
+  .st-key-shadow_controls:hover::after,
+  .st-key-shadow_compare:hover::after,
+  .st-key-roth_inputs:hover::after,
+  .st-key-roth_mc_controls:hover::after,
+  .st-key-roth_redirect:hover::after,
+  .st-key-proof_checks:hover::after,
+  .st-key-landing_preview:hover::after,
+  [class*="st-key-chart_"]:hover::after {
+    opacity: 1;
+  }
+
+  [class*="_kpis"] [data-testid="stMetric"]:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--ss-hi), var(--ss-depth-2);
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #c4c9c3 transparent;
+  }
+}
+
+/* Press: every button and pill. Touch also dips opacity. */
+.stButton button:active,
+.stDownloadButton button:active,
+button[data-variant="pills"]:active,
+[data-testid="stMain"] [data-testid="stPageLink-NavLink"]:active {
+  transform: scale(0.98);
+}
+
+@media (hover: none), (pointer: coarse) {
+  .stButton button:active,
+  .stDownloadButton button:active,
+  button[data-variant="pills"]:active,
+  [data-testid="stMain"] [data-testid="stPageLink-NavLink"]:active,
+  [data-testid="stHeader"] [data-testid="stExpandSidebarButton"]:active {
+    transform: scale(0.98);
+    opacity: 0.88;
+  }
+}
+
+/* ---------------------------------------------------------------- 8. Fields and selection controls */
+[data-testid="stWidgetLabel"] p {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ss-ink);
+}
+
 [data-baseweb="input"],
 [data-baseweb="select"] > div,
 [data-baseweb="textarea"] {
+  min-height: 44px;
+  background: rgba(255, 255, 255, 0.86) !important;
+  border-color: var(--ss-field-edge) !important;
+  border-radius: var(--ss-r-field) !important;
   transition: border-color 200ms var(--ss-ease), box-shadow 200ms var(--ss-ease);
+}
+
+[data-baseweb="input"] input,
+[data-baseweb="input"] > div {
+  background: transparent !important;
+}
+
+[data-testid="stNumberInputContainer"] button {
+  background: transparent !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-baseweb="input"]:hover,
+  [data-baseweb="select"] > div:hover {
+    border-color: var(--ss-field-edge-hover) !important;
+  }
 }
 
 [data-baseweb="input"]:focus-within,
 [data-baseweb="select"] > div:focus-within,
 [data-baseweb="textarea"]:focus-within {
-  border-color: var(--ss-accent) !important;
-  box-shadow: 0 0 0 3px rgba(10, 113, 108, 0.28);
+  border-color: var(--ss-teal) !important;
+  box-shadow: var(--ss-focus);
 }
 
-/* Buttons: focus halo, and a press that every pointer can feel. */
+/* Multiselect chips: soft cyan glass with ink text, not solid teal blocks. */
+[data-baseweb="tag"],
+[data-testid="stMultiSelect"] [data-tag] {
+  height: 30px !important;
+  padding-left: 12px !important;
+  border-radius: var(--ss-r-pill) !important;
+  background: rgba(52, 224, 214, 0.2) !important;
+  border: 1px solid rgba(10, 113, 108, 0.28) !important;
+  color: var(--ss-cyan-ink) !important;
+}
+
+[data-baseweb="tag"] span,
+[data-baseweb="tag"] [role="presentation"],
+[data-baseweb="tag"] svg,
+[data-testid="stMultiSelect"] [data-tag] span,
+[data-testid="stMultiSelect"] [data-tag] button,
+[data-testid="stMultiSelect"] [data-tag] svg {
+  color: var(--ss-cyan-ink) !important;
+  font-weight: 500;
+}
+
+/* Fund it from (roth_mode): a segmented control. The selected option is a raised white pill. */
+.st-key-roth_mode [data-testid="stRadioGroup"] {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: var(--ss-r-pill);
+  background: rgba(26, 29, 27, 0.06);
+  box-shadow: inset 0 1px 2px rgba(26, 29, 27, 0.06);
+}
+
+.st-key-roth_mode [data-testid="stRadioOption"] {
+  min-height: 36px;
+  margin: 0 !important;
+  padding: 0 16px;
+  align-items: center;
+  border-radius: var(--ss-r-pill);
+  cursor: pointer;
+  transition: background-color 160ms var(--ss-ease), box-shadow 160ms var(--ss-ease);
+}
+
+.st-key-roth_mode [data-testid="stRadioOption"] > div > div:not([data-testid="stMarkdownContainer"]) {
+  display: none;
+}
+
+.st-key-roth_mode [data-testid="stRadioOption"] p {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ss-muted);
+}
+
+.st-key-roth_mode [data-testid="stRadioOption"][data-selected="true"] {
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(26, 29, 27, 0.1), 0 4px 12px -6px rgba(40, 46, 42, 0.3);
+}
+
+.st-key-roth_mode [data-testid="stRadioOption"][data-selected="true"] p {
+  color: var(--ss-ink);
+  font-weight: 600;
+}
+
+.st-key-roth_mode [data-testid="stRadioOption"]:has(input:focus-visible) {
+  box-shadow: var(--ss-focus);
+}
+
+/* File uploader: a generous dashed drop area. */
+[data-testid="stFileUploaderDropzone"] {
+  min-height: 96px;
+  padding: 20px 22px;
+  border: 1.5px dashed #9aa19b !important;
+  border-radius: var(--ss-r-tile) !important;
+  background: rgba(255, 255, 255, 0.6) !important;
+  touch-action: manipulation;
+  transition: border-color 200ms var(--ss-ease), background-color 200ms var(--ss-ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-testid="stFileUploaderDropzone"]:hover {
+    border-color: var(--ss-teal) !important;
+    background: rgba(255, 255, 255, 0.85) !important;
+  }
+}
+
+/* ---------------------------------------------------------------- 9. Tables, expanders, alerts */
+[data-testid="stDataFrame"],
+[data-testid="stDataFrameGlideDataEditor"] {
+  max-width: 100%;
+}
+
+[data-testid="stDataFrame"] {
+  overflow: hidden;
+  border-radius: var(--ss-r-field);
+  border: 1px solid rgba(26, 29, 27, 0.08);
+  box-shadow: 0 1px 2px rgba(26, 29, 27, 0.04);
+  -webkit-overflow-scrolling: touch;
+}
+
+[data-testid="stExpander"] details {
+  overflow: hidden;
+  border: 1px solid var(--ss-edge) !important;
+  border-radius: var(--ss-r-tile) !important;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: var(--ss-hi), var(--ss-depth-1);
+}
+
+/* An expander nested in a card is a quieter inset row. */
+[class*="st-key-"] [data-testid="stExpander"] details {
+  background: rgba(240, 246, 250, 0.6);
+  border-color: rgba(26, 29, 27, 0.08) !important;
+  box-shadow: none;
+}
+
+[data-testid="stExpander"] summary {
+  min-height: 48px;
+  padding: 0 18px;
+  font-weight: 500;
+  transition: color 160ms var(--ss-ease);
+}
+
+[data-testid="stExpander"] summary p {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-testid="stExpander"] summary:hover,
+  [data-testid="stExpander"] summary:hover p {
+    color: var(--ss-teal);
+  }
+}
+
+[data-testid="stAlert"] [data-testid="stAlertContainer"],
+[data-testid="stAlertContainer"] {
+  border-radius: var(--ss-r-tile);
+}
+
+/* ---------------------------------------------------------------- 10. Charts */
+[data-testid="stVegaLiteChart"],
+.vega-embed {
+  max-width: 100%;
+  background: transparent !important;
+}
+
+/* fit-x charts already match the column; overflow hidden would clip long y-axis labels. */
+[class*="st-key-chart_"] [data-testid="stVegaLiteChart"],
+[class*="st-key-chart_"] [data-testid="stVegaLiteChart"] svg,
+.st-key-shadow_compare [data-testid="stVegaLiteChart"],
+.st-key-shadow_compare [data-testid="stVegaLiteChart"] svg {
+  overflow: visible !important;
+}
+
+/* Chart toolbar: on touch screens it covers card titles and cannot be hovered away. */
+@media (hover: none), (pointer: coarse) {
+  [data-testid="stElementToolbar"] {
+    display: none !important;
+  }
+}
+
+/* ---------------------------------------------------------------- 11. Upload landing video */
+.st-key-landing_preview [data-testid="stVideo"],
+.st-key-landing_preview video {
+  display: block;
+  width: 100% !important;
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--ss-r-field);
+  overflow: hidden;
+}
+
+.st-key-landing_preview video {
+  background: #ffffff;
+  border: 1px solid var(--ss-edge);
+  box-shadow: 0 1px 2px rgba(26, 29, 27, 0.06), 0 18px 40px -26px rgba(40, 46, 42, 0.4);
+}
+
+/* Swipe hints under wide tables are for phones only: desktop tables fit. */
+@media (min-width: 641px) {
+  [class*="st-key-swipe_hint"] {
+    display: none !important;
+  }
+}
+
+/* ---------------------------------------------------------------- 12. Focus, stale fade, page enter */
+:focus-visible {
+  outline: 2px solid var(--ss-teal);
+  outline-offset: 3px;
+}
+
 .stButton button:focus-visible,
 .stDownloadButton button:focus-visible,
-[data-testid="stMain"] [data-testid="stPageLink-NavLink"]:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(10, 113, 108, 0.35);
+button[data-variant="pills"]:focus-visible,
+[data-testid="stMain"] [data-testid="stPageLink-NavLink"]:focus-visible,
+[data-testid="stTopNavLink"]:focus-visible {
+  outline: 2px solid var(--ss-teal);
+  outline-offset: 3px;
+  box-shadow: var(--ss-focus);
 }
 
-.stButton button:active,
-.stDownloadButton button:active,
-[data-testid="stMain"] [data-testid="stPageLink-NavLink"]:active {
-  transform: scale(0.98);
-}
-
-/* Top nav: smooth hover. */
-[data-testid="stTopNavLink"] {
-  border-radius: var(--ss-radius-pill);
-  transition: background 200ms var(--ss-ease), color 200ms var(--ss-ease);
-}
-
-[data-testid="stTopNavLink"]:hover {
-  background: var(--ss-accent-soft);
-}
-
-/* Expanders: smooth hover, rounded like the cards' controls. */
-[data-testid="stExpander"] details summary {
-  transition: color 200ms var(--ss-ease);
-}
-
-[data-testid="stExpander"] details summary:hover {
-  color: var(--ss-accent);
-}
-
-/* While a page reruns, Streamlit dims stale elements abruptly. Fade instead, and less. */
 [data-testid="stElementContainer"],
 [data-testid="stLayoutWrapper"] {
   transition: opacity 250ms var(--ss-ease);
@@ -595,8 +942,6 @@ h3 {
   opacity: 0.6 !important;
 }
 
-/* Page enter: content rises in gently on navigation (not on every widget change,
-   because Streamlit keeps existing elements mounted between reruns). */
 @keyframes ss-rise {
   from {
     opacity: 0;
@@ -618,33 +963,142 @@ h3 {
 [data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] > *:nth-child(5) { animation-delay: 120ms; }
 [data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] > *:nth-child(n+6) { animation-delay: 150ms; }
 
-/* Text selection in the site's cyan. */
-::selection {
-  background: rgba(52, 224, 214, 0.45);
-  color: #0a1420;
-}
-
-/* Quiet scrollbars on desktop. */
-@media (hover: hover) and (pointer: fine) {
-  * {
-    scrollbar-width: thin;
-    scrollbar-color: #c4c9c3 transparent;
-  }
-
-  [class*="_kpis"] [data-testid="stMetric"]:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--ss-shadow);
-  }
-
-  [data-testid="stMain"] [data-testid="stPageLink-NavLink"]:hover {
-    border-color: var(--ss-accent);
-    background: var(--ss-surface);
-    transform: translateY(-2px);
+/* ---------------------------------------------------------------- 13. Tablet and phone */
+@media (max-width: 900px) {
+  [data-testid="stHeader"] {
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
 }
 
-/* Phone: compact wells, stacked full-width actions. */
 @media (max-width: 640px) {
+  [data-testid="stMainBlockContainer"] {
+    padding-top: 5.75rem;
+    padding-bottom: max(3rem, env(safe-area-inset-bottom));
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+
+  [data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] {
+    gap: 1rem;
+  }
+
+  [data-testid="stHeader"] {
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    height: 56px;
+  }
+
+  [data-testid="stHeader"]::after {
+    right: 20px;
+    font-size: 18px;
+  }
+
+  h1 {
+    font-size: 2.25rem !important;
+    line-height: 1.1 !important;
+  }
+
+  h2 {
+    font-size: 1.4rem !important;
+  }
+
+  h3 {
+    font-size: 1.2rem !important;
+  }
+
+  [data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] > [data-testid="stElementContainer"]:has([data-testid="stCaptionContainer"]):not(:has([aria-label="school icon"])) [data-testid="stCaptionContainer"] p {
+    font-size: 14.5px;
+  }
+
+  [data-testid="stCaptionContainer"]:has([aria-label="school icon"]) {
+    border-radius: 14px;
+  }
+
+  .st-key-column_mapper,
+  .st-key-loaded_summary,
+  .st-key-table_by_category,
+  .st-key-top_merchants,
+  .st-key-shadow_controls,
+  .st-key-shadow_compare,
+  .st-key-roth_inputs,
+  .st-key-roth_mc_controls,
+  .st-key-roth_redirect,
+  .st-key-proof_checks,
+  .st-key-landing_preview,
+  [class*="st-key-chart_"] {
+    padding: 18px 16px !important;
+    border-radius: 20px !important;
+  }
+
+  [class*="st-key-chart_"]::before,
+  .st-key-shadow_compare::before {
+    left: 20px;
+    right: 20px;
+  }
+
+  /* KPI tiles go two-up instead of one tall stack; an odd last tile spans the row. */
+  [class*="_kpis"] [data-testid="stHorizontalBlock"] {
+    flex-wrap: wrap !important;
+    gap: 10px;
+  }
+
+  [class*="_kpis"] [data-testid="stColumn"] {
+    flex: 1 1 calc(50% - 5px) !important;
+    min-width: calc(50% - 5px) !important;
+    width: auto !important;
+  }
+
+  .st-key-shadow_kpis [data-testid="stColumn"]:has(.st-key-shadow_signature),
+  .st-key-shadow_kpis [data-testid="stColumn"]:has(.st-key-shadow_signature_down),
+  .st-key-roth_kpis [data-testid="stColumn"]:first-child {
+    order: -1;
+    flex-basis: 100% !important;
+  }
+
+  [class*="_kpis"] [data-testid="stMetric"] {
+    min-height: 0;
+    height: 100%;
+    padding: 14px 14px 12px !important;
+  }
+
+  [class*="_kpis"] [data-testid="stMetricLabel"] p {
+    font-size: 10.5px !important;
+    letter-spacing: 0.1em;
+  }
+
+  [class*="_kpis"] [data-testid="stMetricValue"] {
+    font-size: 1.5rem !important;
+  }
+
+  .st-key-shadow_signature [data-testid="stMetricValue"],
+  .st-key-shadow_signature_down [data-testid="stMetricValue"],
+  .st-key-roth_kpis [data-testid="stColumn"]:first-child [data-testid="stMetricValue"] {
+    font-size: 2.25rem !important;
+  }
+
+  /* Full-width tap targets. */
+  [data-testid="stMain"] .stButton,
+  [data-testid="stMain"] .stButton button,
+  [data-testid="stMain"] .stDownloadButton,
+  [data-testid="stMain"] .stDownloadButton button,
+  [data-testid="stMain"] .stPageLink,
+  [data-testid="stMain"] [data-testid="stPageLink-NavLink"],
+  [data-testid="stMain"] .st-key-use_sample,
+  [data-testid="stMain"] .st-key-clear_btn {
+    width: 100% !important;
+  }
+
+  [data-testid="stMain"] [data-testid="stPageLink-NavLink"] {
+    justify-content: center;
+  }
+
+  button[data-variant="pills"] {
+    min-height: 44px;
+  }
+
   .st-key-loaded_actions {
     flex-direction: column;
     align-items: stretch;
@@ -657,439 +1111,162 @@ h3 {
     max-width: none !important;
   }
 
-  [data-testid="stMain"] [data-testid="stPageLink-NavLink"] {
+  .st-key-roth_mode [data-testid="stRadioGroup"] {
+    display: flex;
+  }
+
+  .st-key-roth_mode [data-testid="stRadioOption"] {
+    flex: 1 1 0;
+    min-height: 40px;
     justify-content: center;
   }
 
-  .st-key-column_mapper,
-  .st-key-loaded_summary,
-  [class*="st-key-chart_"],
-  .st-key-shadow_controls,
-  .st-key-shadow_compare,
-  .st-key-roth_inputs,
-  .st-key-roth_mc_controls,
-  .st-key-proof_checks,
-  .st-key-roth_redirect,
-  .st-key-landing_preview,
-  .st-key-table_by_category,
-  .st-key-top_merchants {
-    padding: 16px;
-    border-radius: 18px !important;
+  [data-testid="stFileUploaderDropzone"] {
+    min-height: 88px;
   }
 }
 
-/* Reduced motion: no entrances, lifts or presses. */
+/* ---------------------------------------------------------------- 14. Accessibility fallbacks */
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+  }
+
   [data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] > * {
     animation: none !important;
   }
 
-  [class*="_kpis"] [data-testid="stMetric"],
-  [data-testid="stMain"] [data-testid="stPageLink-NavLink"],
-  [data-testid="stElementContainer"],
-  [data-testid="stLayoutWrapper"] {
-    transition: none !important;
-    transform: none !important;
-  }
-
+  [class*="st-key-"]:hover,
+  [class*="_kpis"] [data-testid="stMetric"]:hover,
+  .stButton button:hover,
   .stButton button:active,
-  .stDownloadButton button:active {
-    transform: none;
-  }
-}
-
-/* =====================================================================
-   Liquid Glass layer (v8, light), matched to the live Ashton Capes site
-   (assets/glass.css, v8.css, kronos.css). Visual only: no copy, keys or layout order change.
-   Paper #f0f6fa with three faint static glows, frosted white glass cards, serif titles and
-   big numbers, one cyan accent (#34e0d6 with #0a1420 ink, 9.1:1), teal text #0a716c (4.9:1 on the sky glow, 5.9:1 on white).
-   Real blur only on desktop; phones get a near-opaque fill that reads the same.
-   ===================================================================== */
-
-:root {
-  --lg-serif: ui-serif, Georgia, "Times New Roman", serif;
-  --lg-cyan: #34e0d6;
-  --lg-cyan-ink: #0a1420;
-  --lg-fill: linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.62));
-  --lg-edge: rgba(255, 255, 255, 0.9);
-  --lg-hi: inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 -1px 0 rgba(26, 29, 27, 0.05);
-  --lg-ghost-edge: #c4c9c3;
-  --lg-ghost-edge-hover: #8f958f;
-}
-
-/* The lit room: faint cyan, mint and sky fields so the glass has light behind it. Static. */
-.stApp {
-  background:
-    radial-gradient(42% 38% at 96% 30%, rgba(207, 248, 245, 0.55), transparent 70%),
-    radial-gradient(40% 40% at 0% 70%, rgba(205, 238, 221, 0.5), transparent 70%),
-    radial-gradient(38% 34% at 70% 100%, rgba(212, 228, 250, 0.55), transparent 70%),
-    var(--ss-bg);
-}
-
-[data-testid="stMain"],
-[data-testid="stAppViewContainer"] {
-  background: transparent;
-}
-
-/* Header: the site's floating glass pill. */
-[data-testid="stHeader"] {
-  top: 10px;
-  left: 12px;
-  right: 12px;
-  width: auto;
-  border-radius: 999px;
-  border: 1px solid var(--lg-edge);
-  border-bottom: 1px solid var(--lg-edge);
-  background: rgba(255, 255, 255, 0.66);
-  box-shadow: var(--lg-hi), 0 1px 1px rgba(26, 29, 27, 0.04), 0 12px 40px -12px rgba(40, 46, 42, 0.2);
-  backdrop-filter: saturate(1.6) blur(20px);
-  -webkit-backdrop-filter: saturate(1.6) blur(20px);
-}
-
-[data-testid="stTopNavLink"]:hover {
-  background: rgba(26, 29, 27, 0.06);
-}
-
-/* Titles and section heads: display serif at 400, as on the site. */
-h1, h2, h3,
-h1 *, h2 *, h3 * {
-  font-family: var(--lg-serif) !important;
-}
-
-h1 {
-  font-weight: 400 !important;
-  letter-spacing: -0.025em;
-  line-height: 1.08;
-}
-
-h2, h3 {
-  font-weight: 400 !important;
-  letter-spacing: -0.02em;
-}
-
-/* Glass cards. */
-.st-key-column_mapper,
-.st-key-loaded_summary,
-.st-key-table_by_category,
-.st-key-top_merchants,
-.st-key-shadow_controls,
-.st-key-shadow_compare,
-.st-key-roth_inputs,
-.st-key-roth_mc_controls,
-.st-key-proof_checks,
-.st-key-roth_redirect,
-.st-key-landing_preview,
-[class*="st-key-chart_"] {
-  position: relative;
-  isolation: isolate;
-  background: var(--lg-fill);
-  border: 1px solid var(--lg-edge) !important;
-  box-shadow: var(--lg-hi), var(--ss-shadow);
-}
-
-/* Specular sheen on hover (opacity only), fine pointers. */
-.st-key-column_mapper::after,
-.st-key-loaded_summary::after,
-.st-key-table_by_category::after,
-.st-key-top_merchants::after,
-.st-key-shadow_controls::after,
-.st-key-shadow_compare::after,
-.st-key-roth_inputs::after,
-.st-key-roth_mc_controls::after,
-.st-key-proof_checks::after,
-.st-key-roth_redirect::after,
-.st-key-landing_preview::after,
-[class*="st-key-chart_"]::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  z-index: 2;
-  background: linear-gradient(120deg, rgba(255, 255, 255, 0.3), transparent 42%);
-  opacity: 0;
-  transition: opacity 160ms var(--ss-ease);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .st-key-column_mapper:hover::after,
-  .st-key-loaded_summary:hover::after,
-  .st-key-table_by_category:hover::after,
-  .st-key-top_merchants:hover::after,
-  .st-key-shadow_controls:hover::after,
-  .st-key-shadow_compare:hover::after,
-  .st-key-roth_inputs:hover::after,
-  .st-key-roth_mc_controls:hover::after,
-  .st-key-proof_checks:hover::after,
-  .st-key-roth_redirect:hover::after,
-  .st-key-landing_preview:hover::after,
-  [class*="st-key-chart_"]:hover::after {
-    opacity: 1;
-  }
-
-  [class*="st-key-chart_"]:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--lg-hi), var(--ss-shadow-lift);
-  }
-}
-
-/* Chart cards: the Kronos frame, a thin cyan rule along the top. */
-[class*="st-key-chart_"]::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 22px;
-  right: 22px;
-  height: 2px;
-  border-radius: 2px;
-  background: linear-gradient(90deg, transparent, var(--lg-cyan) 30%, var(--lg-cyan) 70%, transparent);
-  opacity: 0.85;
-  pointer-events: none;
-}
-
-/* KPI tiles: lighter glass, serif numbers. */
-[class*="_kpis"] [data-testid="stMetric"] {
-  background: rgba(255, 255, 255, 0.62);
-  border: 1px solid var(--lg-edge) !important;
-  border-radius: 18px;
-  box-shadow: var(--lg-hi), 0 1px 2px rgba(26, 29, 27, 0.05), 0 12px 30px -18px rgba(40, 46, 42, 0.3);
-}
-
-[class*="_kpis"] [data-testid="stMetricValue"],
-[class*="_kpis"] [data-testid="stMetricValue"] * {
-  font-family: var(--lg-serif) !important;
-  font-weight: 400 !important;
-  letter-spacing: -0.01em !important;
-  font-variant-numeric: tabular-nums;
-}
-
-[class*="_kpis"] [data-testid="stMetricValue"] {
-  font-size: 2rem !important;
-  line-height: 1.1;
-}
-
-.st-key-shadow_signature [data-testid="stMetricValue"],
-.st-key-shadow_signature_down [data-testid="stMetricValue"] {
-  font-size: 2.75rem !important;
-}
-
-/* Primary actions: the site's one cyan pill with dark ink. */
-.stButton button[kind="primary"],
-.stDownloadButton button[kind="primary"],
-[data-testid="stBaseButton-primary"] {
-  background: var(--lg-cyan);
-  border-color: var(--lg-cyan);
-  color: var(--lg-cyan-ink);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), 0 6px 18px -8px rgba(10, 113, 108, 0.6);
-  transition: transform 200ms var(--ss-ease), box-shadow 200ms var(--ss-ease);
-}
-
-.stButton button[kind="primary"] *,
-.stDownloadButton button[kind="primary"] *,
-[data-testid="stBaseButton-primary"] * {
-  color: var(--lg-cyan-ink);
-}
-
-/* Secondary actions and in-page links: frosted ghost pills. */
-.st-key-use_sample button,
-.st-key-clear_btn button,
-[data-testid="stBaseButton-secondary"],
-[data-testid="stMain"] [data-testid="stPageLink-NavLink"] {
-  background: rgba(255, 255, 255, 0.62);
-  border: 1px solid var(--lg-ghost-edge);
-  border-radius: var(--ss-radius-pill);
-  color: var(--ss-text);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 1px 2px rgba(26, 29, 27, 0.06);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .stButton button[kind="primary"]:hover,
-  .stDownloadButton button[kind="primary"]:hover,
-  [data-testid="stBaseButton-primary"]:hover {
-    background: var(--lg-cyan);
-    border-color: var(--lg-cyan);
-    color: var(--lg-cyan-ink);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 10px 24px -10px rgba(10, 113, 108, 0.65);
-    transform: translateY(-2px);
-  }
-
-  .st-key-use_sample button:hover,
-  .st-key-clear_btn button:hover,
-  [data-testid="stBaseButton-secondary"]:hover,
-  [data-testid="stMain"] [data-testid="stPageLink-NavLink"]:hover {
-    background: rgba(255, 255, 255, 0.85);
-    border-color: var(--lg-ghost-edge-hover);
-    color: var(--ss-text);
-  }
-}
-
-/* Fields, uploader, expanders: frosted, quiet edge. */
-[data-baseweb="input"],
-[data-baseweb="select"] > div,
-[data-baseweb="textarea"] {
-  background: rgba(255, 255, 255, 0.72);
-}
-
-[data-testid="stFileUploaderDropzone"],
-[data-testid="stExpander"] details {
-  background: rgba(255, 255, 255, 0.62);
-  border-color: var(--lg-ghost-edge);
-}
-
-[data-testid="stExpander"] details {
-  border-radius: var(--ss-radius-control);
-}
-
-/* Phones and touch screens: no live blur (it repaints on every scroll frame). */
-@media (hover: none), (max-width: 900px) {
-  [data-testid="stHeader"] {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-  }
-}
-
-@media (max-width: 640px) {
-  [data-testid="stHeader"] {
-    top: 8px;
-    left: 8px;
-    right: 8px;
-  }
-
-  [class*="_kpis"] [data-testid="stMetricValue"] {
-    font-size: 1.7rem !important;
-  }
-
-  .st-key-shadow_signature [data-testid="stMetricValue"],
-  .st-key-shadow_signature_down [data-testid="stMetricValue"] {
-    font-size: 2.25rem !important;
-  }
-
-  [class*="st-key-chart_"]::before {
-    left: 18px;
-    right: 18px;
-  }
-}
-
-/* Accessibility fallbacks. */
-@media (prefers-reduced-motion: reduce) {
-  [class*="st-key-"]::after {
-    transition: none !important;
-  }
-
-  [class*="st-key-chart_"]:hover,
-  .stButton button[kind="primary"]:hover,
-  [data-testid="stBaseButton-primary"]:hover {
+  .stDownloadButton button:hover,
+  .stDownloadButton button:active,
+  button[data-variant="pills"]:active,
+  [data-testid="stBaseButton-primary"]:hover,
+  [data-testid="stMain"] [data-testid="stPageLink-NavLink"]:hover,
+  [data-testid="stMain"] [data-testid="stPageLink-NavLink"]:active,
+  [data-testid="stHeader"] [data-testid="stExpandSidebarButton"]:active {
     transform: none !important;
   }
 }
 
 @media (prefers-reduced-transparency: reduce) {
   [data-testid="stHeader"],
-  [class*="st-key-chart_"],
-  .st-key-proof_checks,
+  .st-key-column_mapper,
+  .st-key-loaded_summary,
+  .st-key-table_by_category,
+  .st-key-top_merchants,
+  .st-key-shadow_controls,
+  .st-key-shadow_compare,
+  .st-key-roth_inputs,
+  .st-key-roth_mc_controls,
   .st-key-roth_redirect,
+  .st-key-proof_checks,
   .st-key-landing_preview,
-  [class*="_kpis"] [data-testid="stMetric"] {
-    background: #ffffff;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
+  [class*="st-key-chart_"],
+  [class*="_kpis"] [data-testid="stMetric"],
+  [data-testid="stExpander"] details {
+    background: #ffffff !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .st-key-shadow_signature [data-testid="stMetric"],
+  .st-key-shadow_signature_down [data-testid="stMetric"] {
+    background: #0a1420 !important;
   }
 }
 
 @media (prefers-contrast: more) {
   [data-testid="stHeader"],
-  [class*="st-key-chart_"],
-  .st-key-proof_checks,
+  .st-key-column_mapper,
+  .st-key-loaded_summary,
+  .st-key-table_by_category,
+  .st-key-top_merchants,
+  .st-key-shadow_controls,
+  .st-key-shadow_compare,
+  .st-key-roth_inputs,
+  .st-key-roth_mc_controls,
   .st-key-roth_redirect,
+  .st-key-proof_checks,
   .st-key-landing_preview,
-  [class*="_kpis"] [data-testid="stMetric"] {
-    border-color: #8f958f !important;
+  [class*="st-key-chart_"],
+  [class*="_kpis"] [data-testid="stMetric"],
+  [data-testid="stExpander"] details,
+  [data-testid="stHeader"] [data-testid="stExpandSidebarButton"],
+  button[data-variant="pills"],
+  [data-testid="stBaseButton-secondary"] {
+    border-color: #4f5752 !important;
+  }
+
+  [data-testid="stCaptionContainer"],
+  [data-testid="stCaptionContainer"] p {
+    color: #2c322e;
   }
 }
 
-/* Clean header for viewers: hide the hosting toolbar actions (GitHub, fork, star, edit). */
-[data-testid="stToolbarActions"],
-[data-testid="stToolbarActionButton"],
-[data-testid="stAppDeployButton"] {
-  display: none !important;
+/* ---------------------------------------------------------------- 15. Fit fixes from the 1280 and 390 walkthrough */
+/* Streamlit pads the metric's inner wrapper on top of the tile padding; the tile owns spacing. */
+[class*="_kpis"] [data-testid="stMetric"] > div {
+  padding: 0 !important;
 }
 
-/* Loaded actions: the page link and Clear data share one baseline. */
-.st-key-loaded_actions {
+/* Long KPI labels wrap instead of ending in an ellipsis (two-up tiles on a phone). */
+[data-testid="stMetricLabel"],
+[data-testid="stMetricLabel"] > div,
+[data-testid="stMetricLabel"] p {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+
+/* Big numbers never truncate. */
+[class*="_kpis"] [data-testid="stMetricValue"],
+[class*="_kpis"] [data-testid="stMetricValue"] > div,
+[class*="_kpis"] [data-testid="stMetricValue"] p {
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+
+.st-key-roth_mode [data-testid="stRadioOption"] > div {
+  display: flex;
   align-items: center;
-}
-
-/* Swipe hints under wide tables are for phones only: desktop tables fit. */
-@media (min-width: 641px) {
-  [class*="st-key-swipe_hint"] {
-    display: none !important;
-  }
-}
-
-/* Collapsed nav (phone): the header pill held only a bare double arrow. Give it a visible
-   "Menu" label and a ghost-pill frame so it reads as the way to the other pages. The text
-   also gives the button an accessible name (Streamlit ships it with an empty aria-label). */
-[data-testid="stHeader"] [data-testid="stExpandSidebarButton"] {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
   min-height: 36px;
-  padding: 0 14px 0 8px;
-  border: 1px solid var(--lg-ghost-edge);
-  border-radius: var(--ss-radius-pill);
-  background: rgba(255, 255, 255, 0.72);
-  color: var(--ss-text);
-  touch-action: manipulation;
 }
 
-[data-testid="stHeader"] [data-testid="stExpandSidebarButton"] [data-testid="stIconMaterial"],
-[data-testid="stHeader"] [data-testid="stExpandSidebarButton"] span {
-  color: var(--ss-text) !important;
-}
-
-[data-testid="stHeader"] [data-testid="stExpandSidebarButton"]::after {
-  content: "Menu";
-  font-family: Geist, ui-sans-serif, system-ui, sans-serif;
-  font-size: 14px;
-  font-weight: 500;
+.st-key-roth_mode [data-testid="stRadioOption"] p {
+  margin: 0;
   line-height: 1;
-  color: var(--ss-text);
 }
 
-@media (hover: none), (pointer: coarse) {
-  [data-testid="stHeader"] [data-testid="stExpandSidebarButton"]:active {
-    transform: scale(0.98);
-    opacity: 0.88;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  [data-testid="stHeader"] [data-testid="stExpandSidebarButton"]:active {
-    transform: none;
-  }
-}
-
-@media (prefers-contrast: more) {
-  [data-testid="stHeader"] [data-testid="stExpandSidebarButton"] {
-    border-color: #4f5752;
-  }
-}
-
-
-/* Landing preview: the video fills the card width with the card's control radius. */
-.st-key-landing_preview [data-testid="stVideo"],
-.st-key-landing_preview video {
-  display: block;
-  width: 100% !important;
+/* Deltas wrap on a narrow tile instead of ending in an ellipsis. */
+[class*="_kpis"] [data-testid="stMetricDelta"] {
+  display: inline-flex;
+  width: fit-content;
   max-width: 100%;
-  height: auto;
-  border-radius: var(--ss-radius-control);
-  overflow: hidden;
+  height: auto !important;
+  padding: 3px 10px !important;
 }
 
-.st-key-landing_preview video {
-  background: #ffffff;
-  border: 1px solid var(--lg-edge);
-  box-shadow: 0 1px 2px rgba(26, 29, 27, 0.06);
+[class*="_kpis"] [data-testid="stMetricDelta"] div,
+[class*="_kpis"] [data-testid="stMetricDelta"] p {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+
+/* Page intro spacing: title, then the course chip, then the lede, each with its own air. */
+[data-testid="stElementContainer"]:has(h1) {
+  margin-bottom: 0.25rem;
+}
+
+[data-testid="stCaptionContainer"]:has([aria-label="school icon"]) {
+  margin: 0.25rem 0 0.35rem;
 }

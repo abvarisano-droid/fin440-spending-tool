@@ -17,11 +17,12 @@ import pandas as pd
 from core.categorize import ALL_CATEGORIES
 from core.portfolios import PRESETS
 
-# Tokens from DESIGN.md (Ashton Capes site, Liquid Glass v8 light). Pages may pass these into Altair color scales.
+# Tokens from DESIGN.md v4 (Ashton Capes site, Liquid Glass v8 light). Pages may pass these into Altair color scales.
 TEXT = "#1A1D1B"
 MUTED = "#4F5752"
 BORDER = "#DCDFD8"
-GRID = "#E4E8E6"
+GRID = "#E3E9E8"  # y gridlines only; quiet on the glass card
+FONT = "Geist"
 SPENT = "#B0603A"  # cumulative spending: the baseline, in site chart copper (clearly apart from teal)
 SHADOW = "#0A716C"  # fund value: the hero series, in site teal
 CONTRIBUTIONS = "#3F6F9E"
@@ -52,12 +53,12 @@ HIST_FILL = "#2FA59E"  # solid bars, about 3:1 on white
 # 3:1 non-text stroke on white/paper (the light fills alone are too faint).
 BAND_STROKE = "#0A716C"
 PORTFOLIO_ORDER = list(PRESETS.keys()) + ["SPY (market)", "SPY"]
-# Lines need 3:1 on white, so QQQ uses burnt orange, not the site gold.
+# Lines need 3:1 on white. SCHD is plum (7.16:1 on white, 6.57:1 on paper), apart from teal, blue and grey.
 PORTFOLIO_COLORS = {
     "100% VOO": "#0A716C",
     "60/40 VOO/BND": "#3F6F9E",
     "100% BND": "#4F5752",
-    "100% QQQ": "#B0603A",
+    "100% SCHD": "#7B3F8C",
     "SPY (market)": "#1A1D1B",
     "SPY": "#1A1D1B",
 }
@@ -72,24 +73,26 @@ def _spend_shadow_theme() -> alt.theme.ThemeConfig:
                 "labelColor": MUTED,
                 "titleColor": MUTED,
                 "gridColor": GRID,
-                "domainColor": BORDER,
-                "tickColor": BORDER,
-                "labelFont": "Geist",
-                "titleFont": "Geist",
+                "domain": False,
+                "ticks": False,
+                "labelFont": FONT,
+                "titleFont": FONT,
                 "labelFontSize": 12,
                 "titleFontSize": 12,
+                "titleFontWeight": 500,
             },
+            "axisX": {"grid": False},
             "legend": {
-                "orient": "bottom",
+                "orient": "top",
                 "title": None,
                 "labelColor": TEXT,
-                "labelFont": "Geist",
-                "labelFontSize": 12,
+                "labelFont": FONT,
+                "labelFontSize": 12.5,
                 "symbolType": "circle",
             },
             "range": {"category": CATEGORICAL},
             "bar": {"stroke": None},
-            "line": {"strokeWidth": 2.5},
+            "line": {"strokeWidth": 2.25, "strokeCap": "round", "strokeJoin": "round"},
             "area": {"stroke": None, "opacity": 0.9},
         }
     }
@@ -150,22 +153,62 @@ def _portfolio_scale(names: list[str]) -> alt.Scale:
     return alt.Scale(domain=domain, range=range_)
 
 
+def _mark_type(c) -> str | None:
+    mark = getattr(c, "mark", alt.Undefined)
+    if isinstance(mark, str):
+        return mark
+    t = getattr(mark, "type", alt.Undefined)
+    return t if isinstance(t, str) else None
+
+
+def _restyle_mark(c: alt.Chart, **props) -> alt.Chart:
+    """Add mark properties while keeping the ones the page set (e.g. interpolate)."""
+    mark = getattr(c, "mark", alt.Undefined)
+    if isinstance(mark, str):
+        spec = {"type": mark}
+    elif hasattr(mark, "to_dict"):
+        spec = mark.to_dict()
+    else:
+        return c
+    for k, v in props.items():
+        spec.setdefault(k, v)
+    out = c.copy(deep=False)
+    out.mark = alt.MarkDef(**spec)
+    return out
+
+
+_CURRENT_MARK: list[str | None] = [None]
+
+
 def _legend(columns: int) -> alt.Legend:
-    """Legends wrap into fixed columns so they never run off a phone screen. Set on the encoding,
-    because Streamlit's chart theme overrides legend settings given only in the config."""
-    return alt.Legend(title=None, orient="bottom", columns=columns, columnPadding=14, rowPadding=6,
-                      labelLimit=150, symbolSize=70, labelFontSize=12)
+    """Legends sit above the plot, top left, and wrap into fixed columns so they never run off a
+    phone screen. Set on the encoding, because Streamlit's chart theme overrides legend settings
+    given only in the config. Line charts get a short stroke as the key, other marks a dot."""
+    is_line = _CURRENT_MARK[0] == "line"
+    return alt.Legend(
+        title=None, orient="top", direction="horizontal", columns=columns, columnPadding=20,
+        rowPadding=8, labelLimit=170, labelFontSize=12.5, labelColor=TEXT, labelFont=FONT,
+        symbolType="stroke" if is_line else "circle", symbolSize=180 if is_line else 90,
+        symbolStrokeWidth=3 if is_line else 0, offset=14, padding=0,
+    )
 
 
 def _apply_named_series_colors(c: alt.Chart) -> alt.Chart:
     """Map shadow/roth/category series to DESIGN.md colors."""
+    _CURRENT_MARK[0] = _mark_type(c)
     field = _color_field(c)
-    auto_category = False
     if field is None and (
         _channel_field(c, "y") == "category" or _channel_field(c, "x") == "category"
     ):
-        auto_category = True
-        field = "category"
+        # A ranked bar list whose axis already names each category: one teal fill, rounded
+        # bar ends, no legend. Color adds nothing the axis does not already say.
+        if _mark_type(c) == "bar":
+            horizontal = _channel_field(c, "y") == "category"
+            band = "y" if horizontal else "x"
+            enc = _channel_encoding(c, band).copy(deep=True)
+            enc.scale = alt.Scale(paddingInner=0.32, paddingOuter=0.1)
+            return _restyle_mark(c, color=ACCENT, cornerRadiusEnd=5).encode(**{band: enc})
+        return c
     if field == "series":
         names = _series_names(c)
         spent = next((n for n in names if n.startswith("Spent")), "Spent (cumulative)")
@@ -195,14 +238,24 @@ def _apply_named_series_colors(c: alt.Chart) -> alt.Chart:
     if field == "category":
         seen = set(_field_values(c, "category"))
         domain = [k for k in CATEGORY_COLORS if k in seen] or list(CATEGORY_COLORS.keys())
-        color_kwargs: dict = {
-            "scale": alt.Scale(domain=domain, range=[CATEGORY_COLORS[k] for k in domain]),
-        }
-        if auto_category:
-            color_kwargs["legend"] = None
-        else:
-            color_kwargs["legend"] = _legend(2)
-        return c.encode(color=alt.Color("category:N", **color_kwargs))
+        out = c.encode(color=alt.Color(
+            "category:N",
+            scale=alt.Scale(domain=domain, range=[CATEGORY_COLORS[k] for k in domain]),
+            legend=_legend(2),
+        ))
+        if _mark_type(c) == "bar":
+            # Stacked bars: a hairline of paper between segments so neighbors read apart.
+            out = _restyle_mark(out, stroke="#FFFFFF", strokeWidth=1)
+            x = _channel_encoding(out, "x")
+            if x is not None and _channel_field(out, "x") not in (None, "category"):
+                xe = x.copy(deep=True)
+                if getattr(xe, "scale", alt.Undefined) is alt.Undefined:
+                    xe.scale = alt.Scale(paddingInner=0.38)
+                    try:
+                        out = out.encode(x=xe)
+                    except Exception:
+                        pass
+        return out
     if field in {"name", "portfolio"}:
         names = _field_values(c, field) or list(PORTFOLIO_ORDER)
         return c.encode(
@@ -238,6 +291,19 @@ def section(key: str, title: str | None = None, border: bool = True):
         yield
 
 
+def page_header(title: str, *, course: str | None = None, lede: str | None = None) -> None:
+    """Page intro: serif title, the FIN 440 course chip, then one lede line.
+
+    `course` is the chapter text without the icon (the school icon is added here); `lede` is the
+    plain caption that explains the page. CSS hook: .st-key-page_head."""
+    with st.container(key="page_head"):
+        st.title(title)
+        if course:
+            st.caption(f":material/school: {course}")
+        if lede:
+            st.caption(lede)
+
+
 def kpi_row(key: str, items: list[dict]) -> None:
     """items: dicts of st.metric kwargs (label, value, and optional delta, help)."""
     with st.container(key=key):
@@ -258,25 +324,30 @@ def chart(c: alt.Chart, key: str | None = None) -> None:
     c = _apply_named_series_colors(c)
     c = _tight_age_axis(c)
     c = (
-        c.properties(padding={"left": 12, "right": 8, "top": 8, "bottom": 8})
-        # Legends wrap into columns so they never run off a phone screen.
-        .configure_legend(orient="bottom", title=None, labelColor=TEXT, labelFont="Geist", labelFontSize=12,
-                          columns=2, columnPadding=14, rowPadding=6, labelLimit=150, symbolSize=70)
+        c.properties(padding={"left": 4, "right": 8, "top": 4, "bottom": 4})
+        # Legends sit above the plot and wrap into columns so they never run off a phone screen.
+        .configure_legend(orient="top", title=None, labelColor=TEXT, labelFont=FONT, labelFontSize=12.5,
+                          columns=2, columnPadding=20, rowPadding=8, labelLimit=170)
         .configure_view(strokeWidth=0, clip=False)
         .configure_axis(
             labelColor=MUTED,
             titleColor=MUTED,
             gridColor=GRID,
-            domainColor=BORDER,
-            tickColor=BORDER,
-            labelFont="Geist",
-            titleFont="Geist",
+            domain=False,
+            ticks=False,
+            labelFont=FONT,
+            titleFont=FONT,
+            labelFontSize=12,
+            titleFontSize=12,
+            titleFontWeight=500,
+            titlePadding=12,
             labelLimit=0,
             labelPadding=8,
             labelFlush=False,
         )
+        .configure_axisX(grid=False, domain=True, domainColor=BORDER)
         .configure_range(category=CATEGORICAL)
-        .configure_line(strokeWidth=2.5)
+        .configure_line(strokeWidth=2.25, strokeCap="round", strokeJoin="round")
         .configure_area(opacity=0.9)
         .configure(background="transparent")
     )
