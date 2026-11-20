@@ -27,7 +27,7 @@ OUT = os.path.join(ROOT, "assets", "tutorial.mp4")
 VIEW = dict(width=1280, height=720)   # CSS pixels
 SCALE = 1.5                           # device pixels -> 1920x1080 frames, crisp text
 FRAME = dict(width=1920, height=1080)
-PAD = 0.55                            # breath after each line, seconds
+PAD = 0.35                            # breath after each line, seconds
 STEPS = 6
 
 # Overlay drawn on top of the page during recording only. Colors follow DESIGN.md.
@@ -49,7 +49,7 @@ OVERLAY_JS = r"""
       transition: opacity .4s; opacity: 0; }
     #tut-chip b { color: #0A716C; margin-right: 6px; }
     #tut-spot { position: fixed; z-index: 99990; border-radius: 22px; pointer-events: none; opacity: 0;
-      box-shadow: 0 0 0 3px #34E0D6, 0 0 0 9px rgba(52,224,214,.22), 0 0 0 200vmax rgba(10,20,32,.38);
+      box-shadow: 0 0 0 3px #34E0D6, 0 0 0 9px rgba(52,224,214,.22), 0 0 0 200vmax rgba(10,20,32,.22);
       transition: left .7s cubic-bezier(.2,.8,.2,1), top .7s cubic-bezier(.2,.8,.2,1),
                   width .7s cubic-bezier(.2,.8,.2,1), height .7s cubic-bezier(.2,.8,.2,1), opacity .5s; }
     #tut-cur { position: fixed; z-index: 100000; width: 22px; height: 22px; margin: -11px 0 0 -11px;
@@ -89,6 +89,7 @@ class Director:
     def __init__(self, page, clips, t0):
         self.page, self.clips, self.t0 = page, clips, t0
         self.cues = []      # (seconds from video start, mp3 path)
+        self.cuts = []      # (start, end) stretches of page loading, removed in the edit
         self._end = 0.0
 
     # timing -------------------------------------------------------------
@@ -108,6 +109,14 @@ class Director:
 
     def hold(self, ms):
         self.page.wait_for_timeout(ms)
+
+    def load(self, selector, timeout=60000):
+        """Wait for a slow page with no voice playing; that stretch is cut from the final video."""
+        self.wait_out()
+        start = time.monotonic() - self.t0
+        self.page.wait_for_selector(selector, timeout=timeout)
+        self.page.wait_for_timeout(700)   # let charts finish drawing
+        self.cuts.append((start + 0.25, time.monotonic() - self.t0 - 0.15))
 
     # visuals ------------------------------------------------------------
     def chip(self, n, name):
@@ -137,7 +146,7 @@ class Director:
                 Object.assign(s.style, {left: (c.left - pad) + 'px', top: (c.top - pad) + 'px',
                   width: (c.width + 2 * pad) + 'px', height: (c.height + 2 * pad) + 'px', opacity: 1}); }, 1450);
             }, 700); }""", [selector, pad, zoom])
-        self.page.wait_for_timeout(2300)
+        self.page.wait_for_timeout(1900)
 
     def unspot(self):
         self.page.evaluate("""() => { document.getElementById('tut-spot').style.opacity = 0;
@@ -159,11 +168,12 @@ class Director:
 
     def nav(self, slug):
         self.unspot()
+        self.caption_off()
         sel = f"a[href*='{slug}']"
         self.point(sel)
         self.press()
         self.page.click(sel)
-        self.page.wait_for_timeout(1600)
+        self.page.wait_for_timeout(500)
         self.page.evaluate("() => document.querySelector('[data-testid=\"stMain\"]').scrollTo({top: 0})")
 
     def card(self, title, sub, ms):
@@ -224,7 +234,7 @@ def tutorial(browser, video_dir, clips):
     d.chip(2, "Check the columns")
     d.line("columns")
     d.spot(".st-key-column_mapper", zoom=1.03)
-    d.hold(1200)
+    d.hold(600)
     d.spot(".st-key-load_btn", zoom=1.0)
     d.point(".st-key-load_btn button")
     d.wait_out()
@@ -234,13 +244,14 @@ def tutorial(browser, video_dir, clips):
     d.hold(400)
     d.line("loaded")
     d.spot(".st-key-loaded_summary", zoom=1.03)
-    d.hold(2600)
+    d.hold(1800)
     d.spot(".st-key-use_sample", zoom=1.0)
     d.point(".st-key-use_sample button")
     d.wait_out()
 
     # 3. spending
     d.nav("spending")
+    d.load(".st-key-spend_kpis")
     page.evaluate(OVERLAY_JS)
     d.chip(3, "Spending")
     d.line("spending")
@@ -251,7 +262,7 @@ def tutorial(browser, video_dir, clips):
 
     # 4. shadow
     d.nav("shadow")
-    page.wait_for_selector(".st-key-shadow_kpis", timeout=30000)
+    d.load(".st-key-shadow_compare [data-testid='stDataFrame']")
     d.chip(4, "Shadow portfolio")
     d.line("shadow")
     d.spot(".st-key-shadow_kpis", zoom=1.05)
@@ -263,13 +274,15 @@ def tutorial(browser, video_dir, clips):
     d.point(".st-key-shadow_chip button", "SCHD")
     d.press()
     page.locator(".st-key-shadow_chip button", has_text="SCHD").first.click()
-    d.hold(2200)
+    page.wait_for_function("() => [...document.querySelectorAll('.st-key-shadow_kpis [data-testid=\"stMetricLabel\"]')]"
+                           ".some(e => e.innerText.includes('SCHD'))", timeout=30000)
+    d.hold(1600)
     d.spot(".st-key-shadow_compare", zoom=1.0)
     d.wait_out()
 
     # 5. roth
     d.nav("roth")
-    page.wait_for_selector(".st-key-roth_inputs", timeout=30000)
+    d.load(".st-key-roth_mc_kpis")
     d.chip(5, "Roth calculator")
     d.line("roth")
     d.spot(".st-key-roth_inputs", zoom=1.02)
@@ -277,11 +290,10 @@ def tutorial(browser, video_dir, clips):
     d.line("redirect")
     d.spot(".st-key-roth_redirect", zoom=1.03)
     d.wait_out()
-    d.hold(600)
 
     # 6. proof
     d.nav("proof")
-    page.wait_for_selector(".st-key-proof_checks", timeout=60000)
+    d.load(".st-key-proof_download")
     d.chip(6, "Proof")
     d.line("proof")
     d.spot(".st-key-proof_checks", zoom=1.02)
@@ -295,35 +307,47 @@ def tutorial(browser, video_dir, clips):
     d.card("Try it now", "Upload your CSV, or click Use sample data", 600)
     d.line("outro")
     d.wait_out()
-    d.hold(900)
+    d.hold(500)
 
     total = time.monotonic() - t0
     path = page.video.path()
     ctx.close()
-    return path, d.cues, skip, total
+    return path, d.cues, d.cuts, skip, total
 
 
-def to_mp4(src, dst, cues, skip, total):
-    """Trim the loading, add fades, and lay each voice line at the moment it was cued."""
+def to_mp4(src, dst, cues, cuts, skip, total):
+    """Trim the loading, jump-cut the page loads, add fades, and lay each voice line at its cue."""
     import imageio_ffmpeg
     ff = imageio_ffmpeg.get_ffmpeg_exe()
     os.makedirs(os.path.dirname(dst), exist_ok=True)
-    length = total - skip
-    args = [ff, "-y", "-ss", f"{skip:.3f}", "-i", src]
+    keep, pos = [], skip
+    for a, b in sorted(cuts):
+        if b - a > 0.3:
+            keep.append((pos, a))
+            pos = b
+    keep.append((pos, total))
+
+    def remap(t):  # original time -> edited time
+        return sum(max(0.0, min(b, t) - a) for a, b in keep)
+
+    length = remap(total)
+    args = [ff, "-y", "-i", src]
     for _, path in cues:
         args += ["-i", path]
-    parts = []
+    parts = [f"[0:v]trim=start={a:.3f}:end={b:.3f},setpts=PTS-STARTPTS[v{k}]" for k, (a, b) in enumerate(keep)]
+    parts.append("".join(f"[v{k}]" for k in range(len(keep))) + f"concat=n={len(keep)}:v=1:a=0[vc]")
+    parts.append(f"[vc]fade=t=in:st=0:d=0.8:color=black,fade=t=out:st={length - 1.0:.2f}:d=1.0,"
+                 f"fps=30,format=yuv420p[vout]")
     for i, (at, _) in enumerate(cues, start=1):
-        ms = max(int((at - skip) * 1000), 0)
-        parts.append(f"[{i}:a]adelay={ms}|{ms},volume=1.0[a{i}]")
+        ms = int(remap(at) * 1000)
+        parts.append(f"[{i}:a]adelay={ms}|{ms}[a{i}]")
     mix = "".join(f"[a{i}]" for i in range(1, len(cues) + 1))
     parts.append(f"{mix}amix=inputs={len(cues)}:normalize=0,afade=t=out:st={length - 1.0:.2f}:d=1.0[aout]")
-    parts.append(f"[0:v]fade=t=in:st=0:d=0.8:color=black,fade=t=out:st={length - 1.0:.2f}:d=1.0,"
-                 f"fps=30,format=yuv420p[vout]")
     args += ["-filter_complex", ";".join(parts), "-map", "[vout]", "-map", "[aout]", "-t", f"{length:.3f}",
-             "-c:v", "libx264", "-crf", "26", "-preset", "slow", "-c:a", "aac", "-b:a", "128k",
+             "-c:v", "libx264", "-crf", "30", "-preset", "slow", "-c:a", "aac", "-b:a", "64k",
              "-movflags", "+faststart", dst]
     subprocess.run(args, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    return length
 
 
 if __name__ == "__main__":
@@ -332,8 +356,8 @@ if __name__ == "__main__":
     with sync_playwright() as p:
         browser = p.chromium.launch(channel="chrome", headless=True)
         warm(browser)
-        webm, cues, skip, total = tutorial(browser, tmp, clips)
+        webm, cues, cuts, skip, total = tutorial(browser, tmp, clips)
         browser.close()
-    to_mp4(webm, OUT, cues, skip, total)
+    length = to_mp4(webm, OUT, cues, cuts, skip, total)
     shutil.rmtree(tmp, ignore_errors=True)
-    print("saved", os.path.abspath(OUT), f"{os.path.getsize(OUT) / 1e6:.1f} MB, {total - skip:.0f} s")
+    print("saved", os.path.abspath(OUT), f"{os.path.getsize(OUT) / 1e6:.1f} MB, {length:.0f} s, {len(cuts)} cuts")
