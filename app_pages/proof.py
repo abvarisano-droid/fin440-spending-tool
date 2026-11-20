@@ -88,3 +88,16 @@ independently by the auditor, and this page re-runs the key checks live on your 
 what ships were human decisions. The AI wrote code and checks; people read the results.
 """
     )
+
+with st.expander("FIN 440 links, page by page", key="proof_course"):
+    st.markdown(
+        """
+Bodie, Kane & Marcus, *Investments*, 13e:
+- **Spending breakdown:** Ch 1 (saving vs. consumption), Ch 12 (behavioral finance: impulse
+  spending, mental accounting).
+- **Shadow portfolio:** Ch 2 (asset classes, stock and bond indexes), Ch 5 (holding-period
+  returns, compounding), Ch 7 (stock-bond diversification).
+- **Roth calculator:** Ch 5 (compounding, APR vs. EAR, real vs. nominal returns, arithmetic vs.
+  geometric averages).
+"""
+    )

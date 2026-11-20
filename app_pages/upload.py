@@ -17,8 +17,12 @@ ui.page_header(
 
 with ui.section("upload_source", border=False):
     uploaded = st.file_uploader("Bank or card CSV", type=["csv"], key="csv_file")
-    use_sample = st.button("Use sample data", icon=":material/science:", key="use_sample",
-                           type="primary" if uploaded is None else "secondary")
+    with st.container(horizontal=True, key="sample_actions"):
+        use_sample = st.button("Use sample data", icon=":material/science:", key="use_sample",
+                               type="primary" if uploaded is None else "secondary")
+        # the fictional sample as a file: see the expected format, or practice the upload step
+        st.download_button("Download the sample CSV", SAMPLE_CSV.read_bytes(), file_name="sample_transactions.csv",
+                           mime="text/csv", icon=":material/download:", key="sample_csv_download")
 
 if use_sample:
     # known format, so skip the mapper and load in one click
@@ -110,10 +114,10 @@ if tx is not None:
     with ui.section("loaded_summary", "Loaded"):
         ui.kpi_row("loaded_kpis", [
             dict(label="Purchases", value=f"{len(spend):,}",
-                 help=f"{len(tx) - len(spend)} card payment or transfer row(s) not counted."
+                 help=f"{len(tx) - len(spend)} card payment, transfer or ignored row(s) not counted."
                  if len(tx) != len(spend) else None),
             dict(label="Total spent", value=f"${spend['amount'].sum():,.2f}",
-                 help="Excludes card payments and transfers, same as Spending breakdown."),
+                 help="Excludes card payments, transfers and ignored rows, same as Spending breakdown."),
             dict(label="Date range", value=f"{tx['date'].min():%b %Y} to {tx['date'].max():%b %Y}",
                  help=f"{tx['date'].min():%b %d, %Y} to {tx['date'].max():%b %d, %Y}"),
         ])

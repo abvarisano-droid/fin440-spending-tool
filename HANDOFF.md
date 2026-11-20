@@ -129,3 +129,32 @@ Append only, newest at the bottom. One entry per finished phase or cross-boundar
   row). Re-record after the group settles Taylor's changes.
 - **Auditor:** hand-check six $200 buys on the sample ($1,200 put in), 50% of each want ($1,842.36),
   and that $150/month gives $608,262 in both modes.
+
+## 2026-11-20, builder (claude): ignore purchases, rename and split categories, no course line
+
+- **Asked by Ashton** (Taylor's suggestions): ignore any transaction; rename and split categories;
+  remove the source line under each title; the Roth target fix (already in cd9b667).
+- **Done:**
+  - `core/edits.py` (new): `split_category`, `rename_category`, `recategorize`, `set_ignored`,
+    `want_categories`, `ordered_categories`, name checks (30 characters, no duplicates, the
+    transfers category is reserved). Custom categories keep a want/need flag in session state
+    (`custom_wants`), cleared when new data loads.
+  - `core/state.spending_only` drops rows marked ignored, so every page and Proof leave them out.
+  - Spending: a "Your categories" card (Split / Rename tabs, edits run in button callbacks) and an
+    Ignore checkbox column in All transactions; a caption counts ignored purchases.
+  - Shadow and Roth pick wants by the per-row `discretionary` flag (`want_categories`), not the
+    built-in name list, so a split-off want (or a renamed Shopping) still gets shadowed.
+  - The FIN 440 chapter line is gone from the Spending, Shadow and Roth headers; the same text is
+    in a "FIN 440 links, page by page" expander on Proof (`proof_course`).
+- **Designer (spend-designer, covering):** `core/ui.py` now gives custom categories their own
+  colors in the stacked charts (they were left out of the legend).
+- **Tests:** 135 pass (`tests/test_edits.py`, plus app tests for a split into a need and into a
+  want, rename, a duplicate name, an ignored purchase on two pages, and the header line).
+- **Not done:** the tutorial video and deck still show the old headers and controls.
+- **Auditor:** sample Target split into a need takes wants to $3,058.43 (3,684.72 - 626.29);
+  check an ignored row leaves Upload, Spending, Shadow, Roth and Proof totals.
+- **Also (Dr. Van Alfen's check-in notes):** a "Download the sample CSV" button next to "Use sample
+  data" on Upload, so people can see the expected format or practice the upload. The exact-dollar
+  option he suggested is the cd9b667 work; Yahoo Finance is the price source he asked about; card and
+  bank statements both load (one amount column, or separate debit and credit).
+- **Tests:** 136 pass.

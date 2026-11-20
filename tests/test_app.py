@@ -136,3 +136,76 @@ def test_empty_state_points_to_upload():
     at.switch_page("app_pages/spending.py").run()
     assert not at.exception
     assert at.info
+
+
+def test_split_shopping_into_a_need_leaves_the_shadow():
+    # sample Shopping = Amazon $1,425.82 + Target $626.29; Target -> "Home" (a need)
+    at = _loaded()
+    at.switch_page("app_pages/spending.py").run()
+    assert at.selectbox(key="split_source").value == "Shopping"
+    at.multiselect(key="split_merchants").set_value(["TARGET 00012"])
+    at.text_input(key="split_name").set_value("Home")
+    at.toggle(key="split_want").set_value(False)
+    at.button(key="split_btn").click().run()
+    assert not at.exception and not at.error
+    assert any("into Home" in s.value for s in at.success)
+    assert at.metric[2].value == "$3,058.43"                       # wants: 3,684.72 - 626.29
+    at.switch_page("app_pages/shadow.py").run()
+    assert "Home" not in at.multiselect(key="shadow_cats").options
+    assert at.metric[0].value == "$3,058.43"
+
+
+def test_split_into_a_want_and_rename():
+    at = _loaded()
+    at.switch_page("app_pages/spending.py").run()
+    at.multiselect(key="split_merchants").set_value(["TARGET 00012"])
+    at.text_input(key="split_name").set_value("Home")
+    at.button(key="split_btn").click().run()                       # flag defaults to Shopping's: a want
+    at.selectbox(key="rename_old").set_value("Shopping")
+    at.text_input(key="rename_new").set_value("Online")
+    at.button(key="rename_btn").click().run()
+    assert not at.exception and not at.error
+    at.switch_page("app_pages/shadow.py").run()
+    opts = at.multiselect(key="shadow_cats").options
+    assert "Home" in opts and "Online" in opts and "Shopping" not in opts
+    assert at.metric[0].value == "$3,684.72"                       # same wants, new names
+
+
+def test_split_rejects_an_existing_name():
+    at = _loaded()
+    at.switch_page("app_pages/spending.py").run()
+    at.multiselect(key="split_merchants").set_value(["TARGET 00012"])
+    at.text_input(key="split_name").set_value("dining")
+    at.button(key="split_btn").click().run()
+    assert any("already exists" in e.value for e in at.error)
+
+
+def test_ignored_purchase_leaves_every_total():
+    at = _loaded()
+    tx = at.session_state["transactions"].copy()
+    tx["ignored"] = False
+    first_amazon = tx.index[tx["description"] == "AMAZON.COM*MK12"][0]
+    tx.loc[first_amazon, "ignored"] = True
+    amt = float(tx.loc[first_amazon, "amount"])
+    at.session_state["transactions"] = tx
+    at.switch_page("app_pages/spending.py").run()
+    assert not at.exception and not at.error
+    assert at.metric[0].value == f"${6963.81 - amt:,.2f}"
+    assert any("1 ignored purchase" in c.value for c in at.caption)
+    at.switch_page("app_pages/shadow.py").run()
+    assert at.metric[0].value == f"${3684.72 - amt:,.2f}"
+
+
+def test_no_course_line_under_titles_and_links_on_proof():
+    at = _loaded()
+    for page in ("app_pages/spending.py", "app_pages/shadow.py", "app_pages/roth.py"):
+        at.switch_page(page).run()
+        assert not any("FIN 440 link" in c.value for c in at.caption), page
+    at.switch_page("app_pages/proof.py").run()
+    assert any("Ch 7" in m.value and "Shadow portfolio" in m.value for m in at.markdown)
+
+
+def test_sample_csv_can_be_downloaded():
+    at = AppTest.from_file("../streamlit_app.py", default_timeout=60).run()
+    assert not at.exception
+    assert at.get("download_button")   # next to "Use sample data", before anything is loaded

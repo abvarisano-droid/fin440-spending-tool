@@ -2,14 +2,13 @@ import altair as alt
 import streamlit as st
 
 from core import invest, montecarlo, tvm, ui
-from core.categorize import ALL_CATEGORIES, DISCRETIONARY
+from core.edits import ordered_categories, want_categories
 from core.prices import clean_ticker, fetch_history
 from core.state import discretionary_monthly, get_transactions, spending_only
 from core.suggest import first_year_over, monthly_from_share, starting_room, suggest_monthly
 
 ui.page_header(
     "Roth IRA calculator",
-    course="FIN 440 link (Bodie, Kane & Marcus, 13e): Ch 5 (compounding, APR vs. EAR, real vs. nominal returns, arithmetic vs. geometric averages).",
     lede=(
         "Monthly contributions grow tax-free. Use a real (after-inflation) return to read every "
         "number in today's dollars. Roth eligibility has income limits, which this calculator "
@@ -30,8 +29,8 @@ with ui.section("roth_inputs"):
                         help="My spending: the money you spent becomes your starting balance, and we suggest "
                              "a monthly amount from how much you spend. Enter my own: type any numbers.")
     if mode == "My spending":
-        present = [c for c in ALL_CATEGORIES if c in set(spend["category"])]
-        cats = st.multiselect("Spending to redirect", present, default=[c for c in present if c in DISCRETIONARY],
+        present = ordered_categories(spend)
+        cats = st.multiselect("Spending to redirect", present, default=want_categories(spend),
                               key="roth_cats", help="Wants are picked by default, like on the Shadow page.")
         if not cats:
             st.warning("Pick at least one category.")
