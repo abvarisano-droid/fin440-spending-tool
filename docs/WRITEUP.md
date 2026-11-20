@@ -101,7 +101,7 @@ The audits caught real errors before they shipped:
     is $163,563, and only 34% of paths reach the $705k a simple calculator promises.
 
 ## 6. How we know it's valid
-1. **Hand-checked tests (103).** Expected values come from outside the code: Excel `FV`, hand
+1. **Hand-checked tests (105).** Expected values come from outside the code: Excel `FV`, hand
    formulas, brute-force loops, `numpy.polyfit`. For example, Roth $705,070.79 equals Excel's FV
    to the cent, and the 60/40 portfolio equals a purchase-by-purchase recompute to $0.000001.
 2. **Independent audits every phase,** plus a final three-checker audit (math, data leaks,

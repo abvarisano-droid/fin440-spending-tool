@@ -68,7 +68,7 @@ with ui.section("roth_inputs"):
             st.caption(
                 f":material/lightbulb: You spent \\${picked_total:,.2f} on these over {months} months "
                 f"(\\${wants_monthly:,.2f}/month, {tier_word}). We suggest putting in "
-                f"{sugg.share:.0%} of that: **\\${sugg.monthly:,.0f}/month**."
+                f"{sugg.share:.0%} of that, rounded to the nearest \\$25: **\\${sugg.monthly:,.0f}/month**."
                 + (f" The starting balance is trimmed to \\${start_room:,.2f} so this year's total stays "
                    f"within the \\${tvm.IRA_LIMIT_2026:,.0f} IRA limit." if picked_total > start_room else "")
             )

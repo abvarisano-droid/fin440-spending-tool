@@ -95,6 +95,10 @@ spending figures do not.
 - People made every scope and ship decision.
 
 ## Class check-ins (be ready for these questions)
+*These are what we said at the two check-ins, kept as history. Today's app: 5 pages, 105 tests,
+8 Proof checks; the Risk & CAPM page and the timing test were removed on Nov 19. Quote today's
+numbers, not these.*
+
 **Game plan check-in**
 - *The idea:* turn a bank or card statement into an investments lab on your own spending.
 - *How it relates to investments:* it covers returns, risk, CAPM, diversification, market

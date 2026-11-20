@@ -2,7 +2,7 @@ import streamlit as st
 
 from core import proof, ui
 from core.prices import fetch_many
-from core.state import SAMPLE_CSV, discretionary_monthly, require_transactions, spending_only
+from core.state import SAMPLE_CSV, SAMPLE_FLAG, discretionary_monthly, require_transactions, spending_only
 
 ui.page_header(
     "Proof",
@@ -15,7 +15,7 @@ ui.page_header(
 )
 tx = require_transactions()
 spend = spending_only(tx)
-is_sample = st.session_state.get("source_name", "").startswith("Sample")
+is_sample = bool(st.session_state.get(SAMPLE_FLAG))
 
 try:
     with st.spinner("Getting prices and running checks..."):

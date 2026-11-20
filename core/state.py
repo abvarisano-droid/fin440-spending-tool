@@ -13,19 +13,23 @@ STYLES_CSS = ROOT / "styles.css"
 
 TX_KEY = "transactions"  # normalized + categorized DataFrame
 SOURCE_KEY = "source_name"
+SAMPLE_FLAG = "is_builtin_sample"
 
 
 def get_transactions() -> pd.DataFrame | None:
     return st.session_state.get(TX_KEY)
 
 
-def set_transactions(df: pd.DataFrame, source_name: str) -> None:
+def set_transactions(df: pd.DataFrame, source_name: str, is_sample: bool | None = None) -> None:
+    """is_sample: True only for the built-in sample button; None keeps the current flag (edits)."""
     st.session_state[TX_KEY] = df
     st.session_state[SOURCE_KEY] = source_name
+    if is_sample is not None:
+        st.session_state[SAMPLE_FLAG] = is_sample
 
 
 def clear_transactions() -> None:
-    for k in (TX_KEY, SOURCE_KEY):
+    for k in (TX_KEY, SOURCE_KEY, SAMPLE_FLAG):
         st.session_state.pop(k, None)
 
 

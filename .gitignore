@@ -12,3 +12,7 @@ docs/deck/numbers.json
 
 # Proof workbook downloads
 *.xlsx
+
+# dev-tool audio output (tools/narration.py)
+*.mp3
+narration/

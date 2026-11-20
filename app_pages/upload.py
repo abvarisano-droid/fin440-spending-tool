@@ -27,6 +27,7 @@ if use_sample:
     set_transactions(
         categorize(ingest.normalize(sample, m, ingest.guess_purchases_negative(sample, m))),
         "Sample data (fictional)",
+        is_sample=True,
     )
 
 if uploaded is not None:
@@ -124,8 +125,8 @@ if tx is not None:
                 st.rerun()
 
 TUTORIAL = Path(__file__).resolve().parent.parent / "assets" / "tutorial.mp4"
-if tx is None and TUTORIAL.exists():
-    with ui.section("landing_preview", "How to use it, in about a minute"):
+if tx is None and uploaded is None and TUTORIAL.exists():
+    with ui.section("landing_preview", "How to use it, in under two minutes"):
         st.video(str(TUTORIAL), autoplay=True, muted=True)
         st.caption(":material/volume_up: It starts muted, so turn on the sound in the player to hear the "
                    "walkthrough. Six steps on a fictional statement: upload, check the columns, Spending, "
