@@ -1,7 +1,7 @@
 """Suggested Roth contribution tiers: hand-picked edges, not the module's own constants."""
 import pytest
 
-from core.suggest import first_year_over, starting_room, suggest_monthly
+from core.suggest import first_year_over, monthly_from_share, starting_room, suggest_monthly
 
 
 @pytest.mark.parametrize("wants, tier, share", [
@@ -32,3 +32,10 @@ def test_start_leaves_room_for_twelve_payments():
     assert not first_year_over(3684.72, 150)       # sample: $5,484.72
     assert first_year_over(6963.81, 300)           # every category: $10,563.81
     assert not first_year_over(3900, 300)
+
+
+def test_any_share_uses_the_same_rounding():
+    assert monthly_from_share(614.12, 0.50) == 300   # 307.06 -> 300
+    assert monthly_from_share(614.12, 0.10) == 50    # 61.41 -> 50
+    assert monthly_from_share(614.12, 1.00) == 625   # 614.12 -> 625 = 7,500 / 12, also the cap
+    assert monthly_from_share(30.0, 0.05) == 25      # 1.50 -> the $25 floor

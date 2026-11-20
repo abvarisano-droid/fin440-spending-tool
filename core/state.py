@@ -22,6 +22,8 @@ def get_transactions() -> pd.DataFrame | None:
 
 def set_transactions(df: pd.DataFrame, source_name: str, is_sample: bool | None = None) -> None:
     """is_sample: True only for the built-in sample button; None keeps the current flag (edits)."""
+    if st.session_state.get(SOURCE_KEY) != source_name or is_sample is not None:
+        st.session_state.pop("invest_dollars", None)  # new data: refill the suggested monthly amount
     st.session_state[TX_KEY] = df
     st.session_state[SOURCE_KEY] = source_name
     if is_sample is not None:
@@ -29,7 +31,8 @@ def set_transactions(df: pd.DataFrame, source_name: str, is_sample: bool | None 
 
 
 def clear_transactions() -> None:
-    for k in (TX_KEY, SOURCE_KEY, SAMPLE_FLAG):
+    # invest_mode / invest_dollars: the shared choice from core/invest.py, refilled for the new data
+    for k in (TX_KEY, SOURCE_KEY, SAMPLE_FLAG, "invest_mode", "invest_dollars"):
         st.session_state.pop(k, None)
 
 

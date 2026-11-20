@@ -1,11 +1,11 @@
 import altair as alt
 import streamlit as st
 
-from core import montecarlo, tvm, ui
+from core import invest, montecarlo, tvm, ui
 from core.categorize import ALL_CATEGORIES, DISCRETIONARY
 from core.prices import clean_ticker, fetch_history
 from core.state import discretionary_monthly, get_transactions, spending_only
-from core.suggest import first_year_over, starting_room, suggest_monthly
+from core.suggest import first_year_over, monthly_from_share, starting_room, suggest_monthly
 
 ui.page_header(
     "Roth IRA calculator",
@@ -40,16 +40,10 @@ with ui.section("roth_inputs"):
         picked_total = float(spend.loc[spend["category"].isin(cats), "amount"].sum())
         wants_monthly = picked_total / months
         sugg = suggest_monthly(wants_monthly)
-        start_room = starting_room(sugg.monthly)
-        start_default = round(min(picked_total, start_room), 2)
-        # refill the two boxes when the categories change, and when Streamlit dropped their state
-        # (it does whenever the widgets weren't drawn: the other mode, or another page); edits stick otherwise
-        sig = (tuple(cats), round(picked_total, 2))
-        if (st.session_state.get("_roth_sig") != sig or "roth_start_sp" not in st.session_state
-                or "roth_monthly_sp" not in st.session_state):
-            st.session_state["_roth_sig"] = sig
-            st.session_state["roth_start_sp"] = start_default
-            st.session_state["roth_monthly_sp"] = sugg.monthly
+        invest_mode = invest.mode_radio(
+            st, "roth", help="Percent of wants: a share of what you spend on these each month, rounded to "
+                             "the nearest \\$25. Exact $ per month: any amount. The Shadow page uses the "
+                             "same choice.")
 
     c1, c2, c3 = st.columns(3)
     with c1:
@@ -57,18 +51,34 @@ with ui.section("roth_inputs"):
         retirement_age = st.number_input("Retirement age", 17, 90, 65, key="roth_retire")
     with c2:
         if mode == "My spending":
+            if invest_mode == invest.PERCENT:
+                share_pct = st.slider("Share of monthly wants", 5, 100, int(round(sugg.share * 100)), 5,
+                                      format="%d%%", key="roth_pct",
+                                      help="We suggest a share from how much you spend: 50% if light, 35% "
+                                           "if moderate, 25% if heavy.")
+                monthly = monthly_from_share(wants_monthly, share_pct / 100)
+            else:
+                monthly = invest.dollars_input(st, "roth", sugg.monthly)
+            start_room = starting_room(monthly)
+            start_default = round(min(picked_total, start_room), 2)
+            # refill the start when the categories or the monthly amount change, and when Streamlit
+            # dropped its state (it does whenever the box wasn't drawn: the other mode, or another
+            # page); edits stick otherwise
+            sig = (tuple(cats), round(picked_total, 2), monthly)
+            if st.session_state.get("_roth_sig") != sig or "roth_start_sp" not in st.session_state:
+                st.session_state["_roth_sig"] = sig
+                st.session_state["roth_start_sp"] = start_default
             starting = st.number_input("Starting balance ($)", 0.0, 10_000_000.0, step=100.0, format="%.2f",
                                        key="roth_start_sp",
                                        help="What you spent on these categories in the file, put in as "
                                             "this year's contribution. Together with 12 monthly payments it "
                                             f"stays within the \\${tvm.IRA_LIMIT_2026:,.0f} yearly IRA limit.")
-            monthly = st.number_input("Per month ($)", 0.0, 10_000.0, step=25.0, format="%.0f",
-                                      key="roth_monthly_sp")
             tier_word = {"light": "light", "moderate": "moderate", "heavy": "on the heavy side"}[sugg.tier]
             st.caption(
                 f":material/lightbulb: You spent \\${picked_total:,.2f} on these over {months} months "
                 f"(\\${wants_monthly:,.2f}/month, {tier_word}). We suggest putting in "
                 f"{sugg.share:.0%} of that, rounded to the nearest \\$25: **\\${sugg.monthly:,.0f}/month**."
+                + (f" You're putting in **\\${monthly:,.0f}/month**." if monthly != sugg.monthly else "")
                 + (f" The starting balance is trimmed to \\${start_room:,.2f} so this year's total stays "
                    f"within the \\${tvm.IRA_LIMIT_2026:,.0f} IRA limit." if picked_total > start_room else "")
             )
@@ -189,8 +199,12 @@ with ui.section("roth_mc_controls", "With uncertain returns"):
                             help="About 15% is typical for a broad US stock index.")
     else:
         mc_raw = m2.text_input("Fund for history", value="VOO", max_chars=10, key="mc_ticker")
-    target = m3.number_input("Target balance ($)", 0.0, 100_000_000.0,
-                             float(round(final["balance"], -3)), step=10_000.0, format="%.0f", key="mc_target",
+    target_default = float(round(final["balance"], -3))
+    if st.session_state.get("_mc_target_base") != target_default or "mc_target" not in st.session_state:
+        st.session_state["_mc_target_base"] = target_default  # inputs above changed: reset to match
+        st.session_state["mc_target"] = target_default
+    target = m3.number_input("Target balance ($)", 0.0, 100_000_000.0, step=10_000.0, format="%.0f",
+                             key="mc_target",
                              help="Defaults to the fixed-return balance above.")
     n_sims = m4.selectbox("Simulations", [1000, 5000, 10000], index=1, key="mc_sims")
 

@@ -100,3 +100,32 @@ Append only, newest at the bottom. One entry per finished phase or cross-boundar
   - the professor name on slide 1
   - chart images for slides 5, 6 and 8
   - re-pricing on Nov 29
+
+## 2026-11-20, builder (claude): percent of wants or exact $ per month
+
+- **Asked by Ashton:** an option to invest an exact dollar amount per month instead of a percent of
+  wants; percent stays the default, and the Shadow and Roth math both run off whichever is picked.
+- **Done:**
+  - `core/invest.py` (new): `scale_purchases` (a share of each want on its own date), `monthly_buys`
+    (the amount on the 1st of every calendar month the spending spans), and the shared widgets.
+    The choice and the dollars live in `invest_mode` / `invest_dollars`, so they carry between pages.
+  - Shadow: "How much goes in" radio, then a "Share of each want" slider (default 100%, so the
+    default numbers are unchanged) or "Per month ($)" (starts at the Roth suggestion, $150 on the
+    sample). The KPI says "You put in" when it isn't 100% of wants; the compare table column is "Put in".
+  - Roth (My spending): the same radio; a "Share of monthly wants" slider that starts at the tiered
+    suggestion (25% on the sample, so $150 and $608,262 are unchanged), or the shared dollars. The
+    start re-trims when the monthly amount changes. `core/suggest.monthly_from_share` holds the rounding.
+  - Fixed the deck agent's finding: the Monte Carlo target now resets to the fixed-return balance
+    whenever that balance changes (it kept $608,000 after switching to "Enter my own").
+  - New data (a different upload or the sample) refills the suggested dollars.
+- **Taylor's suggestions, kept in mind, not built yet:** ignored transactions and custom categories
+  would flow through this unchanged (both pages take the already-filtered spending). Custom category
+  names will need a needs/wants flag, since the Shadow filters on `DISCRETIONARY`.
+- **Tests:** 117 pass (new `tests/test_invest.py`, share rounding, and app tests for both modes,
+  the cross-page carry-over and the target reset).
+- **Files:** `core/invest.py`, `core/suggest.py`, `core/state.py`, `app_pages/shadow.py`,
+  `app_pages/roth.py`, `tests/test_invest.py`, `tests/test_suggest.py`, `tests/test_app.py`, `README.md`.
+- **Not done yet:** the tutorial video and deck still show the old controls (no "How much goes in"
+  row). Re-record after the group settles Taylor's changes.
+- **Auditor:** hand-check six $200 buys on the sample ($1,200 put in), 50% of each want ($1,842.36),
+  and that $150/month gives $608,262 in both modes.

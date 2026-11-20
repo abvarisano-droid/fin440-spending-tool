@@ -2,12 +2,13 @@ import altair as alt
 import pandas as pd
 import streamlit as st
 
-from core import lab, ui
+from core import invest, lab, ui
 from core.categorize import ALL_CATEGORIES, DISCRETIONARY
 from core.portfolios import PRESETS
 from core.prices import clean_ticker, fetch_adjusted_close, fetch_many
 from core.shadow import build_shadow
-from core.state import require_transactions, spending_only
+from core.state import discretionary_monthly, require_transactions, spending_only
+from core.suggest import suggest_monthly
 
 ui.page_header(
     "Shadow portfolio",
@@ -43,6 +44,16 @@ with ui.section("shadow_controls"):
     cats = c2.multiselect("Wants to shadow", present, default=present, key="shadow_cats",
                           help="Only discretionary spending: the money you chose to spend, and could have "
                                "invested instead. Needs like groceries, gas and bills stay out.")
+    i1, i2 = st.columns([1, 2])
+    mode = invest.mode_radio(i1, "shadow",
+                             help="Percent of wants: each purchase invests that share of itself, on the day you "
+                                  "spent it. Exact $ per month: the same amount buys on the 1st of every month, "
+                                  "whatever you spent. The Roth page uses the same choice.")
+    if mode == invest.PERCENT:
+        share_pct = i2.slider("Share of each want", 5, 100, 100, 5, format="%d%%", key="shadow_pct",
+                              help="100% = every want dollar is invested instead.")
+    else:
+        dollars = invest.dollars_input(i2, "shadow", suggest_monthly(discretionary_monthly(tx)).monthly)
 
 ticker = clean_ticker(raw_ticker)
 if ticker is None:
@@ -52,18 +63,26 @@ spend = tx[tx["category"].isin(cats)]
 if spend.empty:
     st.warning("Pick at least one category.")
     st.stop()
+# what actually buys the fund: a share of each want on its own date, or a fixed amount every month
+if mode == invest.PERCENT:
+    buys = invest.scale_purchases(spend, share_pct / 100)
+    plan = "every want" if share_pct == 100 else f"{share_pct}% of every want"
+else:
+    buys = invest.monthly_buys(spend, dollars)
+    plan = f"\\${dollars:,.0f} on the 1st of each month ({len(buys)} months)"
 
 with st.spinner(f"Getting {ticker} prices..."):
     try:
-        prices = fetch_adjusted_close(ticker, spend["date"].min())
+        prices = fetch_adjusted_close(ticker, buys["date"].min())
     except RuntimeError as exc:
         st.error(str(exc))
         st.stop()
 
-res = build_shadow(spend, prices)
+res = build_shadow(buys, prices)
 
 ui.kpi_row("shadow_kpis", [
-    dict(label="You spent", value=f"${res.invested:,.2f}"),
+    dict(label="You spent" if mode == invest.PERCENT and share_pct == 100 else "You put in",
+         value=f"${res.invested:,.2f}"),
     dict(label=f"In {ticker} it'd be worth", value=f"${res.value:,.2f}",
          # sign first: Streamlit only colors a delta red/down when it starts with "-"
          delta=f"{'-' if round(res.gain, 2) < 0 else '+'}${abs(res.gain):,.2f} "
@@ -76,6 +95,7 @@ ui.kpi_row("shadow_kpis", [
               "not a close. Prices refresh hourly."),
 ])
 
+st.caption(f":material/payments: Investing {plan}, out of \\${spend['amount'].sum():,.2f} of wants.")
 if res.skipped:
     st.info(f"{res.skipped} purchase(s) are after the latest {ticker} close and are left out.")
 
@@ -100,8 +120,8 @@ with ui.section("shadow_compare", "Same purchases, four portfolios"):
     if picks:
         try:
             with st.spinner("Getting fund prices..."):
-                cmp_prices = fetch_many(lab.tickers_for(picks), spend["date"].min())
-            ports = lab.preset_portfolios(spend, cmp_prices, picks)
+                cmp_prices = fetch_many(lab.tickers_for(picks), buys["date"].min())
+            ports = lab.preset_portfolios(buys, cmp_prices, picks)
         except (RuntimeError, ValueError) as exc:
             st.error(str(exc))
         else:
@@ -120,13 +140,13 @@ with ui.section("shadow_compare", "Same purchases, four portfolios"):
             )
             st.dataframe(
                 pd.DataFrame([{
-                    "Portfolio": n, "Worth now": p.value, "Gain": p.gain, "Spent": p.invested,
+                    "Portfolio": n, "Worth now": p.value, "Gain": p.gain, "Put in": p.invested,
                     "Return": p.simple_return * 100,
                     "XIRR": p.xirr * 100 if p.xirr is not None else None,
                 } for n, p in ports.items()]),
                 hide_index=True,
                 column_config={
-                    "Spent": st.column_config.NumberColumn(format="dollar"),
+                    "Put in": st.column_config.NumberColumn(format="dollar"),
                     "Worth now": st.column_config.NumberColumn(format="dollar"),
                     "Gain": st.column_config.NumberColumn(format="dollar"),
                     "Return": st.column_config.NumberColumn(format="%.2f%%"),

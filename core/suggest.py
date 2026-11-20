@@ -29,13 +29,18 @@ def tier_for(wants_monthly: float) -> str:
     return "moderate" if wants_monthly <= 500 else "heavy"
 
 
+def monthly_from_share(wants_monthly: float, share: float) -> float:
+    """`share` of the monthly wants, rounded to the nearest $25 (halves up), at least $25,
+    at most the IRA limit spread over 12 months."""
+    amount = max(math.floor(max(float(wants_monthly), 0.0) * share / 25 + 0.5) * 25, 25.0)
+    return float(min(amount, tvm.IRA_LIMIT_2026 / 12))
+
+
 def suggest_monthly(wants_monthly: float) -> Suggestion:
     wants_monthly = max(float(wants_monthly), 0.0)
     tier = tier_for(wants_monthly)
     share = SHARES[tier]
-    amount = max(math.floor(wants_monthly * share / 25 + 0.5) * 25, 25.0)  # nearest $25, halves up
-    amount = min(amount, tvm.IRA_LIMIT_2026 / 12)
-    return Suggestion(float(amount), tier, share, wants_monthly)
+    return Suggestion(monthly_from_share(wants_monthly, share), tier, share, wants_monthly)
 
 
 def starting_room(monthly: float) -> float:

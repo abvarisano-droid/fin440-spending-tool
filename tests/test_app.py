@@ -40,20 +40,34 @@ def test_roth_funds_from_spending_on_sample():
     at.switch_page("app_pages/roth.py").run()
     assert not at.exception and not at.error
     assert at.radio(key="roth_mode").value == "My spending"
+    assert at.radio(key="roth_invest_mode").value == "Percent of wants"   # percent is the default
+    assert at.slider(key="roth_pct").value == 25
     assert at.number_input(key="roth_start_sp").value == 3684.72
-    assert at.number_input(key="roth_monthly_sp").value == 150
     assert any("$150/month" in c.value and "614.12/month" in c.value for c in at.caption)
     assert any("614.12/month" in m.value for m in at.markdown)
     at.radio(key="roth_mode").set_value("Enter my own").run()
     assert not at.exception and not at.error
-    # coming back (mode switch or another page) refills the boxes instead of resetting them to $0
+    # coming back (mode switch or another page) refills the start instead of resetting it to $0
     at.radio(key="roth_mode").set_value("My spending").run()
     assert at.number_input(key="roth_start_sp").value == 3684.72
-    assert at.number_input(key="roth_monthly_sp").value == 150
     at.switch_page("app_pages/spending.py").run()
     at.switch_page("app_pages/roth.py").run()
     assert at.number_input(key="roth_start_sp").value == 3684.72
     assert at.metric[0].value == "$608,262"
+
+
+def test_roth_percent_slider_drives_monthly():
+    # 50% of $614.12 = $307.06 -> $300/month; 7,500 - 3,600 leaves $3,900, so the $3,684.72 start fits
+    at = _loaded()
+    at.switch_page("app_pages/roth.py").run()
+    at.slider(key="roth_pct").set_value(50).run()
+    assert not at.exception and not at.error
+    assert any("$300/month" in c.value for c in at.caption)
+    assert at.number_input(key="roth_start_sp").value == 3684.72
+    # 100% = $614.12 -> $625, the whole yearly limit, so no room is left for a starting balance
+    at.slider(key="roth_pct").set_value(100).run()
+    assert any("$625/month" in c.value for c in at.caption)
+    assert at.number_input(key="roth_start_sp").value == 0
 
 
 def test_roth_start_keeps_first_year_within_ira_limit():
@@ -62,11 +76,50 @@ def test_roth_start_keeps_first_year_within_ira_limit():
     at = _loaded()
     at.switch_page("app_pages/roth.py").run()
     at.multiselect(key="roth_cats").set_value(list(at.multiselect(key="roth_cats").options)).run()
-    assert at.number_input(key="roth_monthly_sp").value == 300
+    assert any("$300/month" in c.value for c in at.caption)
     assert at.number_input(key="roth_start_sp").value == 3900
     assert not at.warning
-    at.number_input(key="roth_monthly_sp").set_value(400).run()
+    at.number_input(key="roth_start_sp").set_value(5000).run()
     assert at.warning
+
+
+def test_exact_dollars_drive_roth_and_shadow():
+    # "Exact $ per month" picked on the Roth page carries to the Shadow page with the same amount
+    at = _loaded()
+    at.switch_page("app_pages/roth.py").run()
+    at.radio(key="roth_invest_mode").set_value("Exact $ per month").run()
+    assert not at.exception and not at.error
+    assert at.number_input(key="roth_invest_dollars").value == 150          # starts at the suggestion
+    assert at.metric[0].value == "$608,262"                                  # same plan as 25%
+    at.number_input(key="roth_invest_dollars").set_value(200).run()
+    # $3,684.72 start (7,500 - 2,400 = 5,100 room, so no trim) + $200/month, 21 -> 65 at 7% APR
+    assert at.number_input(key="roth_start_sp").value == 3684.72
+    assert at.metric[0].value != "$608,262"
+    at.switch_page("app_pages/shadow.py").run()
+    assert not at.exception and not at.error
+    assert at.radio(key="shadow_invest_mode").value == "Exact $ per month"
+    assert at.number_input(key="shadow_invest_dollars").value == 200
+    # sample spans May to October: six buys of $200
+    assert at.metric[0].label == "You put in" and at.metric[0].value == "$1,200.00"
+
+
+def test_shadow_percent_of_each_want():
+    at = _loaded()
+    at.switch_page("app_pages/shadow.py").run()
+    assert at.radio(key="shadow_invest_mode").value == "Percent of wants"
+    assert at.metric[0].label == "You spent" and at.metric[0].value == "$3,684.72"   # 100% default
+    at.slider(key="shadow_pct").set_value(50).run()
+    assert not at.exception and not at.error
+    assert at.metric[0].label == "You put in" and at.metric[0].value == "$1,842.36"
+
+
+def test_monte_carlo_target_follows_the_balance():
+    # the target used to keep $608,000 from "My spending" after switching to "Enter my own"
+    at = _loaded()
+    at.switch_page("app_pages/roth.py").run()
+    assert at.number_input(key="mc_target").value == 608_000
+    at.radio(key="roth_mode").set_value("Enter my own").run()
+    assert at.number_input(key="mc_target").value == 705_000
 
 
 def test_roth_monte_carlo_mean_near_closed_form():
