@@ -46,6 +46,9 @@ CATEGORICAL = [
     "#B4BAB5",  # Other
 ]
 CATEGORY_COLORS = dict(zip(ALL_CATEGORIES, CATEGORICAL))
+# Fills for user-made categories (rename or split on Spending), in order of first appearance,
+# cycling if there are more. Hues the built-in 14 do not use: cerulean, orange, indigo, wine, emerald.
+CUSTOM_CATEGORY_COLORS = ["#1B8FB5", "#E0832F", "#3D3FA8", "#7E1F3B", "#2A9D5C"]
 ACCENT = "#0A716C"
 FAN_OUTER = "#C4F6F3"
 FAN_INNER = "#6FD9D1"
@@ -236,11 +239,19 @@ def _apply_named_series_colors(c: alt.Chart) -> alt.Chart:
             )
         )
     if field == "category":
-        seen = set(_field_values(c, "category"))
-        domain = [k for k in CATEGORY_COLORS if k in seen] or list(CATEGORY_COLORS.keys())
+        values = _field_values(c, "category")
+        seen = set(values)
+        builtin = [k for k in CATEGORY_COLORS if k in seen]
+        custom = [v for v in values if v not in CATEGORY_COLORS]
+        domain = builtin + custom
+        range_ = [CATEGORY_COLORS[k] for k in builtin] + [
+            CUSTOM_CATEGORY_COLORS[i % len(CUSTOM_CATEGORY_COLORS)] for i in range(len(custom))
+        ]
+        if not domain:
+            domain, range_ = list(CATEGORY_COLORS.keys()), list(CATEGORY_COLORS.values())
         out = c.encode(color=alt.Color(
             "category:N",
-            scale=alt.Scale(domain=domain, range=[CATEGORY_COLORS[k] for k in domain]),
+            scale=alt.Scale(domain=domain, range=range_),
             legend=_legend(2),
         ))
         if _mark_type(c) == "bar":
