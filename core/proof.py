@@ -94,8 +94,10 @@ def run_checks(tx_all: pd.DataFrame, spend: pd.DataFrame, voo: pd.Series, sample
             "Sum of every negative Amount in the sample file, read line by line with Python's csv "
             "module (before transfers are excluded)."))
     voo = voo.dropna().sort_index()
-    shadow = build_shadow(spend, voo)
-    brute = brute_force_shadow(list(spend["date"]), list(spend["amount"]), list(voo.index),
+    # the Shadow page invests only discretionary (wants) spending
+    wants = spend[spend["discretionary"]] if "discretionary" in spend.columns else spend
+    shadow = build_shadow(wants, voo)
+    brute = brute_force_shadow(list(wants["date"]), list(wants["amount"]), list(voo.index),
                                list(voo.to_numpy(dtype=float)))
     checks.append(Check("Shadow: VOO value vs a brute-force loop", shadow.value, brute, 0.005,
                         "Plain Python loop: each purchase buys at the first close on or after its date."))
@@ -103,8 +105,8 @@ def run_checks(tx_all: pd.DataFrame, spend: pd.DataFrame, voo: pd.Series, sample
     if bnd is not None:
         bnd = bnd.dropna().sort_index()
         both = voo.index.intersection(bnd.index)
-        mix = build_portfolio(spend, {"VOO": voo, "BND": bnd}, {"VOO": 0.6, "BND": 0.4})
-        dates, amts = list(spend["date"]), spend["amount"].to_numpy(dtype=float)
+        mix = build_portfolio(wants, {"VOO": voo, "BND": bnd}, {"VOO": 0.6, "BND": 0.4})
+        dates, amts = list(wants["date"]), wants["amount"].to_numpy(dtype=float)
         brute_mix = sum(brute_force_shadow(dates, list(amts * w), list(both), list(s.loc[both].to_numpy(dtype=float)))
                         for s, w in ((voo, 0.6), (bnd, 0.4)))
         checks.append(Check("Portfolio: 60/40 VOO/BND vs a brute-force loop", mix.value, brute_mix, 0.005,
@@ -204,7 +206,7 @@ def build_workbook(spend: pd.DataFrame, voo: pd.Series, app: dict) -> bytes:
         "Each sheet recomputes an app number with Excel formulas, next to the app's own value.",
         "The Difference cells should all be 0 (or a rounding speck). Change any input to see it flow.",
         "Roth: Excel FV() on the app's default inputs.",
-        "Shadow: every purchase buys VOO at the first close on or after it; value at the latest close.",
+        "Shadow: every discretionary (wants) purchase buys VOO at the first close on or after it; value at the latest close.",
         "Prices are Yahoo Finance dividend-adjusted closes as of the download.",
     ]
     for i, t in enumerate(notes, start=3):

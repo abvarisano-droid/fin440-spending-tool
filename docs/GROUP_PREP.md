@@ -21,6 +21,10 @@ spending figures do not.
 - *Q: Why not net refunds?* A bank CSV can't reliably tell a refund from income.
 
 ## Shadow portfolio
+- **Wants only:** it shadows discretionary spending (dining, coffee, entertainment, shopping,
+  subscriptions, travel), $3,684.72 on the sample. *Q: Why not groceries?* You have to buy food;
+  the question is what the money you chose to spend could have done. On Nov 19: VOO $3,498.99
+  (-5.0%), 60/40 -3.3%, BND -0.6%, SCHD $3,807.44 (+3.3%).
 - Each purchase buys **fractional shares** at the close of the first trading day on or after it:
   shares = amount / price. Value today = shares x latest price, summed.
 - **Adjusted closes** fold dividends back into the price, so dividends count as reinvested.

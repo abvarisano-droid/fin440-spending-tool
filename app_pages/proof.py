@@ -48,7 +48,7 @@ with ui.section("proof_checks", "Live checks"):
 
 by_name = {c.name: c for c in checks}
 workbook = proof.build_workbook(
-    spend, prices["VOO"],
+    spend[spend["discretionary"]], prices["VOO"],
     app=dict(
         shadow_value=by_name["Shadow: VOO value vs a brute-force loop"].app,
         roth_fv=by_name["Roth: app vs Excel FV(7%/12, 528, -200)"].app,

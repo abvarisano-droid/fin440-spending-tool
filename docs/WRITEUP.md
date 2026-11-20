@@ -39,7 +39,7 @@ Chapters refer to Bodie, Kane & Marcus, *Investments*, 13th edition, as covered 
 | Page | What it computes | BKM 13e chapters |
 |---|---|---|
 | Spending breakdown | Gross purchases by category; discretionary (wants) share | Ch 1 (saving vs. consumption), Ch 12 (impulse spending, mental accounting) |
-| Shadow portfolio | Each purchase buys fractional shares at the first close on or after its date, using dividend-adjusted prices (dividends reinvested). Value today, gain, money-weighted return (XIRR) | Ch 2 (asset classes, stock and bond indexes), Ch 5 (holding-period returns, compounding) |
+| Shadow portfolio | Each discretionary (wants) purchase buys fractional shares at the first close on or after its date, using dividend-adjusted prices (dividends reinvested). Value today, gain, money-weighted return (XIRR) | Ch 2 (asset classes, stock and bond indexes), Ch 5 (holding-period returns, compounding) |
 | Shadow: compare | The same purchases split 100% VOO, 60/40 VOO/BND, 100% BND, 100% SCHD | Ch 7 (efficient diversification: the stock-bond mix) |
 | Roth calculator | FV of a monthly annuity with the 2026 IRA limit and age-50 catch-up; APR vs. effective rate; ordinary annuity vs. annuity due; starting balance = your wants total (PV), suggested monthly by spending tier (PMT); 25%, 50% and all of your discretionary average redirected | Ch 5 (compounding, APR vs. EAR, real vs. nominal returns) |
 | Roth: uncertain returns | 5,000 simulated paths (normal returns, or replayed real fund months); percentile bands; odds of a target | Ch 5 (normal distribution, arithmetic vs. geometric averages: volatility drag) |
@@ -87,8 +87,9 @@ The audits caught real errors before they shipped:
 ## 5. What the output looks like (on the sample file)
 - **Spending:** $6,963.81 over 6 months ($1,160.63/month). Wants are 53% ($3,684.72). Top
   categories: Shopping $2,052, Groceries $1,627, Dining $764.
-- **Shadow portfolio:** the same $6,963.81 in VOO would be worth about $6,749 today (-3.1%). The
-  60/40 mix lost less, BND least (-0.6%), and the dividend fund SCHD gained (+3.7% on Nov 19).
+- **Shadow portfolio (wants only):** the $3,684.72 of wants in VOO would be worth $3,498.99 on
+  Nov 19 (-5.0%). The 60/40 mix lost less (-3.3%), BND least (-0.6%), and the dividend fund SCHD
+  gained (+3.3%, $3,807.44).
   Over a short window, which fund wins is mostly luck (health care XLV +10%, gold -15%), so the
   Roth uses long-run averages.
 - **Roth:**

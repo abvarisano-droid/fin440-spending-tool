@@ -3,7 +3,7 @@ import pandas as pd
 import streamlit as st
 
 from core import lab, ui
-from core.categorize import ALL_CATEGORIES
+from core.categorize import ALL_CATEGORIES, DISCRETIONARY
 from core.portfolios import PRESETS
 from core.prices import clean_ticker, fetch_adjusted_close, fetch_many
 from core.shadow import build_shadow
@@ -13,7 +13,7 @@ ui.page_header(
     "Shadow portfolio",
     course="FIN 440 link (Bodie, Kane & Marcus, 13e): Ch 2 (asset classes, stock and bond indexes), Ch 5 (holding-period returns, compounding), Ch 7 (stock-bond diversification).",
     lede=(
-        "What if every purchase had bought an index fund instead? Each dollar buys fractional "
+        "What if every want (dining, coffee, shopping and the rest) had bought an index fund instead? Each dollar buys fractional "
         "shares at the close of the first trading day on or after the purchase. Prices are "
         "dividend-adjusted, so dividends count as reinvested. No fees or taxes. Only the ticker and "
         "your earliest purchase date go to Yahoo Finance."
@@ -35,8 +35,14 @@ with ui.section("shadow_controls"):
     c1, c2 = st.columns([1, 2])
     raw_ticker = c1.text_input("Fund ticker", max_chars=10, key="shadow_ticker",
                                help="Any Yahoo Finance ticker, e.g. VOO, VTI, QQQ, SCHD.")
-    present = [c for c in ALL_CATEGORIES if c in set(tx["category"])]
-    cats = c2.multiselect("Categories to shadow", present, default=present, key="shadow_cats")
+    present = [c for c in ALL_CATEGORIES if c in DISCRETIONARY and c in set(tx["category"])]
+    if not present:
+        st.info("No discretionary (wants) spending found: dining, coffee, entertainment, shopping, "
+                "subscriptions or travel. Fix categories on the Spending page.")
+        st.stop()
+    cats = c2.multiselect("Wants to shadow", present, default=present, key="shadow_cats",
+                          help="Only discretionary spending: the money you chose to spend, and could have "
+                               "invested instead. Needs like groceries, gas and bills stay out.")
 
 ticker = clean_ticker(raw_ticker)
 if ticker is None:
