@@ -5,7 +5,7 @@ from core import montecarlo, tvm, ui
 from core.categorize import ALL_CATEGORIES, DISCRETIONARY
 from core.prices import clean_ticker, fetch_history
 from core.state import discretionary_monthly, get_transactions, spending_only
-from core.suggest import suggest_monthly
+from core.suggest import first_year_over, starting_room, suggest_monthly
 
 ui.page_header(
     "Roth IRA calculator",
@@ -40,10 +40,13 @@ with ui.section("roth_inputs"):
         picked_total = float(spend.loc[spend["category"].isin(cats), "amount"].sum())
         wants_monthly = picked_total / months
         sugg = suggest_monthly(wants_monthly)
-        start_default = round(min(picked_total, tvm.IRA_LIMIT_2026), 2)
-        # refill the two boxes whenever the categories change; edits stick otherwise
+        start_room = starting_room(sugg.monthly)
+        start_default = round(min(picked_total, start_room), 2)
+        # refill the two boxes when the categories change, and when Streamlit dropped their state
+        # (it does whenever the widgets weren't drawn: the other mode, or another page); edits stick otherwise
         sig = (tuple(cats), round(picked_total, 2))
-        if st.session_state.get("_roth_sig") != sig:
+        if (st.session_state.get("_roth_sig") != sig or "roth_start_sp" not in st.session_state
+                or "roth_monthly_sp" not in st.session_state):
             st.session_state["_roth_sig"] = sig
             st.session_state["roth_start_sp"] = start_default
             st.session_state["roth_monthly_sp"] = sugg.monthly
@@ -57,7 +60,8 @@ with ui.section("roth_inputs"):
             starting = st.number_input("Starting balance ($)", 0.0, 10_000_000.0, step=100.0, format="%.2f",
                                        key="roth_start_sp",
                                        help="What you spent on these categories in the file, put in as "
-                                            "this year's contribution.")
+                                            "this year's contribution. Together with 12 monthly payments it "
+                                            f"stays within the \\${tvm.IRA_LIMIT_2026:,.0f} yearly IRA limit.")
             monthly = st.number_input("Per month ($)", 0.0, 10_000.0, step=25.0, format="%.0f",
                                       key="roth_monthly_sp")
             tier_word = {"light": "light", "moderate": "moderate", "heavy": "on the heavy side"}[sugg.tier]
@@ -65,9 +69,13 @@ with ui.section("roth_inputs"):
                 f":material/lightbulb: You spent \\${picked_total:,.2f} on these over {months} months "
                 f"(\\${wants_monthly:,.2f}/month, {tier_word}). We suggest putting in "
                 f"{sugg.share:.0%} of that: **\\${sugg.monthly:,.0f}/month**."
-                + (f" The starting balance is capped at this year's \\${tvm.IRA_LIMIT_2026:,.0f} IRA limit."
-                   if picked_total > tvm.IRA_LIMIT_2026 else "")
+                + (f" The starting balance is trimmed to \\${start_room:,.2f} so this year's total stays "
+                   f"within the \\${tvm.IRA_LIMIT_2026:,.0f} IRA limit." if picked_total > start_room else "")
             )
+            if first_year_over(starting, monthly):
+                st.warning(f"Starting balance plus 12 months of \\${monthly:,.0f} is "
+                           f"\\${starting + 12 * monthly:,.2f}, over this year's \\${tvm.IRA_LIMIT_2026:,.0f} "
+                           f"IRA limit. Lower one of them to stay within it.")
         else:
             starting = st.number_input("Current Roth balance ($)", 0.0, 10_000_000.0, 0.0, step=100.0,
                                        format="%.0f", key="roth_start")

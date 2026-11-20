@@ -49,8 +49,11 @@ spending figures do not.
   balance, and the monthly box is pre-filled with a suggestion by tier: under $200/month of wants
   suggests 50%, $200 to $500 suggests 35%, over $500 suggests 25%, rounded to $25 and capped at
   $625. The sample's $614.12/month is the heavy tier: 25% = $153.53, so $150/month. 21 to 65 at
-  7%: $608,262. *Q: Why a smaller share for heavier spenders?* So the ask stays realistic: a
-  quarter of a big wants budget is still more dollars than half of a small one.
+  7%: $608,262. *Q: Why a smaller share for heavier spenders?* To keep the ask realistic: a
+  heavy spender is asked for a smaller slice. It is a simple tiered rule, so the suggestion steps
+  down right at a tier edge ($199.99/month suggests $100, $200 suggests $75); it is a starting
+  point you can edit, not advice. The start is trimmed so start plus 12 payments stays within the
+  $7,500 limit.
 - **Redirected wants table:** the sample's wants (dining, coffee, entertainment, shopping,
   subscriptions, travel) average $3,684.72 / 6 months = $614.12/month. All of it from 21 to 65
   at 7% grows to $2,164,990; 25% ($153.53) grows to $541,248; 50% to $1,082,495. $614.12 is under

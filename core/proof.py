@@ -18,7 +18,7 @@ import pandas as pd
 from core import montecarlo, tvm
 from core.portfolios import build_portfolio
 from core.shadow import build_shadow
-from core.suggest import suggest_monthly
+from core.suggest import starting_room, suggest_monthly
 
 # Roth defaults and Excel's own answer: =FV(0.07/12, 528, -200) in Excel 365 = 705,070.79
 ROTH_DEFAULTS = dict(current_age=21, retirement_age=65, monthly=200.0, rate=0.07)
@@ -133,7 +133,7 @@ def run_checks(tx_all: pd.DataFrame, spend: pd.DataFrame, voo: pd.Series, sample
 
     if disc_monthly and disc_total:
         sg = suggest_monthly(disc_monthly)
-        pv = min(disc_total, tvm.IRA_LIMIT_2026)
+        pv = min(disc_total, starting_room(sg.monthly))
         app_sugg = float(tvm.roth_projection(d["current_age"], d["retirement_age"], sg.monthly, d["rate"], pv,
                                              enforce_limit=False).iloc[-1]["balance"])
         checks.append(Check("Roth: suggested plan (your spending as the start, plus the suggestion) vs the formula",
@@ -225,6 +225,9 @@ def build_workbook(spend: pd.DataFrame, voo: pd.Series, app: dict) -> bytes:
         r[c].font = bold
     r.column_dimensions["A"].width = 28
     r.column_dimensions["B"].width = 16
+    r["B2"].number_format = "0.00%"
+    for c in ("B4", "B5", "B7", "B8", "B9"):
+        r[c].number_format = '"$"#,##0.00'
 
     # Shadow
     s = wb.create_sheet("Shadow")
@@ -253,7 +256,16 @@ def build_workbook(spend: pd.DataFrame, voo: pd.Series, app: dict) -> bytes:
     s["H6"], s["I6"] = "Difference", "=I5-I4"
     for c in ("H3", "H4", "H5", "H6"):
         s[c].font = bold
-    s.column_dimensions["H"].width = 18
+    # wide enough that dates and dollars never show as ##### when the file opens
+    money = '"$"#,##0.00'
+    for col, width in {"A": 12, "B": 11, "C": 12, "D": 11, "E": 11, "F": 12, "G": 3, "H": 18, "I": 13}.items():
+        s.column_dimensions[col].width = width
+    for rr in range(2, last + 1):
+        s.cell(rr, 2).number_format = s.cell(rr, 4).number_format = s.cell(rr, 6).number_format = money
+        s.cell(rr, 5).number_format = "0.000000"
+    for c in ("I1", "I3", "I4", "I5", "I6"):
+        s[c].number_format = money
+    s.freeze_panes = "A2"
 
     buf = io.BytesIO()
     wb.save(buf)

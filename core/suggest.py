@@ -36,3 +36,13 @@ def suggest_monthly(wants_monthly: float) -> Suggestion:
     amount = max(math.floor(wants_monthly * share / 25 + 0.5) * 25, 25.0)  # nearest $25, halves up
     amount = min(amount, tvm.IRA_LIMIT_2026 / 12)
     return Suggestion(float(amount), tier, share, wants_monthly)
+
+
+def starting_room(monthly: float) -> float:
+    """Most of this year's IRA limit left for a lump-sum start once 12 monthly payments are in."""
+    return max(tvm.IRA_LIMIT_2026 - 12 * monthly, 0.0)
+
+
+def first_year_over(starting: float, monthly: float) -> bool:
+    """True when a start plus 12 monthly payments exceeds this year's IRA limit (cent tolerance)."""
+    return starting + 12 * monthly > tvm.IRA_LIMIT_2026 + 0.005

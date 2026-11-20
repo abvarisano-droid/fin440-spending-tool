@@ -46,6 +46,27 @@ def test_roth_funds_from_spending_on_sample():
     assert any("614.12/month" in m.value for m in at.markdown)
     at.radio(key="roth_mode").set_value("Enter my own").run()
     assert not at.exception and not at.error
+    # coming back (mode switch or another page) refills the boxes instead of resetting them to $0
+    at.radio(key="roth_mode").set_value("My spending").run()
+    assert at.number_input(key="roth_start_sp").value == 3684.72
+    assert at.number_input(key="roth_monthly_sp").value == 150
+    at.switch_page("app_pages/spending.py").run()
+    at.switch_page("app_pages/roth.py").run()
+    assert at.number_input(key="roth_start_sp").value == 3684.72
+    assert at.metric[0].value == "$608,262"
+
+
+def test_roth_start_keeps_first_year_within_ira_limit():
+    # every category on the sample: $6,963.81 spent, $1,160.64/month -> $300 suggested,
+    # so the start is trimmed to 7,500 - 12 x 300 = $3,900
+    at = _loaded()
+    at.switch_page("app_pages/roth.py").run()
+    at.multiselect(key="roth_cats").set_value(list(at.multiselect(key="roth_cats").options)).run()
+    assert at.number_input(key="roth_monthly_sp").value == 300
+    assert at.number_input(key="roth_start_sp").value == 3900
+    assert not at.warning
+    at.number_input(key="roth_monthly_sp").set_value(400).run()
+    assert at.warning
 
 
 def test_roth_monte_carlo_mean_near_closed_form():

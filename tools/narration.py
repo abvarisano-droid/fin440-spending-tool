@@ -24,8 +24,8 @@ LINES = {
                 "and how much went to wants, like dining out and shopping.",
     "shadow": "Now the fun part. The shadow portfolio pretends every purchase bought an index fund "
               "that same day, and shows what it would be worth today.",
-    "compare": "Tap a fund to try it. Over a few months, the winner is mostly luck, "
-               "so here are four mixes side by side.",
+    "compare": "Tap a fund to try it, and see four mixes side by side. "
+               "Every dollar you spend is a dollar you could put to work.",
     "roth": "The Roth calculator starts from your own spending. What you spent on wants becomes "
             "your starting balance, and it suggests a monthly amount that fits how you spend.",
     "redirect": "And this is where your coffee habit turns into a retirement number.",
