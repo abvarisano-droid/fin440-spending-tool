@@ -6,7 +6,7 @@ fictional sample CSV only. The voice-over comes from tools/narration.py (Andrew,
 step is held for exactly as long as its line, so picture and voice stay in sync.
 Needs Playwright with Chrome, edge-tts and imageio-ffmpeg:
     python tools/record_tutorial.py http://localhost:8544
-Writes assets/tutorial.mp4 (1920x1080 H.264 with AAC audio).
+Writes assets/tutorial.mp4 (1920x1080 H.264 with AAC audio; the app fills the whole frame).
 """
 import os
 import shutil
@@ -25,8 +25,9 @@ ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 SAMPLE = os.path.join(ROOT, "sample_data", "sample_transactions.csv")
 OUT = os.path.join(ROOT, "assets", "tutorial.mp4")
 VIEW = dict(width=1280, height=720)   # CSS pixels
-SCALE = 1.5                           # device pixels -> 1920x1080 frames, crisp text
-FRAME = dict(width=1920, height=1080)
+# Playwright captures frames in CSS pixels, so record at the viewport size (a bigger record size only
+# pads the frame with grey) and scale up to 1080p in ffmpeg.
+OUT_W, OUT_H = 1920, 1080
 PAD = 0.35                            # breath after each line, seconds
 STEPS = 6
 
@@ -42,7 +43,7 @@ OVERLAY_JS = r"""
       text-align: center; box-shadow: 0 18px 50px rgba(10,20,32,.28); backdrop-filter: blur(10px);
       transition: opacity .4s, transform .4s; opacity: 0; }
     #tut-cap.on { opacity: 1; transform: translateX(-50%) translateY(0); }
-    #tut-chip { position: fixed; left: 28px; top: 22px; z-index: 99999; padding: 8px 16px;
+    #tut-chip { position: fixed; left: 28px; top: 88px; z-index: 100000; padding: 8px 16px;
       border-radius: 999px; background: rgba(255,255,255,.82); color: #1A1D1B; backdrop-filter: blur(12px);
       border: 1px solid rgba(10,113,108,.25); box-shadow: 0 8px 24px rgba(10,20,32,.12);
       font: 600 15px/1 Geist, "Segoe UI", Arial, sans-serif; letter-spacing: .02em;
@@ -89,6 +90,7 @@ class Director:
         self.page, self.clips, self.t0 = page, clips, t0
         self.cues = []      # (seconds from video start, mp3 path)
         self.cuts = []      # (start, end) stretches of page loading, removed in the edit
+        self.clicked = None
         self._end = 0.0
 
     # timing -------------------------------------------------------------
@@ -113,18 +115,23 @@ class Director:
         """Wait out a page load or re-render with no voice playing; that stretch is cut from the video."""
         self.wait_out()
         start = time.monotonic() - self.t0
+        if self.clicked is not None:      # cut from the click itself, so no half-drawn frame shows
+            start, self.clicked = min(start, self.clicked), None
         self.page.wait_for_timeout(250)
         if until:
             self.page.wait_for_function(until, timeout=timeout)
         if selector:
             self.page.wait_for_selector(selector, timeout=timeout)
+        # Streamlit greys out the previous run's elements until the rerun finishes; wait for none
+        self.page.wait_for_function("() => !document.querySelector('[data-stale=\"true\"]') && "
+                                    "!document.querySelector('[data-testid=\"stSpinner\"]')", timeout=timeout)
         if top:
             self.page.evaluate("""() => { for (const el of [document.scrollingElement,
                 document.querySelector('[data-testid="stMain"]'),
                 document.querySelector('[data-testid="stAppViewContainer"]')]) if (el) el.scrollTop = 0; }""")
         self.page.evaluate(OVERLAY_JS)
         self.page.wait_for_timeout(900)   # charts finish drawing and fonts settle
-        self.cuts.append((start + 0.2, time.monotonic() - self.t0 - 0.1))
+        self.cuts.append((start + 0.05, time.monotonic() - self.t0 - 0.1))
 
     # visuals ------------------------------------------------------------
     def chip(self, n, name):
@@ -188,9 +195,12 @@ class Director:
     def nav(self, slug):
         self.unspot()
         self.caption_off()
+        self.chip_off()
         sel = f"a[href*='{slug}']"
         self.point(sel)
         self.press()
+        self.page.wait_for_timeout(200)   # let the press read on screen
+        self.clicked = time.monotonic() - self.t0
         self.page.click(sel)
 
     def card(self, title, sub, ms):
@@ -219,8 +229,7 @@ def warm(browser):
 
 
 def tutorial(browser, video_dir, clips):
-    ctx = browser.new_context(viewport=VIEW, device_scale_factor=SCALE, record_video_dir=video_dir,
-                              record_video_size=FRAME)
+    ctx = browser.new_context(viewport=VIEW, record_video_dir=video_dir, record_video_size=VIEW)
     ctx.add_init_script(INIT_CARD)
     t0 = time.monotonic()
     page = ctx.new_page()
@@ -256,6 +265,8 @@ def tutorial(browser, video_dir, clips):
     d.point(".st-key-load_btn button")
     d.wait_out()
     d.press()
+    d.hold(200)
+    d.clicked = time.monotonic() - t0
     page.click(".st-key-load_btn button")
     d.unspot()
     d.load(".st-key-loaded_summary", top=False)
@@ -285,6 +296,8 @@ def tutorial(browser, video_dir, clips):
     d.spot(".st-key-shadow_chip")
     d.point(".st-key-shadow_chip button", "SCHD")
     d.press()
+    d.hold(200)
+    d.clicked = time.monotonic() - t0
     page.locator(".st-key-shadow_chip button", has_text="SCHD").first.click()
     d.unspot()
     d.load(until="() => [...document.querySelectorAll('.st-key-shadow_kpis [data-testid=\"stMetricLabel\"]')]"
@@ -349,7 +362,7 @@ def to_mp4(src, dst, cues, cuts, skip, total):
         args += ["-i", path]
     parts = [f"[0:v]trim=start={a:.3f}:end={b:.3f},setpts=PTS-STARTPTS[v{k}]" for k, (a, b) in enumerate(keep)]
     parts.append("".join(f"[v{k}]" for k in range(len(keep))) + f"concat=n={len(keep)}:v=1:a=0[vc]")
-    parts.append(f"[vc]fade=t=in:st=0:d=0.8:color=black,fade=t=out:st={length - 1.0:.2f}:d=1.0,"
+    parts.append(f"[vc]scale={OUT_W}:{OUT_H}:flags=lanczos,fade=t=in:st=0:d=0.8:color=black,fade=t=out:st={length - 1.0:.2f}:d=1.0,"
                  f"fps=30,format=yuv420p[vout]")
     for i, (at, _) in enumerate(cues, start=1):
         ms = int(remap(at) * 1000)
