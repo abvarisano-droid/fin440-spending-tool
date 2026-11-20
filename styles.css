@@ -21,6 +21,7 @@
   --ss-ghost-edge: #c4c9c3;
   --ss-field-edge: #8f958f;
   --ss-field-edge-hover: #4f5752;
+  --ss-control-off: #7a817b;
 
   --ss-serif: ui-serif, "New York", Georgia, "Times New Roman", serif;
   --ss-sans: Geist, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -182,9 +183,11 @@ html {
 /* Real blur only on a desktop with a fine pointer. */
 @media (min-width: 901px) and (hover: hover) and (pointer: fine) {
   [data-testid="stHeader"] {
-    background: rgba(255, 255, 255, 0.68);
-    backdrop-filter: saturate(1.6) blur(20px);
-    -webkit-backdrop-filter: saturate(1.6) blur(20px);
+    /* Near opaque and unsaturated: a cyan button scrolling under the pill stays a faint blur,
+       not a colored blob. */
+    background: rgba(255, 255, 255, 0.93);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
   }
 
   [data-testid="stTopNavLink"]:not([aria-current="page"]):hover {
@@ -379,19 +382,11 @@ h3 {
   transform: none !important;
 }
 
-/* Spending: the chart and the totals cards share one height on desktop. */
+/* Spending: the chart and the totals cards sit side by side, top-aligned, each as tall as its
+   own content (stretching the chart card to the table height left a band of empty glass). */
 @media (min-width: 641px) {
   [data-testid="stHorizontalBlock"]:has(.st-key-chart_by_category) {
-    align-items: stretch;
-  }
-
-  [data-testid="stColumn"]:has(.st-key-chart_by_category) > [data-testid="stVerticalBlock"],
-  [data-testid="stColumn"]:has(.st-key-table_by_category) > [data-testid="stVerticalBlock"],
-  [data-testid="stColumn"]:has(.st-key-chart_by_category) [data-testid="stLayoutWrapper"],
-  [data-testid="stColumn"]:has(.st-key-table_by_category) [data-testid="stLayoutWrapper"],
-  .st-key-chart_by_category,
-  .st-key-table_by_category {
-    height: 100%;
+    align-items: flex-start;
   }
 }
 
@@ -1269,4 +1264,73 @@ button[data-variant="pills"]:focus-visible,
 
 [data-testid="stCaptionContainer"]:has([aria-label="school icon"]) {
   margin: 0.25rem 0 0.35rem;
+}
+
+/* ---------------------------------------------------------------- 16. Final audit fixes (2026-11-19) */
+/* A paper strip fills the gap above the header pill, so content scrolling up disappears
+   before it reaches the pill instead of peeking over its top edge. */
+[data-testid="stHeader"]::before {
+  content: "";
+  position: absolute;
+  left: -16px;
+  right: -16px;
+  top: -13px;
+  height: 13px;
+  background: linear-gradient(180deg, var(--ss-paper) 0 70%, rgba(240, 246, 250, 0));
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  [data-testid="stHeader"]::before {
+    left: -8px;
+    right: -8px;
+    top: -9px;
+    height: 9px;
+  }
+}
+
+/* Off-state controls meet 3:1 against the card (#7A817B: 3.87:1 on the card, 3.67:1 on paper).
+   Toggle: the unchecked track is solid control-off with a white knob (4.0:1). */
+[data-testid="stCheckbox"] label:has(input[role="switch"]:not(:checked)) > span + div {
+  background-color: var(--ss-control-off) !important;
+}
+
+[data-testid="stCheckbox"] label:has(input[role="switch"]:not(:checked)) > span + div > div {
+  background-color: #ffffff !important;
+}
+
+/* Plain checkboxes: the unchecked box gets the same 3:1 edge. */
+[data-testid="stCheckbox"] label:has(input[type="checkbox"]:not([role="switch"]):not(:checked)) > span + div {
+  border-color: var(--ss-control-off) !important;
+  box-shadow: inset 0 0 0 1px var(--ss-control-off);
+}
+
+/* Radio circles: the unselected ring is control-off and 2px wide (outer 16px, inner 12px). */
+[data-testid="stRadioOption"]:not([data-selected="true"]) > div > div:first-child:not([data-testid="stMarkdownContainer"]) {
+  background-color: var(--ss-control-off) !important;
+  align-items: center;
+  justify-content: center;
+}
+
+[data-testid="stRadioOption"]:not([data-selected="true"]) > div > div:first-child:not([data-testid="stMarkdownContainer"]) > div {
+  width: 12px !important;
+  height: 12px !important;
+  background-color: #ffffff !important;
+}
+
+/* Multiselects wrap every chip onto as many lines as they need: no one-line strip with a
+   faded edge, no inner scroll, no fixed max height. */
+[data-testid="stMultiSelect"] .react-aria-ComboBox > [role="group"] {
+  max-height: none !important;
+  height: auto !important;
+  min-height: 40px;
+}
+
+[data-testid="stMultiSelect"] [data-testid="stMultiSelectTagsContainer"] {
+  flex-wrap: wrap !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
 }

@@ -66,6 +66,7 @@ Light only, like the site. Text pairs all pass WCAG AA, measured against the wor
 | label on dark | white 78% | Signature label and help icon | 5.72:1 or better |
 | field edge | `#8F958F` (hover `#4F5752`, focus teal plus a 3px halo) | Text inputs, number inputs, selects | 3.06:1 on white |
 | chip | cyan 20% on white, teal 28% edge, ink `#0A1420` | Multiselect chips | 16.3:1 |
+| control off | `#7A817B` (white knob or center) | Unchecked toggle track, unchecked radio ring (2px), unchecked checkbox edge | 3.87:1 on the card, 3.67:1 on paper, knob 4.0:1 |
 
 The teal was `#0B7A75` until 2026-11-19; it measured 4.34:1 on the sky glow and 4.44:1 on mint, so it moved one step darker. Every place that defines it moved together: `--ss-accent` / `--ss-green` and the focus halos in `styles.css`, `primaryColor`, `linkColor`, `greenColor` and the sequential stop in `config.toml`, and `ACCENT`, `SHADOW`, `GROWTH`, `BAND_STROKE`, VOO and Shopping in `core/ui.py`.
 
@@ -90,7 +91,7 @@ Sequential (teal ramp): `#EAFBFA` to `#19373F`, 10 stops in `config.toml`.
 - Radius: **24px** cards (20px on a phone), **18px** KPI tiles, expanders, alerts and the dropzone, **14px** inputs and tables; **pill (999px)** buttons, page links, `st.pills`, chips, the segmented control, header
 - Borders: glass edges are 1px white at 90%; widget hairlines 1px `border`
 - Depth (three levels, each with the inset top highlight): tiles and expanders `--ss-depth-1` (`0 10px 24px -16px`), cards `--ss-depth-2` (`0 28px 56px -28px`), hover lift `--ss-depth-3` (`0 36px 70px -28px`), fine pointers only
-- Header: the site's floating glass pill, 60px tall (56px phone), inset 12px top and 16px sides (8px on a phone), white 68% with `saturate(1.6) blur(20px)` only above 900px with a fine pointer; everything else gets white 95% to 96% and no live blur. Current page: white pill, ink 600 text, teal icon; other links muted `#4F5752` 500 (Streamlit's 60% ink measured 4.48:1, below AA)
+- Header: the site's floating glass pill, 60px tall (56px phone), inset 12px top and 16px sides (8px on a phone), white 93% with `blur(24px)` (no saturate, so a cyan button scrolling under it stays a faint blur, not a colored blob) only above 900px with a fine pointer; everything else gets white 95% to 96% and no live blur. A paper strip fills the gap above the pill so content never peeks over its top edge. Current page: white pill, ink 600 text, teal icon; other links muted `#4F5752` 500 (Streamlit's 60% ink measured 4.48:1, below AA)
 - Phone (max 640px): side padding 16px plus `env(safe-area-inset-*)`, h1 36px, KPI values 24px two-up, signature 36px, `st.pills` 44px, buttons, download buttons and in-page `stPageLink` 44px min-height and full width, file dropzone at least 88px tall, header Menu pill 36px tall inside the 44px-plus header
 
 ---
@@ -153,11 +154,11 @@ Keyed containers already exist. CSS targets `.st-key-<key>`. Keep these keys sta
 Order, top to bottom:
 
 1. Title: "Upload your transactions". Caption: session-only privacy line.
-2. **`upload_source`**: file uploader, then the ghost-pill "Use sample data" button on the same block (same as Clear data). After a real file, "Load transactions" is the only cyan primary. Sample is still one click for the fictional CSV.
+2. **`upload_source`**: file uploader, then "Use sample data" on the same block. It is the cyan primary until a file is chosen (deliberate, set in `upload.py`: with nothing uploaded it is the one next step), then drops to a ghost pill so "Load transactions" is the only cyan primary. Sample is still one click for the fictional CSV.
 3. **`column_mapper`** (only after a real file): glass card, subheader "Check the columns", three columns (date/description | amount mode | sign). Preview table `raw_preview` directly under the card. Primary "Load transactions" under the preview.
 4. **`loaded_summary`**: glass card after a successful load. Subheader "Loaded". Nested **`loaded_kpis`**: three metrics (Purchases, Total spent, Date range). Caption with source name. Two actions in a horizontal row: page link to spending, "Clear data" as a ghost pill.
 
-5. **`landing_preview`** (only while no data is loaded): glass card, title "See it in 45 seconds". `st.video` of `assets/preview.mp4` (autoplay, muted, loop; recorded on the fictional sample) fills the card width at 1280 and 390, 14px radius (`--ss-radius-control`, nested inside the 22px card), white 1px edge, no overflow. Caption under it in the muted caption style. Same hover lift, sheen and fallbacks as every glass card.
+5. **`landing_preview`** (only while no data is loaded and no file is picked): glass card, title "How to use it, in under two minutes". `st.video` of the tutorial (about 1:40, AI voice-over, autoplay muted, no loop; the caption tells viewers to turn the sound on; recorded on the fictional sample) fills the card width at 1280 and 390, 14px radius (`--ss-radius-control`, nested inside the 22px card), white 1px edge, no overflow. Caption under it in the muted caption style. Same hover lift, sheen and fallbacks as every glass card.
 
 Empty: title, caption, `upload_source`, then `landing_preview`. No mapper, no summary.
 
@@ -167,7 +168,7 @@ Order:
 
 1. Title. Course caption (`:material/school:` FIN 440 / BKM chapters). Then "Totals include only purchases unless you turn on transfers." Toggle "Include transfers and card payments" immediately under that (filter, not a card).
 2. **`spend_kpis`**: four metrics in one row: Total spent, Per month (avg), Discretionary, Discretionary share. The row container is unbordered; each metric is a glass KPI tile.
-3. Two-column row **3:2**: **`chart_by_category`** (bar, dollars on x, category on y) | **`table_by_category`** (totals + share progress).
+3. Two-column row **3:2**: **`chart_by_category`** (bar, dollars on x, category on y) | **`table_by_category`** (totals + share progress). Top-aligned, each card as tall as its content (stretching the chart card to the table left ~120px of empty glass).
 4. **`chart_by_month`**: full-width stacked bars by month.
 5. **`top_merchants`**: top 10 table, full width. Merchant pinned, Category before Visits. Swipe hint `swipe_hint_merchants` under it (phone only).
 6. Expander **`all_tx`**: editable category column. Collapsed by default.
@@ -219,8 +220,8 @@ Signatures stay stable: `section(key, title=None, border=True)`, `kpi_row(key, i
 - `kpi_row`: keyed container, equal `st.columns`, each `st.metric(..., border=True)`. CSS makes each a glass tile (top-aligned, 112px min) with serif 400 34px values; labels and deltas wrap, values never truncate. The shadow signature metric is wrapped as `.st-key-shadow_signature` (gain: `#7FF0E8`) or `.st-key-shadow_signature_down` (loss: `#FFB4A6`) and drawn as the dark hero tile, 46px. Roth growth (third `roth_kpis` value) is teal.
 - `chart`: Altair theme `spend_shadow` (also registered globally): legend on top (left, horizontal, 2 columns; line charts key with a short stroke, others with a dot), no view stroke, axis labels muted `#4F5752` 12px with 500 titles, y grid `#E3E9E8` only (no x grid), no axis domain or ticks except a hairline x domain, lines 2.25px with round caps, view clip off so long category labels stay whole, background transparent on the glass card. Field `series`: domain Spent (cumulative) then Value in {ticker}, range `SPENT` (`#B0603A`) / `SHADOW` (`#0A716C`). Field `part`: Contributions / Growth in `CONTRIBUTIONS` / `GROWTH`. Field `category`: pinned `CATEGORY_COLORS` (14 distinct fills); the scale domain is only categories present in the frame, so empty ones stay out of the legend. If `category` is on x or y, color is unset and the mark is a bar, `ui.chart` draws one teal `#0A716C` fill with 5px rounded bar ends and no legend (a ranked list: the axis already names each bar). Stacked category bars get a 1px white seam between segments. Field `name` or `portfolio`: `PORTFOLIO_COLORS` (VOO teal, 60/40 blue, BND muted, SCHD plum, SPY ink). An x field named `age` gets a tight scale (no zero, no nice). Named constants: `ui.SPENT`, `ui.SHADOW`, `ui.CONTRIBUTIONS`, `ui.GROWTH`, `ui.ACCENT`, `ui.MUTED`, `ui.PORTFOLIO_COLORS`, `ui.MARKET_NAMES`. Color encodings set a 2-column wrapping legend.
 - Extra helpers: `chart_fan(percentiles_df, key=...)` (Roth). `chart_histogram`, `chart_risk_return` and `chart_sml` stay in `ui.py` for the kept engines but no page calls them since the Risk and Timing test pages were removed (2026-11-19). Pages pass engine frames; they do not restyle these.
-- Primary button: cyan `#34E0D6` pill with `#0A1420` ink, 600. Secondary / "Use sample data" / "Clear data" / in-page `stPageLink`: frosted ghost pills, `#C4C9C3` edge, ink text, 44px tall. Download (`proof_xlsx`) is primary.
-- `st.pills` (`shadow_chip`): glass pills, 38px (44px phone); the picked one fills cyan with ink. Multiselect chips: cyan 20% glass, teal 28% edge, ink text. `roth_mode` radio: a segmented control (grey track, the selected option a raised white pill; full width on a phone); other radios stay native.
+- Primary button: cyan `#34E0D6` pill with `#0A1420` ink, 600. "Use sample data" is primary until a file is chosen. Secondary / "Use sample data" after a file / "Clear data" / in-page `stPageLink`: frosted ghost pills, `#C4C9C3` edge, ink text, 44px tall. Download (`proof_xlsx`) is primary.
+- `st.pills` (`shadow_chip`): glass pills, 38px (44px phone); the picked one fills cyan with ink. Multiselect chips: cyan 20% glass, teal 28% edge, ink text. `roth_mode` radio: a segmented control (grey track, the selected option a raised white pill; full width on a phone); other radios stay native, with a 2px `#7A817B` ring when unselected. Toggles: teal track when on, `#7A817B` track with a white knob when off. Multiselects wrap every chip onto as many lines as needed at every width (no one-line strip, no inner scroll, no max height).
 - Fields: 44px, white 86%, `#8F958F` edge, teal edge plus a 3px halo on focus. File dropzone: 1.5px dashed `#9AA19B`, radius 18, 96px tall (88px phone), teal edge on hover.
 - `st.caption` for helper copy. Course lines with `:material/school:` are teal 500 (`[aria-label="school icon"]`); other captions stay muted. `st.info` for the empty-upload pointer and skip/cap notices only.
 - Tables: header `#F4F8FA`, cell lines `#E6EBE8`, a soft outer edge (ink 8%), radius 14, tabular nums. Expanders: glass rows (18px radius); inside a card they become a quieter paper inset.
@@ -259,7 +260,7 @@ Streamlit app, so Lighthouse 95 is a stretch goal. Practical targets: no layout-
 
 ## Section 7 checklist (WEB_DESIGN_REFERENCE), v4 rerun 2026-11-19 (after)
 
-Checked against the running app at 1280px and 390px (sample data, fictional), walkthrough tags `before` (v3) and `after` (v4): 0 exceptions on every page view, no page-level sideways scroll (the overflow list only shows internal scrollers: the multiselect chip strip, chart SVG, table canvas, KaTeX), Proof 8 of 8.
+Checked against the running app at 1280px and 390px (sample data, fictional), walkthrough tags `before` (v3) and `after` (v4): 0 exceptions on every page view, no page-level sideways scroll (the overflow list only shows internal scrollers: chart SVG, table canvas, KaTeX), Proof 8 of 8.
 
 - [x] Exactly one signature moment: yes. Shadow "it'd be worth" is the only dark tile and the only 46px (36px phone) number; Roth MC and compare stay at 34px.
 - [x] Three layout alternatives compared: yes. Liquid Glass v8 light shipped; Night desk and Split studio parked.
@@ -267,7 +268,7 @@ Checked against the running app at 1280px and 390px (sample data, fictional), wa
 - [x] Motion in numbers: yes. Page-enter 420ms / 8px with 30ms stagger, card lift 300ms / 3px, tile lift 2px, primary lift 200ms / 2px, sheen 160ms, press scale 0.98, stale fade 250ms, easing `cubic-bezier(0.2, 0.8, 0.2, 1)`.
 - [x] Transform and opacity only: yes. Motion is transform and opacity; colors and shadows change without moving layout.
 - [x] Reduced-motion fallback: yes. Transitions, lifts, presses, sheen transition, entrance animation and smooth scroll all off. Reduced-transparency gives solid white glass; more-contrast darkens the edges.
-- [x] No 3D; one quiet video: yes. The Upload `landing_preview` loop is muted, sits inside a glass card and leaves once data loads. No cinematic hero; under reduced motion the reduced-motion rules still drop every CSS transition and lift (the video is user content with its own controls).
+- [x] No 3D; one quiet video: yes. The Upload `landing_preview` tutorial starts muted, plays once (no loop), sits inside a glass card and leaves once a file is picked or data loads. No cinematic hero; under reduced motion the reduced-motion rules still drop every CSS transition and lift (the video is user content with its own controls).
 - [x] Mobile-first wrap: yes. Columns wrap at 640px. 390px: full-width 44px buttons, KPI tiles two-up, title clears the header pill, no page-level sideways scroll, wide tables scroll inside their card with a swipe hint, nav is a labeled Menu pill.
 - [ ] Lighthouse 95 / CLS 0.00: no. Streamlit is not Lighthouse-clean. Contrast passes AA on the worst glow: text 14.23, muted 6.24, teal 4.89, red 5.83, cyan ink 11.27; course chip teal 5.59; hero label 5.72, gain 6.93, loss 5.51 (worst case, on the glow); nav links 7.45; chip ink 16.3; field edges 3.06 (non-text). Focus: 2px teal outline, 3px offset, plus a 3px halo on buttons, pills and fields. Light fills (fan outer, Other, Entertainment gold) are never text and the fan carries a teal edge.
 - [x] Specific decision: yes. Ashton's own site system (Liquid Glass v8 light, matched to the live site assets), not a default dashboard.
