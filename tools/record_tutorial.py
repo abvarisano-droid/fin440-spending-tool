@@ -56,7 +56,6 @@ OVERLAY_JS = r"""
       border-radius: 50%; background: rgba(10,20,32,.85); border: 3px solid #fff; pointer-events: none;
       box-shadow: 0 6px 18px rgba(10,20,32,.3); left: 640px; top: 420px;
       transition: left .9s cubic-bezier(.25,.9,.25,1), top .9s cubic-bezier(.25,.9,.25,1), transform .15s; }
-    [data-testid="stAppViewContainer"] { transition: transform 1.4s cubic-bezier(.25,.9,.25,1); }
     #tut-card { position: fixed; inset: 0; z-index: 100001; display: flex; flex-direction: column;
       align-items: center; justify-content: center; gap: 16px; color: #1A1D1B; transition: opacity .7s;
       background: radial-gradient(1200px 600px at 50% 40%, #FFFFFF 0%, #EAF4F8 55%, #DCEBF2 100%); }
@@ -110,13 +109,22 @@ class Director:
     def hold(self, ms):
         self.page.wait_for_timeout(ms)
 
-    def load(self, selector, timeout=60000):
-        """Wait for a slow page with no voice playing; that stretch is cut from the final video."""
+    def load(self, selector=None, until=None, top=True, timeout=60000):
+        """Wait out a page load or re-render with no voice playing; that stretch is cut from the video."""
         self.wait_out()
         start = time.monotonic() - self.t0
-        self.page.wait_for_selector(selector, timeout=timeout)
-        self.page.wait_for_timeout(700)   # let charts finish drawing
-        self.cuts.append((start + 0.25, time.monotonic() - self.t0 - 0.15))
+        self.page.wait_for_timeout(250)
+        if until:
+            self.page.wait_for_function(until, timeout=timeout)
+        if selector:
+            self.page.wait_for_selector(selector, timeout=timeout)
+        if top:
+            self.page.evaluate("""() => { for (const el of [document.scrollingElement,
+                document.querySelector('[data-testid="stMain"]'),
+                document.querySelector('[data-testid="stAppViewContainer"]')]) if (el) el.scrollTop = 0; }""")
+        self.page.evaluate(OVERLAY_JS)
+        self.page.wait_for_timeout(900)   # charts finish drawing and fonts settle
+        self.cuts.append((start + 0.2, time.monotonic() - self.t0 - 0.1))
 
     # visuals ------------------------------------------------------------
     def chip(self, n, name):
@@ -130,28 +138,39 @@ class Director:
     def caption_off(self):
         self.page.evaluate("() => document.getElementById('tut-cap').classList.remove('on')")
 
-    def spot(self, selector, pad=10, zoom=1.0):
-        """Scroll the block to the middle, push the camera in a touch, then spotlight it."""
-        self.page.evaluate("""([sel, pad, zoom]) => {
+    def spot(self, selector, pad=10, settle=0):
+        """Ease the page so the block sits in the middle, then glide the spotlight onto it."""
+        self.page.evaluate("""([sel, pad]) => new Promise(done => {
             const e = document.querySelector(sel); const s = document.getElementById('tut-spot');
-            const app = document.querySelector('[data-testid="stAppViewContainer"]');
-            if (!e) { s.style.opacity = 0; return; }
-            app.style.transform = 'none';
-            e.scrollIntoView({block: 'center', behavior: 'smooth'});
-            setTimeout(() => {
-              const b = e.getBoundingClientRect();
-              app.style.transformOrigin = (b.left + b.width / 2) + 'px ' + (b.top + b.height / 2) + 'px';
-              app.style.transform = 'scale(' + zoom + ')';
-              setTimeout(() => { const c = e.getBoundingClientRect();
+            if (!e) { s.style.opacity = 0; return done(); }
+            let box = e.parentElement;
+            while (box && box !== document.body && !(box.scrollHeight > box.clientHeight + 2 &&
+                   /(auto|scroll)/.test(getComputedStyle(box).overflowY))) box = box.parentElement;
+            const scroller = (box && box !== document.body) ? box : document.scrollingElement;
+            const view = scroller === document.scrollingElement ? window.innerHeight : scroller.clientHeight;
+            const r = e.getBoundingClientRect();
+            const from = scroller.scrollTop;
+            const max = scroller.scrollHeight - view;
+            const to = Math.max(0, Math.min(max, from + r.top + r.height / 2 - view / 2 - 20));
+            const dur = Math.abs(to - from) < 4 ? 0 : 900;
+            const t0 = performance.now();
+            const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+            const place = () => { const c = e.getBoundingClientRect();
                 Object.assign(s.style, {left: (c.left - pad) + 'px', top: (c.top - pad) + 'px',
-                  width: (c.width + 2 * pad) + 'px', height: (c.height + 2 * pad) + 'px', opacity: 1}); }, 1450);
-            }, 700); }""", [selector, pad, zoom])
-        self.page.wait_for_timeout(1900)
+                  width: (c.width + 2 * pad) + 'px', height: (c.height + 2 * pad) + 'px', opacity: 1}); };
+            const step = now => {
+                const k = dur ? Math.min(1, (now - t0) / dur) : 1;
+                scroller.scrollTop = from + (to - from) * ease(k);
+                if (k < 1) requestAnimationFrame(step); else { place(); setTimeout(done, 750); }
+            };
+            requestAnimationFrame(step);
+        })""", [selector, pad])
+        if settle:
+            self.page.wait_for_timeout(settle)
 
     def unspot(self):
-        self.page.evaluate("""() => { document.getElementById('tut-spot').style.opacity = 0;
-            document.querySelector('[data-testid="stAppViewContainer"]').style.transform = 'none'; }""")
-        self.page.wait_for_timeout(700)
+        self.page.evaluate("() => { document.getElementById('tut-spot').style.opacity = 0; }")
+        self.page.wait_for_timeout(450)
 
     def point(self, selector, text=None):
         """Glide the cursor to an element (optionally the first one whose text matches)."""
@@ -173,8 +192,6 @@ class Director:
         self.point(sel)
         self.press()
         self.page.click(sel)
-        self.page.wait_for_timeout(500)
-        self.page.evaluate("() => document.querySelector('[data-testid=\"stMain\"]').scrollTo({top: 0})")
 
     def card(self, title, sub, ms):
         self.page.evaluate("""([t, s]) => { const d = document.createElement('div'); d.id = 'tut-card';
@@ -223,41 +240,38 @@ def tutorial(browser, video_dir, clips):
     # 1. upload
     d.chip(1, "Upload")
     d.line("upload")
-    d.spot(".st-key-upload_source", zoom=1.04)
+    d.spot(".st-key-upload_source", settle=400)
     d.point('[data-testid="stFileUploaderDropzone"] button')
     d.wait_out()
+    d.press()
     page.set_input_files('[data-testid="stFileUploaderDropzoneInput"]', SAMPLE)
-    page.wait_for_selector(".st-key-column_mapper", timeout=30000)
-    d.hold(500)
+    d.unspot()
+    d.load(".st-key-column_mapper", top=False)
 
     # 2. columns
     d.chip(2, "Check the columns")
     d.line("columns")
-    d.spot(".st-key-column_mapper", zoom=1.03)
-    d.hold(600)
-    d.spot(".st-key-load_btn", zoom=1.0)
+    d.spot(".st-key-column_mapper", settle=1400)
+    d.spot(".st-key-load_btn")
     d.point(".st-key-load_btn button")
     d.wait_out()
     d.press()
     page.click(".st-key-load_btn button")
-    page.wait_for_selector(".st-key-loaded_summary", timeout=30000)
-    d.hold(400)
+    d.unspot()
+    d.load(".st-key-loaded_summary", top=False)
     d.line("loaded")
-    d.spot(".st-key-loaded_summary", zoom=1.03)
-    d.hold(1800)
-    d.spot(".st-key-use_sample", zoom=1.0)
+    d.spot(".st-key-loaded_summary", settle=2600)
+    d.spot(".st-key-use_sample")
     d.point(".st-key-use_sample button")
     d.wait_out()
 
     # 3. spending
     d.nav("spending")
     d.load(".st-key-spend_kpis")
-    page.evaluate(OVERLAY_JS)
     d.chip(3, "Spending")
     d.line("spending")
-    d.spot(".st-key-spend_kpis", zoom=1.05)
-    d.hold(1800)
-    d.spot(".st-key-chart_by_category", zoom=1.02)
+    d.spot(".st-key-spend_kpis", settle=2200)
+    d.spot(".st-key-chart_by_category")
     d.wait_out()
 
     # 4. shadow
@@ -265,19 +279,19 @@ def tutorial(browser, video_dir, clips):
     d.load(".st-key-shadow_compare [data-testid='stDataFrame']")
     d.chip(4, "Shadow portfolio")
     d.line("shadow")
-    d.spot(".st-key-shadow_kpis", zoom=1.05)
-    d.hold(1500)
-    d.spot(".st-key-chart_shadow", zoom=1.02)
+    d.spot(".st-key-shadow_kpis", settle=2200)
+    d.spot(".st-key-chart_shadow")
     d.wait_out()
-    d.line("compare")
-    d.spot(".st-key-shadow_chip", zoom=1.0)
+    d.spot(".st-key-shadow_chip")
     d.point(".st-key-shadow_chip button", "SCHD")
     d.press()
     page.locator(".st-key-shadow_chip button", has_text="SCHD").first.click()
-    page.wait_for_function("() => [...document.querySelectorAll('.st-key-shadow_kpis [data-testid=\"stMetricLabel\"]')]"
-                           ".some(e => e.innerText.includes('SCHD'))", timeout=30000)
-    d.hold(1600)
-    d.spot(".st-key-shadow_compare", zoom=1.0)
+    d.unspot()
+    d.load(until="() => [...document.querySelectorAll('.st-key-shadow_kpis [data-testid=\"stMetricLabel\"]')]"
+                 ".some(e => e.innerText.includes('SCHD'))", top=False)
+    d.line("compare")
+    d.spot(".st-key-shadow_kpis", settle=1800)
+    d.spot(".st-key-shadow_compare")
     d.wait_out()
 
     # 5. roth
@@ -285,10 +299,10 @@ def tutorial(browser, video_dir, clips):
     d.load(".st-key-roth_mc_kpis")
     d.chip(5, "Roth calculator")
     d.line("roth")
-    d.spot(".st-key-roth_inputs", zoom=1.02)
+    d.spot(".st-key-roth_inputs")
     d.wait_out()
     d.line("redirect")
-    d.spot(".st-key-roth_redirect", zoom=1.03)
+    d.spot(".st-key-roth_redirect")
     d.wait_out()
 
     # 6. proof
@@ -296,9 +310,8 @@ def tutorial(browser, video_dir, clips):
     d.load(".st-key-proof_download")
     d.chip(6, "Proof")
     d.line("proof")
-    d.spot(".st-key-proof_checks", zoom=1.02)
-    d.hold(2400)
-    d.spot(".st-key-proof_download", zoom=1.04)
+    d.spot(".st-key-proof_checks", settle=2600)
+    d.spot(".st-key-proof_download")
     d.wait_out()
 
     d.unspot()
